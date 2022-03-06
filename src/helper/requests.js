@@ -1,0 +1,53 @@
+import axios from './axios';
+
+export const getBalance = () => {
+	return axios.get('/account/balance');
+};
+
+export const getTransaction = (num) => {
+	return axios.get(
+		num ? `/transaction/?pageNumber=${num}&pageSize=10` : `/transaction`
+	);
+};
+
+export const getDataPlans = (each) => {
+	return axios.get(`/recharge/plans/${each}`);
+};
+
+export const makeSingleRecharge = (data) => {
+	return axios.post('/auth-recharge', data);
+};
+export const getSingleRechargeResponse = (id) => {
+	return axios.get(`/auth-recharge/${id}`);
+};
+
+export const makeScheduleRecharge = (data) => {
+	return axios.post('/auth-recharge/scheduled', data);
+};
+
+export const makeBulkRecharge = (data) => {
+	return axios.post('/auth-recharge/newbulk', data);
+};
+
+export const getBulkRechargeResponse = (id) => {
+	return axios.get(`/auth-recharge/newbulk/${id}`);
+};
+
+export const fundWallet = (data) => {
+	return axios.post('/account/fund', data);
+};
+
+export const getFundWalletResponse = (id) => {
+	return axios.get(`/account/fund/${id}`);
+};
+
+export const getBeneficiary = () => {
+	return axios.get('/beneficiary');
+};
+
+export const makeScheduledRecharge = (data) => {
+	return axios.post('/auth-recharge/scheduled', data);
+};
+export const getScheduledRechargeResponse = (id) => {
+	return axios.get(`/auth-recharge/scheduled/${id}`);
+};

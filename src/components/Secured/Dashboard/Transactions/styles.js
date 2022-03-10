@@ -70,7 +70,7 @@ export const TransactionTextStrong = styled(TransactionText)`
 
 export const TransactionButtonContainer = styled.div`
 	display: flex;
-	gap: 30px;
+	gap: 100px;
 	align-items: center;
 	justify-content: space-between;
 	margin-top: 30px;

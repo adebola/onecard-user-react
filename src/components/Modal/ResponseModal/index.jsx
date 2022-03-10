@@ -178,6 +178,23 @@ const ResponseModal = () => {
 									</>
 								</>
 							)}
+
+							{responseMessage === 'Bulk Excel Successful' && (
+								<>
+									<>
+										<IconBox>
+											<ImCheckmark color='#124A80' size={24} />
+										</IconBox>
+										<StrongText>Successful</StrongText>
+
+										<LightText>
+											Bulk Request has been submitted successfully, results will
+											be mailed to you
+										</LightText>
+									</>
+								</>
+							)}
+
 							{responseMessage === 'Something went wrong, please try again' && (
 								<>
 									<>

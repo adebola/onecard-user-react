@@ -7,6 +7,7 @@ import ModalCompo from '../Modal';
 import SendBeneModal from '../Modal/SendBeneModal';
 import ResponseModal from '../Modal/ResponseModal';
 import { ModalContext } from '../../context/ModalProvider';
+import ErrorModal from '../Modal/ErrorModal';
 
 const Container = styled.div`
 	${({ responseModal }) => {
@@ -36,6 +37,16 @@ const Container = styled.div`
 			`
 		);
 	}}
+	}}
+	${({ errorModal }) => {
+		return (
+			errorModal &&
+			css`
+				overflow: hidden;
+				height: 100vh;
+			`
+		);
+	}}
 `;
 const Inner = styled.div`
 	display: flex;
@@ -57,12 +68,18 @@ const FullWidth = styled.div`
 
 const Wrapper = ({ children }) => {
 	const { beneModal } = useContext(GlobalContext);
-	const { sendToBeneModal, responseModal } = useContext(ModalContext);
+	const { sendToBeneModal, responseModal, errorModal } =
+		useContext(ModalContext);
 	return (
-		<Container sendToBeneModal={sendToBeneModal} beneModal={beneModal}>
+		<Container
+			sendToBeneModal={sendToBeneModal}
+			beneModal={beneModal}
+			errorModal={errorModal}>
 			{beneModal && <ModalCompo />}
 			{sendToBeneModal && <SendBeneModal />}
 			{responseModal && <ResponseModal />}
+			{errorModal && <ErrorModal />}
+
 			<Inner>
 				<Sidebar />
 				<FullWidth>{children}</FullWidth>

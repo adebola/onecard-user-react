@@ -164,6 +164,7 @@ const ListOfBene = () => {
 				setResponseMessage(response.data.message);
 			}
 		} catch (error) {
+			console.log(error);
 			setBtnDisabled(false);
 			setResponseMessage('Something went wrong, please try again');
 			setResponseModal(true);

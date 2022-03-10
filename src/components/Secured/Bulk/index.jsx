@@ -12,13 +12,11 @@ import MenuList from '../../Hamburger/Menulist';
 import { AuthContext } from '../../../context/AuthProvider';
 import { GlobalContext } from '../../../context/GlobalProvider';
 import { ModalContext } from '../../../context/ModalProvider';
-import {
-	getBulkRechargeResponse,
-	getSingleRechargeResponse,
-} from '../../../helper/requests';
+import { getBulkRechargeResponse } from '../../../helper/requests';
 
 const Bulk = () => {
 	const [toggle, setToggle] = useState(false);
+	const [rechargeType, setRechargeType] = useState(1);
 
 	const { authId } = useContext(AuthContext);
 
@@ -54,11 +52,14 @@ const Bulk = () => {
 				<Container>
 					<BulkBoxOne>
 						<SmallText text='Recharge' />
-						<Recharge />
+						<Recharge
+							rechargeType={rechargeType}
+							setRechargeType={setRechargeType}
+						/>
 					</BulkBoxOne>
 					<BulkBoxTwo>
 						<SmallText text='Recharge Details' />
-						<RechargeDetails />
+						<RechargeDetails rechargeId={rechargeType} />
 					</BulkBoxTwo>
 				</Container>
 			</Wrapper>

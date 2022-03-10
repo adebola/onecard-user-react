@@ -9,8 +9,7 @@ import {
 	SmallText,
 } from './styles';
 
-const Recharge = () => {
-	const [rechargeType, setRechargeType] = useState(1);
+const Recharge = ({ rechargeType, setRechargeType }) => {
 	const rechargeOptions = [
 		{
 			id: 1,

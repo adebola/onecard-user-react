@@ -1,7 +1,7 @@
 import styled from 'styled-components/macro';
 import InputMask from 'react-input-mask';
 
-export const MinHeight = styled.form`
+export const MinHeight = styled.div`
 	min-height: 302px;
 `;
 
@@ -28,7 +28,7 @@ export const TopContainer = styled.div`
 	grid-template-columns: repeat(5, 1fr);
 	gap: 10px;
 	margin-top: 20px;
-	margin-bottom: 60px;
+	margin-bottom: 40px;
 `;
 
 export const Grid = styled.div`
@@ -40,9 +40,16 @@ export const Grid = styled.div`
 	justify-content: center;
 	color: var(--text-color);
 	cursor: pointer;
+	transition: all 0.3s;
 	&.active {
 		background: var(--text-color);
 		color: var(--white);
+	}
+
+	&.dim {
+		opacity: 0.5;
+		cursor: default;
+		transition: all 0.3s;
 	}
 `;
 

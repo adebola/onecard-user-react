@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { GlobalContext } from '../../../../context/GlobalProvider';
+import MyStyledButton from '../../../MyStyledButton';
 import {
 	Amount,
 	Container,
@@ -22,7 +23,6 @@ import {
 	BULKRECHARGE,
 	TRANSACTIONS,
 } from '../../../../constant';
-import LinkButton from '../../../LinkButton';
 import { getTransaction } from '../../../../helper/requests';
 import NoContainer from '../../../NoContainer';
 
@@ -84,8 +84,8 @@ const Transactions = () => {
 			</>
 
 			<TransactionButtonContainer>
-				<LinkButton name='Bulk Recharge' to={BULKRECHARGE} />
-				<LinkButton name='Single Recharge' to={SINGLERECHARGE} />
+				<MyStyledButton name='Bulk Recharge' to={BULKRECHARGE} />
+				<MyStyledButton name='Single Recharge' to={SINGLERECHARGE} />
 			</TransactionButtonContainer>
 		</Container>
 	);

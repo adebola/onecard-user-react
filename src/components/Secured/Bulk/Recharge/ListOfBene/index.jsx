@@ -2,8 +2,12 @@ import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { GlobalContext } from '../../../../../context/GlobalProvider';
 import { GrFormClose } from 'react-icons/gr';
-import { makeBulkRecharge } from '../../../../../helper/requests';
+import {
+	makeBulkRecharge,
+	makeScheduledRecharge,
+} from '../../../../../helper/requests';
 import { ModalContext } from '../../../../../context/ModalProvider';
+import { convertDate } from '../../../../../utils/dateformat';
 const Container = styled.form`
 	background: var(--light-background);
 	margin-top: 50px;
@@ -105,7 +109,7 @@ const SmallText = styled.span`
 	color: var(--text-color);
 `;
 
-const ListOfBene = () => {
+const ListOfBene = ({ rechargeType }) => {
 	const [authUrl, setAuthUrl] = useState('');
 	useEffect(() => {
 		if (authUrl !== '') {
@@ -117,9 +121,15 @@ const ListOfBene = () => {
 
 	const [btnDisabled, setBtnDisabled] = useState(false);
 
-	const { listOfBulk, setListOfBulk, paymentMode, setResponseMessage } =
-		useContext(GlobalContext);
-	const { setResponseModal } = useContext(ModalContext);
+	const {
+		listOfBulk,
+		setListOfBulk,
+		paymentMode,
+		setResponseMessage,
+		startDate,
+	} = useContext(GlobalContext);
+	const { setResponseModal, setErrorMessage, setErrorModal } =
+		useContext(ModalContext);
 
 	const handleDelete = (index) => {
 		setListOfBulk(listOfBulk.filter((e, b) => b !== index));
@@ -132,6 +142,8 @@ const ListOfBene = () => {
 			return;
 		}
 
+		const scheduledDate = convertDate(startDate);
+
 		let bulkData;
 
 		const finalData = listOfBulk.map(({ recipient, ...each }) => ({
@@ -139,38 +151,76 @@ const ListOfBene = () => {
 			...each,
 		}));
 
-		if (paymentMode === 'wallet') {
-			bulkData = { paymentMode, recipients: finalData };
-		} else {
-			bulkData = {
-				paymentMode,
-				recipients: finalData,
-				redirectUrl: `${window.origin}${window.location.pathname}`,
-			};
-		}
-
-		try {
-			const response = await makeBulkRecharge(bulkData);
-			console.log(response);
-
-			if (response.data.authorizationUrl) {
-				setAuthUrl(response.data.authorizationUrl);
-				localStorage.setItem('id', JSON.stringify(response.data.id));
-				setBtnDisabled(false);
-				return;
+		if (rechargeType === 2) {
+			if (paymentMode === 'wallet') {
+				bulkData = {
+					paymentMode,
+					recipients: finalData,
+					scheduledDate,
+					rechargeType: 'bulk',
+				};
 			} else {
-				setBtnDisabled(false);
-				setResponseModal(true);
-				setResponseMessage(response.data.message);
+				bulkData = {
+					paymentMode,
+					scheduledDate,
+					rechargeType: 'bulk',
+					recipients: finalData,
+					redirectUrl: `${window.origin}${window.location.pathname}`,
+				};
 			}
-		} catch (error) {
-			console.log(error);
-			setBtnDisabled(false);
-			setResponseMessage('Something went wrong, please try again');
-			setResponseModal(true);
+
+			try {
+				const response = await makeScheduledRecharge(bulkData);
+				if (response.data.authorizationUrl) {
+					setAuthUrl(response.data.authorizationUrl);
+					localStorage.setItem('id', JSON.stringify(response.data.id));
+					localStorage.setItem('type', JSON.stringify(rechargeType));
+					setBtnDisabled(false);
+					return;
+				} else {
+					setBtnDisabled(false);
+					setResponseModal(true);
+					setResponseMessage('Schedule Success');
+				}
+			} catch (error) {
+				setBtnDisabled(false);
+				const message = error.response.data.message;
+				setErrorModal(true);
+				setErrorMessage(message);
+			}
+		} else {
+			if (paymentMode === 'wallet') {
+				bulkData = { paymentMode, recipients: finalData };
+			} else {
+				bulkData = {
+					paymentMode,
+					recipients: finalData,
+					redirectUrl: `${window.origin}${window.location.pathname}`,
+				};
+			}
+
+			try {
+				const response = await makeBulkRecharge(bulkData);
+				console.log(response);
+
+				if (response.data.authorizationUrl) {
+					setAuthUrl(response.data.authorizationUrl);
+					localStorage.setItem('id', JSON.stringify(response.data.id));
+					setBtnDisabled(false);
+					return;
+				} else {
+					setBtnDisabled(false);
+					setResponseModal(true);
+					setResponseMessage(response.data.message);
+				}
+			} catch (error) {
+				setBtnDisabled(false);
+				const message = error.response.data.message;
+				setErrorModal(true);
+				setErrorMessage(message);
+			}
 		}
 	};
-
 	return (
 		listOfBulk.length > 0 && (
 			<Container onSubmit={handleSubmit}>

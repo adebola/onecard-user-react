@@ -96,6 +96,7 @@ const RechargeDetails = ({ rechargeId }) => {
 					setFileSelect={setFileSelect}
 					setOptionId={setOptionId}
 					optionId={optionId}
+					fileSelect={fileSelect}
 				/>
 				{optionId === 1 && (
 					<TopContainer>

@@ -32,7 +32,19 @@ const ErrorModal = () => {
 										<ErrorBox>
 											<AiOutlineClose color='#DC3545' size={30} />{' '}
 										</ErrorBox>
-										<ErrorText>{errorMessage}</ErrorText>
+										<ErrorText>Error</ErrorText>
+										<LightText>{errorMessage}</LightText>
+									</>
+								</>
+							)}
+							{errorMessage ===
+								'Error processing Payment : (INSUFFICIENT FUNDS)' && (
+								<>
+									<>
+										<ErrorBox>
+											<AiOutlineClose color='#DC3545' size={30} />{' '}
+										</ErrorBox>
+										<ErrorText>INSUFFICIENT FUNDS</ErrorText>
 										<LightText>
 											Top up your account to perform your transaction
 										</LightText>

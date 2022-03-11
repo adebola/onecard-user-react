@@ -45,9 +45,18 @@ export const getBeneficiary = () => {
 	return axios.get('/beneficiary');
 };
 
+export const createBeneficiary = (data) => {
+	return axios.post('/beneficiary', data);
+};
+
+export const deleteBeneficiary = (id) => {
+	return axios.delete(`/beneficiary/${id}`);
+};
+
 export const makeScheduledRecharge = (data) => {
 	return axios.post('/auth-recharge/scheduled', data);
 };
+
 export const getScheduledRechargeResponse = (id) => {
 	return axios.get(`/auth-recharge/scheduled/${id}`);
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ScheduleDatePicker from '../../../DatePicker';
 import ListOfBene from './ListOfBene';
 
@@ -40,7 +40,7 @@ const Recharge = ({ rechargeType, setRechargeType }) => {
 						</div>
 					);
 				})}
-				<ListOfBene />
+				<ListOfBene rechargeType={rechargeType} />
 			</RechargeInner>
 		</RechargeContainer>
 	);

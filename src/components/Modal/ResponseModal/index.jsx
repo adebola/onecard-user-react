@@ -93,6 +93,41 @@ const ResponseModal = () => {
 									)}
 								</>
 							)}
+							{responseMessage === 'Schedule Success' && (
+								<>
+									<IconBox>
+										<ImCheckmark color='#124A80' size={24} />
+									</IconBox>
+									<StrongText>Success</StrongText>
+									{responseDetail && (
+										<LightText>
+											Your scheduled request was submitted successfully.
+										</LightText>
+									)}
+								</>
+							)}
+							{responseMessage === 'Delete' && (
+								<>
+									<IconBox>
+										<ImCheckmark color='#124A80' size={24} />
+									</IconBox>
+									<StrongText>Success</StrongText>
+									{responseDetail && (
+										<LightText>Beneficiary deleted successfully.</LightText>
+									)}
+								</>
+							)}
+
+							{responseMessage === 'Bene' && (
+								<>
+									<IconBox>
+										<ImCheckmark color='#124A80' size={24} />
+									</IconBox>
+									<StrongText>Success</StrongText>
+									<LightText>Beneficiary credited successfully</LightText>
+								</>
+							)}
+
 							{responseMessage === 'Data Recharge' && (
 								<>
 									<IconBox>
@@ -147,7 +182,7 @@ const ResponseModal = () => {
 										<StrongText>Successful</StrongText>
 
 										<LightText>
-											You bulk request has been submitted successfully
+											Your bulk request has been submitted successfully
 										</LightText>
 									</>
 								</>
@@ -161,7 +196,7 @@ const ResponseModal = () => {
 										<StrongText>Successful</StrongText>
 
 										<LightText>
-											You bulk request has been submitted successfully
+											Your bulk request has been submitted successfully
 										</LightText>
 									</>
 								</>

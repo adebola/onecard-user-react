@@ -5,6 +5,7 @@ import { getBeneficiary } from '../../../../helper/requests';
 import SingleBeneficiary from './SingleBene';
 
 import NoContainer from '../../../NoContainer';
+import { ModalContext } from '../../../../context/ModalProvider';
 
 const ListInner = styled.div`
 	padding: 1rem;
@@ -32,8 +33,9 @@ const SearchInput = styled.input`
 
 const Search = styled.div``;
 
-const ListOfBene = () => {
+const ListOfBene = ({ setReload }) => {
 	const { bene, setBene } = useContext(GlobalContext);
+	const { setErrorModal, setErrorMessage } = useContext(ModalContext);
 
 	useEffect(() => {
 		const awaitResponse = async () => {
@@ -41,11 +43,12 @@ const ListOfBene = () => {
 				const response = await getBeneficiary();
 				setBene(response.data);
 			} catch (error) {
-				console.log(error);
+				setErrorMessage(error.response.data.message);
+				setErrorModal(true);
 			}
 		};
 		awaitResponse();
-	}, []);
+	}, [setBene, setErrorMessage, setErrorModal]);
 
 	return (
 		<>
@@ -60,7 +63,13 @@ const ListOfBene = () => {
 						</Search>
 
 						{bene.map((each) => {
-							return <SingleBeneficiary key={each.id} each={each} />;
+							return (
+								<SingleBeneficiary
+									setReload={setReload}
+									key={each.id}
+									each={each}
+								/>
+							);
 						})}
 					</>
 				)}

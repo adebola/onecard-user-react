@@ -12,7 +12,10 @@ import MenuList from '../../Hamburger/Menulist';
 import { AuthContext } from '../../../context/AuthProvider';
 import { GlobalContext } from '../../../context/GlobalProvider';
 import { ModalContext } from '../../../context/ModalProvider';
-import { getBulkRechargeResponse } from '../../../helper/requests';
+import {
+	getBulkRechargeResponse,
+	getScheduledRechargeResponse,
+} from '../../../helper/requests';
 
 const Bulk = () => {
 	const [toggle, setToggle] = useState(false);
@@ -21,9 +24,33 @@ const Bulk = () => {
 	const { authId } = useContext(AuthContext);
 
 	const { setResponseMessage } = useContext(GlobalContext);
-	const { setResponseModal } = useContext(ModalContext);
+	const { setResponseModal, setErrorModal, setErrorMessage } =
+		useContext(ModalContext);
 	useEffect(() => {
 		if (authId === null) {
+			return;
+		}
+
+		if (authId === null) {
+			return;
+		}
+
+		if (localStorage.getItem('type')) {
+			const awaitResponse = async () => {
+				if (localStorage.getItem('id')) {
+					try {
+						const parsedId = JSON.parse(localStorage.getItem('id'));
+						await getScheduledRechargeResponse(parsedId);
+						setResponseModal(true);
+						setResponseMessage('Data Success');
+					} catch (error) {
+						const message = error.response.data.message;
+						setErrorModal(true);
+						setErrorMessage(message);
+					}
+				}
+			};
+			awaitResponse();
 			return;
 		}
 		const awaitResponse = async () => {
@@ -34,13 +61,20 @@ const Bulk = () => {
 					setResponseModal(true);
 					setResponseMessage(response.data.message);
 				} catch (error) {
-					setResponseMessage('Something went wrong, please try again');
-					setResponseModal(true);
+					const message = error.response.data.message;
+					setErrorModal(true);
+					setErrorMessage(message);
 				}
 			}
 		};
 		awaitResponse();
-	}, [authId, setResponseMessage, setResponseModal]);
+	}, [
+		authId,
+		setResponseMessage,
+		setResponseModal,
+		setErrorMessage,
+		setErrorModal,
+	]);
 
 	return (
 		<>

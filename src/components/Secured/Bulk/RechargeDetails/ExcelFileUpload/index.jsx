@@ -82,6 +82,7 @@ const ExcelFileUpload = ({
 	setFileSelect,
 	setOptionId,
 	optionId,
+	fileSelect,
 	rechargeId,
 }) => {
 	const [selectedFile, setSelectedFile] = useState(null);
@@ -149,7 +150,6 @@ const ExcelFileUpload = ({
 			const dateData = new Blob([JSON.stringify({ scheduledDate })], {
 				type: 'application/json',
 			});
-			console.log(dateData);
 			data.append('file', selectedFile);
 			data.append('date', dateData);
 
@@ -161,7 +161,6 @@ const ExcelFileUpload = ({
 				setSelectedFile(null);
 			} catch (error) {
 				const message = error.response.data.message;
-				console.log(message);
 				setErrorModal(true);
 				setErrorMessage(message);
 				setSelectedFile(null);

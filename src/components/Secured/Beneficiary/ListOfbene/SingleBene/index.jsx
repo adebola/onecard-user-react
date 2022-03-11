@@ -15,8 +15,20 @@ import {
 import { MdDeleteOutline } from 'react-icons/md';
 import { useContext } from 'react';
 import { ModalContext } from '../../../../../context/ModalProvider';
-const SingleBeneficiary = ({ each }) => {
-	const { setSendToBeneModal, setName } = useContext(ModalContext);
+import { deleteBeneficiary } from '../../../../../helper/requests';
+const SingleBeneficiary = ({ each, setReload }) => {
+	const { setSendToBeneModal, setName, setErrorMessage, setErrorModal } =
+		useContext(ModalContext);
+
+	const handleDelete = async (id) => {
+		try {
+			await deleteBeneficiary(id);
+			setReload(true);
+		} catch (e) {
+			setErrorMessage(e.response.data.message);
+			setErrorModal(true);
+		}
+	};
 
 	return (
 		<Container>
@@ -47,7 +59,11 @@ const SingleBeneficiary = ({ each }) => {
 						Send
 					</SendButton>
 					<Icon>
-						<MdDeleteOutline size={22} color='#FF0000' />
+						<MdDeleteOutline
+							size={22}
+							color='#FF0000'
+							onClick={() => handleDelete(each.id)}
+						/>
 					</Icon>
 				</Action>
 			</DetailsContainer>

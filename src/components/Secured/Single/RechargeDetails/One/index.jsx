@@ -83,8 +83,13 @@ const One = () => {
 		startDate,
 	} = useContext(GlobalContext);
 
-	const { setResponseModal, setResponseDetail, rechargeType } =
-		useContext(ModalContext);
+	const {
+		setResponseModal,
+		setResponseDetail,
+		setErrorMessage,
+		setErrorModal,
+		rechargeType,
+	} = useContext(ModalContext);
 
 	const handelSelectedDataPlans = (e) => {
 		setSelectedSingleDataPlans(e);
@@ -102,35 +107,41 @@ const One = () => {
 		const scheduledDate = convertDate(startDate);
 
 		if (rechargeType === 2) {
-			console.log('Two');
 			let data, localData;
 			if (paymentMode === 'wallet') {
-				console.log('Wallet');
 				data = {
-					productId: selectedSingleDataPlans.id,
-					recipient: singlePhoneNumber.replace(/\D+/g, ''),
 					paymentMode,
 					rechargeType: 'single',
 					scheduledDate,
-					serviceCode: serviceName,
+					recipients: [
+						{
+							recipient: singlePhoneNumber.replace(/\D+/g, ''),
+							productId: selectedSingleDataPlans.id,
+							serviceCode: serviceName,
+						},
+					],
 				};
+
 				const dataToDisplay = {
 					amount: selectedSingleDataPlans.value,
 					recipient: singlePhoneNumber,
 				};
 				setResponseDetail(dataToDisplay);
 			} else {
-				console.log('paystack');
-
 				data = {
-					productId: selectedSingleDataPlans.id,
-					recipient: singlePhoneNumber.replace(/\D+/g, ''),
 					paymentMode,
-					serviceCode: serviceName,
-					scheduledDate,
 					rechargeType: 'single',
+					scheduledDate,
+					recipients: [
+						{
+							recipient: singlePhoneNumber.replace(/\D+/g, ''),
+							productId: selectedSingleDataPlans.id,
+							serviceCode: serviceName,
+						},
+					],
 					redirectUrl: `${window.origin}${window.location.pathname}`,
 				};
+
 				localData = {
 					amount: selectedSingleDataPlans.value,
 					recipient: singlePhoneNumber,
@@ -155,8 +166,9 @@ const One = () => {
 					setResponseMessage('Data Recharge');
 				}
 			} catch (error) {
-				setResponseModal(true);
-				setResponseMessage('Something went wrong, please try again');
+				console.log({ ...error });
+				setErrorModal(true);
+				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
 			}
 		} else {
@@ -202,8 +214,9 @@ const One = () => {
 					setResponseMessage('Data Recharge');
 				}
 			} catch (error) {
-				setResponseModal(true);
-				setResponseMessage('Something went wrong, please try again');
+				console.log({ ...error });
+				setErrorModal(true);
+				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
 			}
 		}

@@ -80,8 +80,13 @@ const Two = () => {
 		startDate,
 	} = useContext(GlobalContext);
 
-	const { setResponseModal, setResponseDetail, rechargeType } =
-		useContext(ModalContext);
+	const {
+		setResponseModal,
+		setResponseDetail,
+		setErrorModal,
+		setErrorMessage,
+		rechargeType,
+	} = useContext(ModalContext);
 
 	useEffect(() => {
 		if (authUrl !== '') {
@@ -110,12 +115,16 @@ const Two = () => {
 			if (paymentMode === 'wallet') {
 				console.log('Wallet');
 				data = {
-					serviceCost: singleAmount,
-					recipient: singlePhoneNumber.replace(/\D+/g, ''),
 					paymentMode,
 					rechargeType: 'single',
 					scheduledDate,
-					serviceCode: serviceName,
+					recipients: [
+						{
+							recipient: singlePhoneNumber.replace(/\D+/g, ''),
+							serviceCode: serviceName,
+							serviceCost: singleAmount,
+						},
+					],
 				};
 				const dataToDisplay = {
 					amount: singleAmount,
@@ -124,12 +133,16 @@ const Two = () => {
 				setResponseDetail(dataToDisplay);
 			} else {
 				data = {
-					serviceCost: singleAmount,
-					recipient: singlePhoneNumber.replace(/\D+/g, ''),
 					paymentMode,
-					serviceCode: serviceName,
 					scheduledDate,
 					rechargeType: 'single',
+					recipients: [
+						{
+							recipient: singlePhoneNumber.replace(/\D+/g, ''),
+							serviceCode: serviceName,
+							serviceCost: singleAmount,
+						},
+					],
 					redirectUrl: `${window.origin}${window.location.pathname}`,
 				};
 				localData = {
@@ -138,8 +151,10 @@ const Two = () => {
 				};
 			}
 
+			console.log(data);
 			try {
 				const response = await makeScheduledRecharge(data);
+				console.log(response);
 				if (response.data.authorizationUrl !== null) {
 					setAuthUrl(response.data.authorizationUrl);
 					localStorage.setItem('id', JSON.stringify(response.data.id));
@@ -155,8 +170,9 @@ const Two = () => {
 					setResponseMessage('SUCCESS');
 				}
 			} catch (error) {
-				setResponseModal(true);
-				setResponseMessage('Something went wrong, please try again');
+				console.log({ ...error });
+				setErrorModal(true);
+				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
 			}
 		} else {
@@ -201,8 +217,9 @@ const Two = () => {
 					setResponseMessage('SUCCESS');
 				}
 			} catch (error) {
-				setResponseModal(true);
-				setResponseMessage('Something went wrong, please try again');
+				console.log({ ...error });
+				setErrorModal(true);
+				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
 			}
 		}

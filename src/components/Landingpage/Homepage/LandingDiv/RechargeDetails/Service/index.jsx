@@ -1,15 +1,25 @@
 import { useContext, useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { GlobalContext } from '../../../../../../context/GlobalProvider';
 import { getDataPlans } from '../../../../../../helper/noauthrequests';
 
 const Container = styled.div`
 	display: grid;
 	gap: 20px;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(6, 1fr);
 
 	${({ mb }) => {
 		return mb && 'margin-bottom: 20px';
+	}}
+
+	${({ gridTemplate }) => {
+		return (
+			gridTemplate &&
+			css`
+				grid-template-columns: repeat(9, 1fr);
+				gap: 20px;
+			`
+		);
 	}}
 `;
 
@@ -35,6 +45,7 @@ const Image = styled.img`
 `;
 
 const ServiceProvider = ({
+	type,
 	nepa,
 	setDataPlans,
 	serviceName,
@@ -67,7 +78,7 @@ const ServiceProvider = ({
 	}, [airtimeId, dataType, serviceName, setDataPlans]);
 
 	return (
-		<Container mb={mb}>
+		<Container mb={mb} gridTemplate={type}>
 			{data.map((each) => {
 				return (
 					<Item

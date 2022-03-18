@@ -2,6 +2,8 @@ import React, { useContext, useState, useEffect } from 'react';
 import ServiceProvider from '../Service';
 import mtn from '../../../../../assets/mtn.svg';
 import glo from '../../../../../assets/glo.svg';
+import spectranet from '../../../../../assets/nologg.png';
+import smile from '../../../../../assets/nosmile.png';
 import mobile from '../../../../../assets/9mobile.svg';
 import airtel from '../../../../../assets/airtel.svg';
 import ReactInputMask from 'react-input-mask';
@@ -34,9 +36,38 @@ const airtime = [
 		name: '9mobile',
 		img: mobile,
 	},
+
+	{
+		id: 5,
+		airtime: 'SPECTRANET-AIRTIME',
+		data: 'SPECTRANET-DATA',
+		name: 'spectranet',
+		img: spectranet,
+	},
+	{
+		id: 6,
+		airtime: 'SMILE-AIRTIME',
+		data: 'SMILE-DATA',
+		name: 'smile',
+		img: smile,
+	},
 ];
 
 const Input = styled(ReactInputMask)`
+	width: 100%;
+	margin: 15px 0;
+	height: 50px;
+	border: 1px solid var(--text-color);
+	border-radius: 4px;
+	outline: none;
+	padding: 0.5rem;
+	color: var(--text-color);
+	&::placeholder {
+		color: var(--text-color);
+	}
+`;
+
+const NormalInput = styled.input`
 	width: 100%;
 	margin: 15px 0;
 	height: 50px;
@@ -61,11 +92,10 @@ const Form = styled.form``;
 
 const One = () => {
 	const [authUrl, setAuthUrl] = useState('');
-
 	const [dataPlans, setDataPlans] = useState([]);
-
 	const [btnDisabled, setBtnDisabled] = useState(false);
 	const [serviceName, setServiceName] = useState('');
+
 	useEffect(() => {
 		if (authUrl !== '') {
 			window.location = authUrl;
@@ -73,6 +103,7 @@ const One = () => {
 		}
 		return;
 	}, [authUrl]);
+
 	const {
 		singlePhoneNumber,
 		setSinglePhoneNumber,
@@ -81,6 +112,9 @@ const One = () => {
 		paymentMode,
 		setResponseMessage,
 		startDate,
+		airtimeId,
+		accountNumber,
+		setAccountNumber,
 	} = useContext(GlobalContext);
 
 	const {
@@ -95,7 +129,9 @@ const One = () => {
 		setSelectedSingleDataPlans(e);
 	};
 
-	const disabled = !selectedSingleDataPlans || singlePhoneNumber === '';
+	const disabled =
+		!selectedSingleDataPlans ||
+		(singlePhoneNumber === '' && accountNumber === '');
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -115,7 +151,10 @@ const One = () => {
 					scheduledDate,
 					recipients: [
 						{
-							recipient: singlePhoneNumber.replace(/\D+/g, ''),
+							recipient:
+								singlePhoneNumber !== ''
+									? singlePhoneNumber.replace(/\D+/g, '')
+									: accountNumber,
 							productId: selectedSingleDataPlans.id,
 							serviceCode: serviceName,
 						},
@@ -124,7 +163,10 @@ const One = () => {
 
 				const dataToDisplay = {
 					amount: selectedSingleDataPlans.value,
-					recipient: singlePhoneNumber,
+					recipient:
+						singlePhoneNumber !== ''
+							? singlePhoneNumber.replace(/\D+/g, '')
+							: accountNumber,
 				};
 				setResponseDetail(dataToDisplay);
 			} else {
@@ -134,7 +176,10 @@ const One = () => {
 					scheduledDate,
 					recipients: [
 						{
-							recipient: singlePhoneNumber.replace(/\D+/g, ''),
+							recipient:
+								singlePhoneNumber !== ''
+									? singlePhoneNumber.replace(/\D+/g, '')
+									: accountNumber,
 							productId: selectedSingleDataPlans.id,
 							serviceCode: serviceName,
 						},
@@ -144,13 +189,15 @@ const One = () => {
 
 				localData = {
 					amount: selectedSingleDataPlans.value,
-					recipient: singlePhoneNumber,
+					recipient:
+						singlePhoneNumber !== ''
+							? singlePhoneNumber.replace(/\D+/g, '')
+							: accountNumber,
 				};
 			}
 
 			try {
 				const response = await makeScheduledRecharge(data);
-				console.log(response);
 				if (response.data.authorizationUrl !== null) {
 					setAuthUrl(response.data.authorizationUrl);
 					localStorage.setItem('id', JSON.stringify(response.data.id));
@@ -166,7 +213,6 @@ const One = () => {
 					setResponseMessage('Data Recharge');
 				}
 			} catch (error) {
-				console.log({ ...error });
 				setErrorModal(true);
 				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
@@ -176,26 +222,38 @@ const One = () => {
 			if (paymentMode === 'wallet') {
 				data = {
 					productId: selectedSingleDataPlans.id,
-					recipient: singlePhoneNumber.replace(/\D+/g, ''),
+					recipient:
+						singlePhoneNumber !== ''
+							? singlePhoneNumber.replace(/\D+/g, '')
+							: accountNumber,
 					paymentMode,
 					serviceCode: serviceName,
 				};
 				const dataToDisplay = {
 					amount: selectedSingleDataPlans.value,
-					recipient: singlePhoneNumber,
+					recipient:
+						singlePhoneNumber !== ''
+							? singlePhoneNumber.replace(/\D+/g, '')
+							: accountNumber,
 				};
 				setResponseDetail(dataToDisplay);
 			} else {
 				data = {
 					productId: selectedSingleDataPlans.id,
-					recipient: singlePhoneNumber.replace(/\D+/g, ''),
+					recipient:
+						singlePhoneNumber !== ''
+							? singlePhoneNumber.replace(/\D+/g, '')
+							: accountNumber,
 					paymentMode,
 					serviceCode: serviceName,
 					redirectUrl: `${window.origin}${window.location.pathname}`,
 				};
 				localData = {
 					amount: selectedSingleDataPlans.value,
-					recipient: singlePhoneNumber,
+					recipient:
+						singlePhoneNumber !== ''
+							? singlePhoneNumber.replace(/\D+/g, '')
+							: accountNumber,
 				};
 			}
 			try {
@@ -214,7 +272,6 @@ const One = () => {
 					setResponseMessage('Data Recharge');
 				}
 			} catch (error) {
-				console.log({ ...error });
 				setErrorModal(true);
 				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
@@ -224,6 +281,7 @@ const One = () => {
 
 	const resetAllValue = () => {
 		setSinglePhoneNumber('');
+		setAccountNumber('');
 		setSelectedSingleDataPlans({});
 	};
 
@@ -234,6 +292,7 @@ const One = () => {
 				serviceName={serviceName}
 				setDataPlans={setDataPlans}
 				data={airtime}
+				type={1}
 			/>
 			<MySelect
 				value={
@@ -251,17 +310,27 @@ const One = () => {
 					}),
 				}}
 			/>
-			<Input
-				onChange={({ target }) => {
-					setSinglePhoneNumber(target.value);
-				}}
-				type='tel'
-				maskChar=' '
-				value={singlePhoneNumber}
-				mask='999 9999 9999'
-				placeholder='Enter phone number'
-			/>
-
+			{airtimeId === 5 || airtimeId === 6 ? (
+				<NormalInput
+					type='number'
+					placeholder='Enter account number'
+					value={accountNumber}
+					onChange={({ target }) => {
+						setAccountNumber(target.value);
+					}}
+				/>
+			) : (
+				<Input
+					onChange={({ target }) => {
+						setSinglePhoneNumber(target.value);
+					}}
+					type='tel'
+					maskChar=' '
+					value={singlePhoneNumber}
+					mask='999 9999 9999'
+					placeholder='Enter phone number'
+				/>
+			)}
 			<ModePayment />
 			<Button
 				className={btnDisabled && 'not-allowed'}

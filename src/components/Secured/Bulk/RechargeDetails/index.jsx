@@ -45,6 +45,8 @@ const RechargeDetails = ({ rechargeId }) => {
 		setSelectedSingleDataPlans,
 		singleAmount,
 		setSingleAmount,
+		setAccountNumber,
+		accountNumber,
 	} = useContext(GlobalContext);
 
 	const [id, setId] = useState(0);
@@ -54,23 +56,27 @@ const RechargeDetails = ({ rechargeId }) => {
 
 	const resetDetails = () => {
 		setPhoneNumber('');
+		setAccountNumber('');
 		setSingleAmount('');
 		setSelectedSingleDataPlans({});
 	};
 
-	const disabled = phoneNumber === '' || serviceName === '';
+	const disabled =
+		!selectedSingleDataPlans || (phoneNumber === '' && accountNumber === '');
 
 	const handleAdd = () => {
 		let singleDetails;
 		if (rechargeType === 'Data') {
 			singleDetails = {
-				recipient: phoneNumber,
+				recipient:
+					phoneNumber !== '' ? phoneNumber.replace(/\D+/g, '') : accountNumber,
 				serviceCode: serviceName,
 				productId: selectedSingleDataPlans.id,
 			};
 		} else {
 			singleDetails = {
-				recipient: phoneNumber,
+				recipient:
+					phoneNumber !== '' ? phoneNumber.replace(/\D+/g, '') : accountNumber,
 				serviceCode: serviceName,
 				serviceCost: singleAmount,
 			};

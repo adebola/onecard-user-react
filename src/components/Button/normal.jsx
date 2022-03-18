@@ -25,6 +25,7 @@ const ButtonInner = styled.button`
 
 	&:disabled {
 		opacity: 0.5;
+		cursor: default;
 	}
 
 	&.not-allowed {

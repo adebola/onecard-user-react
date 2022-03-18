@@ -15,7 +15,6 @@ import {
 } from '../../../../../helper/requests';
 import { ModalContext } from '../../../../../context/ModalProvider';
 import { convertDate } from '../../../../../utils/dateformat';
-
 const airtime = [
 	{ id: 1, airtime: 'MTN-AIRTIME', data: 'MTN-DATA', name: 'mtn', img: mtn },
 	{
@@ -37,7 +36,8 @@ const airtime = [
 
 const Input = styled(ReactInputMask)`
 	width: 100%;
-	margin: 15px 0;
+
+	margin: 10px 0;
 	height: 50px;
 	border: 1px solid var(--text-color);
 	border-radius: 4px;
@@ -52,7 +52,7 @@ const Input = styled(ReactInputMask)`
 const NormalInput = styled.input`
 	width: 100%;
 	height: 50px;
-	margin-top: 15px;
+	margin: 10px 0;
 	border: 1px solid var(--text-color);
 	border-radius: 4px;
 	outline: none;
@@ -67,6 +67,7 @@ const Form = styled.form``;
 
 const Two = () => {
 	const [btnDisabled, setBtnDisabled] = useState(false);
+	const [accountNumber, setAccountNumber] = useState('');
 	const [serviceName, setServiceName] = useState('');
 	const [authUrl, setAuthUrl] = useState('');
 
@@ -78,6 +79,7 @@ const Two = () => {
 		paymentMode,
 		setResponseMessage,
 		startDate,
+		airtimeId,
 	} = useContext(GlobalContext);
 
 	const {
@@ -154,7 +156,6 @@ const Two = () => {
 			console.log(data);
 			try {
 				const response = await makeScheduledRecharge(data);
-				console.log(response);
 				if (response.data.authorizationUrl !== null) {
 					setAuthUrl(response.data.authorizationUrl);
 					localStorage.setItem('id', JSON.stringify(response.data.id));
@@ -170,7 +171,6 @@ const Two = () => {
 					setResponseMessage('SUCCESS');
 				}
 			} catch (error) {
-				console.log({ ...error });
 				setErrorModal(true);
 				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
@@ -217,7 +217,6 @@ const Two = () => {
 					setResponseMessage('SUCCESS');
 				}
 			} catch (error) {
-				console.log({ ...error });
 				setErrorModal(true);
 				setErrorMessage(error.response.data.message);
 				setBtnDisabled(false);
@@ -245,17 +244,27 @@ const Two = () => {
 					setSingleAmount(target.value);
 				}}
 			/>
-			<Input
-				type='tel'
-				maskChar=' '
-				value={singlePhoneNumber}
-				onChange={({ target }) => {
-					setSinglePhoneNumber(target.value);
-				}}
-				mask='999 9999 9999'
-				placeholder='Enter phone number'
-			/>
-
+			{airtimeId === 5 || airtimeId === 6 ? (
+				<NormalInput
+					type='number'
+					placeholder='Enter account number'
+					value={accountNumber}
+					onChange={({ target }) => {
+						setAccountNumber(target.value);
+					}}
+				/>
+			) : (
+				<Input
+					onChange={({ target }) => {
+						setSinglePhoneNumber(target.value);
+					}}
+					type='tel'
+					maskChar=' '
+					value={singlePhoneNumber}
+					mask='999 9999 9999'
+					placeholder='Enter phone number'
+				/>
+			)}
 			<ModePayment />
 			<Button
 				className={btnDisabled && 'not-allowed'}

@@ -27,6 +27,9 @@ const GlobalProvider = ({ children }) => {
 	//single-phoneNumber
 	const [singlePhoneNumber, setSinglePhoneNumber] = useState('');
 
+	//single-accountNumber
+	const [accountNumber, setAccountNumber] = useState('');
+
 	//single-amount
 	const [singleAmount, setSingleAmount] = useState('');
 
@@ -94,6 +97,8 @@ const GlobalProvider = ({ children }) => {
 				setSelectedSingleDataPlans,
 				responseMessage,
 				setResponseMessage,
+				accountNumber,
+				setAccountNumber,
 			}}>
 			{children}
 		</GlobalContext.Provider>

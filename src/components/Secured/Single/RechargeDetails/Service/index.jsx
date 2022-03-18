@@ -1,5 +1,6 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import { css } from 'styled-components';
 import { GlobalContext } from '../../../../../context/GlobalProvider';
 import { getDataPlans } from '../../../../../helper/requests';
 
@@ -7,6 +8,13 @@ const Container = styled.div`
 	display: grid;
 	gap: 20px;
 	grid-template-columns: repeat(4, 1fr);
+
+	${({ gridTemplate }) =>
+		gridTemplate &&
+		css`
+			grid-template-columns: repeat(6, 1fr);
+			gap: 10px;
+		`}
 `;
 
 const Item = styled.div`
@@ -38,9 +46,15 @@ const ServiceProvider = ({
 	serviceName,
 	setServiceName,
 	id,
+	type,
 }) => {
-	const { dataType } = useContext(GlobalContext);
-	const [airtimeId, setAirtimeId] = useState(0);
+	const {
+		dataType,
+		airtimeId,
+		setAirtimeId,
+		selectedSingleDataPlans,
+		setSelectedSingleDataPlans,
+	} = useContext(GlobalContext);
 
 	useEffect(() => {
 		if (airtimeId === 0 || dataType === 'Airtime') return;
@@ -51,8 +65,12 @@ const ServiceProvider = ({
 					response.data.map((each) => {
 						return {
 							id: each.product_id,
-							value: `${each.allowance} ${each.validity} ${each.price}`,
-							label: `${each.allowance} ${each.validity} ${each.price}`,
+							value: `${each.allowance === null ? '' : each.allowance} ${
+								each.validity
+							} ${each.price}`,
+							label: `${each.allowance === null ? '' : each.allowance} ${
+								each.validity
+							} ${each.price}`,
 						};
 					})
 				);
@@ -64,12 +82,15 @@ const ServiceProvider = ({
 	}, [airtimeId, dataType, serviceName, setDataPlans]);
 
 	return (
-		<Container>
+		<Container gridTemplate={type}>
 			{data.map((each) => {
 				return (
 					<Item
 						onClick={() => {
 							setAirtimeId(each.id);
+							if (selectedSingleDataPlans) {
+								setSelectedSingleDataPlans({});
+							}
 							if (dataType === 'Airtime') {
 								setServiceName(each.airtime);
 							} else {
@@ -83,7 +104,7 @@ const ServiceProvider = ({
 					</Item>
 				);
 			})}
-			{/* <p>{serviceName}</p> */}
+			{/* <p>{type}</p> */}
 		</Container>
 	);
 };

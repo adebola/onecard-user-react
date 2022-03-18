@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import ServiceProvider from '../Service';
 import mtn from '../../../../../assets/mtn.svg';
 import glo from '../../../../../assets/glo.svg';
@@ -6,10 +6,8 @@ import mobile from '../../../../../assets/9mobile.svg';
 import airtel from '../../../../../assets/airtel.svg';
 import ReactInputMask from 'react-input-mask';
 import styled from 'styled-components';
-import Button from '../../../../Button/normal';
 import Bene from '../Beneficiary';
 import { GlobalContext } from '../../../../../context/GlobalProvider';
-import ModePayment from '../../../../PaymentType';
 
 const airtime = [
 	{ id: 1, airtime: 'MTN-AIRTIME', data: 'MTN-DATA', name: 'mtn', img: mtn },
@@ -51,7 +49,7 @@ const NormalInput = styled.input`
 	border-radius: 4px;
 	outline: none;
 	padding: 0.5rem;
-	margin-top: 10px;
+	margin: 15px 0;
 	color: var(--text-color);
 	&::placeholder {
 		color: var(--text-color);
@@ -59,6 +57,8 @@ const NormalInput = styled.input`
 `;
 
 const Two = () => {
+	const [accountNumber, setAccountNumber] = useState('');
+
 	const {
 		phoneNumber,
 		setPhoneNumber,
@@ -85,16 +85,27 @@ const Two = () => {
 						value={singleAmount}
 						onChange={({ target }) => setSingleAmount(target.value)}
 					/>
-					<Input
-						type='tel'
-						maskChar=' '
-						onChange={({ target }) => {
-							setPhoneNumber(target.value);
-						}}
-						value={phoneNumber}
-						mask='999 9999 9999'
-						placeholder='Enter phone number'
-					/>
+					{airtimeId === 5 || airtimeId === 6 ? (
+						<NormalInput
+							type='number'
+							placeholder='Enter account number'
+							value={accountNumber}
+							onChange={({ target }) => {
+								setAccountNumber(target.value);
+							}}
+						/>
+					) : (
+						<Input
+							onChange={({ target }) => {
+								setPhoneNumber(target.value);
+							}}
+							type='tel'
+							maskChar=' '
+							value={phoneNumber}
+							mask='999 9999 9999'
+							placeholder='Enter phone number'
+						/>
+					)}
 				</>
 			)}
 		</>

@@ -229,6 +229,17 @@ const ResponseModal = () => {
 									</>
 								</>
 							)}
+							{/* {responseMessage && (
+								<>
+									<>
+										<IconBox>
+											<ImCheckmark color='#124A80' size={24} />
+										</IconBox>
+										<StrongText>Success</StrongText>
+										<LightText>{responseMessage}</LightText>
+									</>
+								</>
+							)} */}
 
 							{responseMessage === 'Something went wrong, please try again' && (
 								<>

@@ -4,6 +4,8 @@ import mtn from '../../../../../../assets/mtn.svg';
 import glo from '../../../../../../assets/glo.svg';
 import mobile from '../../../../../../assets/9mobile.svg';
 import airtel from '../../../../../../assets/airtel.svg';
+import spectranet from '../../../../../../assets/nologg.png';
+import smile from '../../../../../../assets/nosmile.png';
 import ReactInputMask from 'react-input-mask';
 import styled from 'styled-components';
 import Button from '../../../../../Button/normal';
@@ -28,6 +30,21 @@ const airtime = [
 		data: '9MOBILE-DATA',
 		name: '9mobile',
 		img: mobile,
+	},
+
+	{
+		id: 5,
+		airtime: 'SPECTRANET-AIRTIME',
+		data: 'SPECTRANET-DATA',
+		name: 'spectranet',
+		img: spectranet,
+	},
+	{
+		id: 6,
+		airtime: 'SMILE-AIRTIME',
+		data: 'SMILE-DATA',
+		name: 'smile',
+		img: smile,
 	},
 ];
 
@@ -63,6 +80,8 @@ const One = () => {
 	const { setResponseModal } = useContext(ModalContext);
 
 	const {
+		accountNumber,
+		setAccountNumber,
 		singlePhoneNumber,
 		setSinglePhoneNumber,
 		selectedSingleDataPlans,
@@ -93,7 +112,11 @@ const One = () => {
 		setBtnDisabled(true);
 		if (btnDisabled) return;
 		const data = {
-			recipient: singlePhoneNumber.replace(/\D+/g, ''),
+			recipient:
+				singlePhoneNumber !== ''
+					? singlePhoneNumber.replace(/\D+/g, '')
+					: accountNumber,
+
 			productId: selectedSingleDataPlans.id,
 			paymentMode: 'paystack',
 			serviceCode: serviceName,
@@ -101,7 +124,10 @@ const One = () => {
 		};
 		localData = {
 			amount: selectedSingleDataPlans.value,
-			recipient: singlePhoneNumber,
+			recipient:
+				singlePhoneNumber !== ''
+					? singlePhoneNumber.replace(/\D+/g, '')
+					: accountNumber,
 		};
 
 		try {
@@ -125,6 +151,7 @@ const One = () => {
 	const resetAllValue = () => {
 		setSelectedSingleDataPlans({});
 		setSinglePhoneNumber('');
+		setAccountNumber('');
 	};
 
 	return (
@@ -134,6 +161,7 @@ const One = () => {
 				serviceName={serviceName}
 				setDataPlans={setDataPlans}
 				data={airtime}
+				type={1}
 				mb='true'
 			/>
 			<MySelect

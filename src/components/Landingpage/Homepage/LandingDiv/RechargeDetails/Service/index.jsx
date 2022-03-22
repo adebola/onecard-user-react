@@ -16,11 +16,24 @@ const Container = styled.div`
 		return (
 			gridTemplate &&
 			css`
-				grid-template-columns: repeat(9, 1fr);
+				grid-template-columns: repeat(6, 1fr);
 				gap: 20px;
 			`
 		);
 	}}
+	
+
+	@media (max-width:400px) {
+		${({ gridTemplate }) => {
+			return (
+				gridTemplate &&
+				css`
+					grid-template-columns: repeat(6, 1fr);
+					gap: 5px;
+				`
+			);
+		}}
+	}
 `;
 
 const Item = styled.div`
@@ -40,8 +53,11 @@ const Item = styled.div`
 
 const Image = styled.img`
 	width: 30px;
+	${({ nepa }) => nepa && `width: 50px`};
 
-	${({ nepa }) => nepa && `width: 60px`}
+	${({ filter }) => {
+		return filter && 'filter: brightness(0) invert(1)';
+	}};
 `;
 
 const ServiceProvider = ({
@@ -51,6 +67,7 @@ const ServiceProvider = ({
 	serviceName,
 	setServiceName,
 	mb,
+	filter,
 	data,
 }) => {
 	const { dataType } = useContext(GlobalContext);
@@ -93,7 +110,11 @@ const ServiceProvider = ({
 						}}
 						className={each.id === airtimeId && 'active'}
 						key={each.id}>
-						<Image nepa={nepa} src={each.img} />
+						<Image
+							nepa={nepa}
+							filter={filter && !each.filter && each.id === airtimeId}
+							src={each.img}
+						/>
 					</Item>
 				);
 			})}

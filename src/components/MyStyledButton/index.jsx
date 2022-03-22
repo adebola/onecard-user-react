@@ -5,7 +5,7 @@ import { Container, Button as ButtonContainer, ButtonRipple } from './styles';
 const ANIMATION_MS = 400;
 const CIRCLE_SIZE = 50;
 
-const Button = ({ color, to, name }) => {
+const Button = ({ color, to, name, myStyles }) => {
 	const navigate = useNavigate();
 
 	const [ripples, setRipples] = useState([]);
@@ -33,7 +33,7 @@ const Button = ({ color, to, name }) => {
 	};
 
 	return (
-		<Container>
+		<Container myStyles={myStyles}>
 			<ButtonContainer
 				color={color}
 				className={clicked && 'not-allowed'}

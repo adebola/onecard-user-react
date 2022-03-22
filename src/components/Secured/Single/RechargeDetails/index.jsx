@@ -18,6 +18,8 @@ import One from './One';
 import Two from './Two';
 import Three from './Three';
 import { GlobalContext } from '../../../../context/GlobalProvider';
+import Four from './Four';
+import Five from './Five';
 
 const data = [
 	{ id: 1, text: 'Data', img: <FaDatabase /> },
@@ -61,6 +63,8 @@ const RechargeDetails = () => {
 				{id === 1 && <One />}
 				{id === 2 && <Two />}
 				{id === 3 && <Three />}
+				{id === 4 && <Four />}
+				{id === 5 && <Five />}
 			</MinHeight>
 
 			<WalletBalance />

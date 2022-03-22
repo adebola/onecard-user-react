@@ -34,9 +34,12 @@ const Item = styled.div`
 
 const Image = styled.img`
 	width: 34px;
+	${({ filter }) => {
+		return filter && 'filter: brightness(0) invert(1)';
+	}};
 
 	&.big {
-		width: 60px;
+		width: 48px;
 	}
 `;
 
@@ -47,6 +50,7 @@ const ServiceProvider = ({
 	setServiceName,
 	id,
 	type,
+	filter,
 }) => {
 	const {
 		dataType,
@@ -81,26 +85,32 @@ const ServiceProvider = ({
 		awaitData();
 	}, [airtimeId, dataType, serviceName, setDataPlans]);
 
+	const handleClick = (each) => {
+		setAirtimeId(each.id);
+		if (selectedSingleDataPlans) {
+			setSelectedSingleDataPlans({});
+		}
+		if (dataType === 'Airtime') {
+			setServiceName(each.airtime);
+		} else {
+			setServiceName(each.data);
+			getDataPlans(each.data);
+		}
+	};
+
 	return (
 		<Container gridTemplate={type}>
 			{data.map((each) => {
 				return (
 					<Item
-						onClick={() => {
-							setAirtimeId(each.id);
-							if (selectedSingleDataPlans) {
-								setSelectedSingleDataPlans({});
-							}
-							if (dataType === 'Airtime') {
-								setServiceName(each.airtime);
-							} else {
-								setServiceName(each.data);
-								getDataPlans(each.data);
-							}
-						}}
+						onClick={() => handleClick(each)}
 						className={each.id === airtimeId && 'active'}
 						key={each.id}>
-						<Image src={each.img} className={id && 'big'} />
+						<Image
+							filter={filter && !each.filter && each.id === airtimeId}
+							src={each.img}
+							className={id && 'big'}
+						/>
 					</Item>
 				);
 			})}

@@ -7,13 +7,10 @@ export const MinHeight = styled.div`
 
 export const Container = styled.div`
 	flex: 1;
-	/* background: red; */
 
 	@media (max-width: 768px) {
-		/* margin: 10px 0; */
 		margin-bottom: 20px;
 		width: 85%;
-		padding: 2rem;
 	}
 	@media (max-width: 408px) {
 		width: 100%;
@@ -24,6 +21,7 @@ export const RechargeDetailsContainer = styled.div`
 	min-height: 464px;
 	padding: 2rem 1.2rem;
 	background: rgba(255, 255, 255, 0.1);
+	width: 100%;
 	box-shadow: 0px 4px 90px 4px rgba(0, 0, 0, 0.1);
 	border-radius: 20px;
 `;
@@ -47,6 +45,7 @@ export const TopContainer = styled.div`
 `;
 
 export const Grid = styled.div`
+	/* padding: 20px; */
 	height: 50px;
 	background: rgba(235, 106, 43, 0.1);
 	border-radius: 10px;
@@ -62,7 +61,6 @@ export const Grid = styled.div`
 `;
 
 export const GridInner = styled.div`
-	/* color: white; */
 	display: flex;
 	flex-direction: column;
 	align-items: center;

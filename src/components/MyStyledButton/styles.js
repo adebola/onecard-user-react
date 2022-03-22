@@ -23,6 +23,10 @@ export const Container = styled.div`
 	align-items: center;
 	justify-content: center;
 	width: 200px;
+
+	${({ myStyles }) => {
+		return { ...myStyles };
+	}}
 `;
 
 export const Button = styled.button`

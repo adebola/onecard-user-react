@@ -16,6 +16,8 @@ import { MdLiveTv, MdOutlineAddCircleOutline } from 'react-icons/md';
 import One from './One';
 import Two from './Two';
 import Three from './Three';
+import Four from './Four';
+import Five from './Five';
 import { GlobalContext } from '../../../../context/GlobalProvider';
 import WalletBalance from '../../../WalletBalance';
 import ModePayment from '../../../PaymentType';
@@ -126,6 +128,8 @@ const RechargeDetails = ({ rechargeId }) => {
 						{id === 1 && <One rechargeType={rechargeType} />}
 						{id === 2 && <Two rechargeType={rechargeType} />}
 						{id === 3 && <Three rechargeType={rechargeType} />}
+						{id === 4 && <Four rechargeType={rechargeType} />}
+						{id === 5 && <Five rechargeType={rechargeType} />}
 						<ModePayment />
 						<Button
 							disabled={disabled}

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
-	/* padding: ${({ padding }) => (padding ? padding : '2rem')}; */
+	padding: ${({ padding }) => (padding ? padding : '2rem')};
 	background: ${({ bg }) => (bg ? bg : null)};
 	display: flex;
 	position: relative;

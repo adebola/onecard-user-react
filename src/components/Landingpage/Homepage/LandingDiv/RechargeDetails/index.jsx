@@ -17,6 +17,8 @@ import { MdLiveTv, MdOutlineAddCircleOutline } from 'react-icons/md';
 import One from './One';
 import Two from './Two';
 import Three from './Three';
+import Four from './Four';
+import Five from './Five';
 import { GlobalContext } from '../../../../../context/GlobalProvider';
 
 const data = [
@@ -61,6 +63,8 @@ const RechargeDetails = () => {
 					{id === 1 && <One />}
 					{id === 2 && <Two />}
 					{id === 3 && <Three />}
+					{id === 4 && <Four />}
+					{id === 5 && <Five />}
 				</MinHeight>
 			</RechargeDetailsContainer>
 		</Container>

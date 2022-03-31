@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 
 import { GlobalContext } from '../../context/GlobalProvider';
 import {
@@ -15,8 +15,7 @@ import {
 } from './styles';
 
 const BeneficiaryModal = () => {
-	const { bene, setPhoneNumber, phoneNumber, setBeneModal } =
-		useContext(GlobalContext);
+	const { bene, setPhoneNumber, setBeneModal } = useContext(GlobalContext);
 
 	const handleClick = (each) => {
 		setPhoneNumber(each.telephone);

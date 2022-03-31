@@ -201,7 +201,6 @@ const ListOfBene = ({ rechargeType }) => {
 
 			try {
 				const response = await makeBulkRecharge(bulkData);
-				console.log(response);
 
 				if (response.data.authorizationUrl) {
 					setAuthUrl(response.data.authorizationUrl);
@@ -230,7 +229,7 @@ const ListOfBene = ({ rechargeType }) => {
 							<GridItem key={index}>
 								<ItemDetails>
 									<ItemText>{each.recipient}</ItemText>
-									<ItemText>{each.serviceCode}</ItemText>
+									<ItemText>{each.serviceCode || each.name}</ItemText>
 								</ItemDetails>
 								<Action>
 									<GrFormClose

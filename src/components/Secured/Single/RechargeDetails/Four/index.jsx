@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import ServiceProvider from '../Service';
 import Loading from './Loading';
 
 import dstv from '../../../../../assets/dstv.png';
 import gotv from '../../../../../assets/gotv.png';
-import starttimes from '../../../../../assets/startime.png';
+import startimes from '../../../../../assets/startime.png';
+import { GlobalContext } from '../../../../../context/GlobalProvider';
 
 const InputDiv = styled.input`
 	width: 100%;
@@ -22,10 +23,12 @@ const InputDiv = styled.input`
 `;
 
 const Four = () => {
+	const { airtimeId, setAirtimeId } = useContext(GlobalContext);
+
 	const cable = [
-		{ id: 1, type: 'dstv', img: dstv },
-		{ id: 2, type: 'gotv', img: gotv, filter: true },
-		{ id: 3, type: 'starttimes', img: starttimes },
+		{ id: 1, data: 'DSTV', img: dstv },
+		{ id: 2, data: 'GOTV', img: gotv, filter: true },
+		{ id: 3, data: 'STARTIMES', img: startimes },
 	];
 
 	const [serviceName, setServiceName] = useState('');
@@ -34,7 +37,7 @@ const Four = () => {
 
 	useEffect(() => {
 		if (!cardNumber) return;
-		if (cardNumber.length === 12) {
+		if (cardNumber.length === 11) {
 			setLoading(true);
 		} else {
 			setLoading(false);
@@ -45,20 +48,25 @@ const Four = () => {
 		<div>
 			<ServiceProvider
 				filter='true'
+				airtimeId={airtimeId}
+				setAirtimeId={setAirtimeId}
 				setServiceName={setServiceName}
 				serviceName={serviceName}
 				data={cable}
 				id='true'
 			/>
-			<InputDiv
-				placeholder='Enter card number'
-				maxLength='12'
-				value={cardNumber}
-				onChange={({ target }) =>
-					setCardNumber(target.value.replace(/[^0-9]/g, ''))
-				}
-			/>
-			{loading && <Loading />}
+			{airtimeId !== 0 && (
+				<InputDiv
+					placeholder='Enter card number'
+					maxLength={(airtimeId === 1 || airtimeId === 2) && '11'}
+					value={cardNumber}
+					onChange={({ target }) =>
+						setCardNumber(target.value.replace(/[^0-9]/g, ''))
+					}
+				/>
+			)}
+
+			{loading && <Loading cardNumber={cardNumber} cableType={serviceName} />}
 		</div>
 	);
 };

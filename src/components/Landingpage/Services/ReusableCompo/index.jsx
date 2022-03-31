@@ -1,6 +1,5 @@
 import React from 'react';
 import UserServices from '../../../../services/UserServices';
-import NoAuthContainer from '../../Container';
 import two from '../../../../assets/circle2.png';
 
 import {

@@ -23,14 +23,6 @@ const Top = styled.div`
 	${LandingPage({ marginBottom: '30px' })}
 `;
 
-const Middle = styled.div`
-	margin-bottom: 20px;
-`;
-
-const Bottom = styled.div`
-	${LandingPage({ marginBottom: '10px' })}
-`;
-
 const SmallText = styled.div`
 	font-size: 34px;
 	font-style: normal;

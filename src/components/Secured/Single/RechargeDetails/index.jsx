@@ -66,7 +66,6 @@ const RechargeDetails = () => {
 				{id === 4 && <Four />}
 				{id === 5 && <Five />}
 			</MinHeight>
-
 			<WalletBalance />
 		</RechargeDetailsContainer>
 	);

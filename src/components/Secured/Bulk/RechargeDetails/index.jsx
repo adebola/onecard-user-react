@@ -51,7 +51,9 @@ const RechargeDetails = ({ rechargeId }) => {
 		accountNumber,
 	} = useContext(GlobalContext);
 
+	const [cardNumber, setCardNumber] = useState('');
 	const [id, setId] = useState(0);
+	const [selected, setSelected] = useState({});
 	const [optionId, setOptionId] = useState(1);
 	const [rechargeType, setRechargeType] = useState('');
 	const [fileSelect, setFileSelect] = useState(false);
@@ -60,11 +62,10 @@ const RechargeDetails = ({ rechargeId }) => {
 		setPhoneNumber('');
 		setAccountNumber('');
 		setSingleAmount('');
+		setSelected({});
 		setSelectedSingleDataPlans({});
+		setCardNumber('');
 	};
-
-	const disabled =
-		!selectedSingleDataPlans || (phoneNumber === '' && accountNumber === '');
 
 	const handleAdd = () => {
 		let singleDetails;
@@ -75,14 +76,26 @@ const RechargeDetails = ({ rechargeId }) => {
 				serviceCode: serviceName,
 				productId: selectedSingleDataPlans.id,
 			};
-		} else {
+		} else if (rechargeType === 'Airtime') {
 			singleDetails = {
 				recipient:
 					phoneNumber !== '' ? phoneNumber.replace(/\D+/g, '') : accountNumber,
 				serviceCode: serviceName,
 				serviceCost: singleAmount,
 			};
+		} else if (rechargeType === 'Cable TV') {
+			singleDetails = {
+				recipient: cardNumber,
+				name: selected.name,
+				serviceCost: selected.price,
+				productId: selected.code,
+				serviceCode: serviceName,
+			};
+		} else {
+			//TO-DO
 		}
+
+		console.log(singleDetails);
 		setListOfBulk([...listOfBulk, singleDetails]);
 		resetDetails();
 	};
@@ -94,6 +107,14 @@ const RechargeDetails = ({ rechargeId }) => {
 		setServiceName('');
 		setAirtimeId(0);
 	};
+
+	console.log(serviceName);
+
+	const disabled =
+		!selectedSingleDataPlans ||
+		(phoneNumber === '' &&
+			accountNumber === '' &&
+			Object.entries(selected).length === 0);
 
 	return (
 		<RechargeDetailsContainer>
@@ -128,7 +149,17 @@ const RechargeDetails = ({ rechargeId }) => {
 						{id === 1 && <One rechargeType={rechargeType} />}
 						{id === 2 && <Two rechargeType={rechargeType} />}
 						{id === 3 && <Three rechargeType={rechargeType} />}
-						{id === 4 && <Four rechargeType={rechargeType} />}
+						{id === 4 && (
+							<Four
+								serviceName={serviceName}
+								setServiceName={setServiceName}
+								cardNumber={cardNumber}
+								setCardNumber={setCardNumber}
+								rechargeType={rechargeType}
+								selected={selected}
+								setSelected={setSelected}
+							/>
+						)}
 						{id === 5 && <Five rechargeType={rechargeType} />}
 						<ModePayment />
 						<Button
@@ -140,7 +171,7 @@ const RechargeDetails = ({ rechargeId }) => {
 					</>
 				)}
 			</MinHeight>
-			{optionId === 1 && <WalletBalance balance={balance} />}{' '}
+			{optionId === 1 && <WalletBalance balance={balance} />}
 		</RechargeDetailsContainer>
 	);
 };

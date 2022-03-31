@@ -62,6 +62,12 @@ export const Button = styled.button`
 		box-shadow: none;
 		opacity: 0.6;
 	} */
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: default;
+		box-shadow: none;
+	}
 `;
 
 export const ButtonRipple = styled.div`

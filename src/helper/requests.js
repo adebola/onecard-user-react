@@ -17,6 +17,7 @@ export const getDataPlans = (each) => {
 export const makeSingleRecharge = (data) => {
 	return axios.post('/auth-recharge', data);
 };
+
 export const getSingleRechargeResponse = (id) => {
 	return axios.get(`/auth-recharge/${id}`);
 };
@@ -64,6 +65,11 @@ export const getScheduledRechargeResponse = (id) => {
 export const makeBulkRechargeWithExcel = (data) => {
 	return axios.post('/auth-recharge/bulkfile', data);
 };
+
 export const makeBulkScheduleRechargeWithExcel = (data) => {
 	return axios.post('/auth-recharge/schedulefile', data);
+};
+
+export const makeCableRecharge = (data) => {
+	return axios.post('/auth-recharge', data);
 };

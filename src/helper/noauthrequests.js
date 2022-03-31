@@ -10,3 +10,7 @@ export const makeSingleRecharge = (data) => {
 export const getSingleRechargeResponse = (id) => {
 	return axios.get(`/recharge/${id}`);
 };
+
+export const getCardDetails = (data) => {
+	return axios.post('/recharge/plans', data);
+};

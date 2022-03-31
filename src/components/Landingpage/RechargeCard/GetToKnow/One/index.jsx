@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { LandingPage } from '../../../../../responsive/responsive';
 
 import two from '../../../../../assets/circle2.png';
@@ -60,31 +60,6 @@ const LargeText = styled.p`
 
 const LightText = styled(LargeText)`
 	font-weight: 400;
-`;
-
-const NormalText = styled.p`
-	font-size: 15px;
-	font-style: normal;
-	font-weight: 500;
-	line-height: 24px;
-	letter-spacing: 0em;
-	color: var(--text-color);
-	width: 90%;
-	/* margin: auto; */
-	margin: 20px auto;
-`;
-
-const LandingImage = styled.img`
-	height: 80px;
-	width: 50%;
-	${({ abs }) =>
-		abs &&
-		css`
-			position: absolute;
-			height: 40px;
-			width: 95%;
-			left: 5%;
-		`};
 `;
 
 const One = () => {

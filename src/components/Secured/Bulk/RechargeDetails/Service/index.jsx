@@ -61,7 +61,8 @@ const ServiceProvider = ({
 	} = useContext(GlobalContext);
 
 	useEffect(() => {
-		if (airtimeId === 0 || dataType === 'Airtime') return;
+		if (airtimeId === 0 || dataType === 'Airtime' || dataType === 'Cable TV')
+			return;
 		const awaitData = async () => {
 			try {
 				const response = await getDataPlans(serviceName);
@@ -92,9 +93,16 @@ const ServiceProvider = ({
 		}
 		if (dataType === 'Airtime') {
 			setServiceName(each.airtime);
-		} else {
+			return;
+		}
+		if (dataType === 'Data') {
 			setServiceName(each.data);
 			getDataPlans(each.data);
+			return;
+		}
+		if (dataType === 'Cable TV') {
+			setServiceName(each.data);
+			return;
 		}
 	};
 

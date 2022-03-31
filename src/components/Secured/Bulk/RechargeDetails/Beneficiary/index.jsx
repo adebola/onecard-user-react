@@ -69,7 +69,7 @@ const Bene = () => {
 			}
 		};
 		awaitResponse();
-	}, []);
+	}, [setBene]);
 
 	const handleClick = (each) => {
 		setSingleBene(each);

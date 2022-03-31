@@ -26,18 +26,6 @@ const SmallImage = styled.img`
 	transform: translate(-30%, 20%);
 `;
 
-const Title = styled.p`
-	color: var(--text-color);
-	font-size: 48px;
-	font-style: normal;
-	font-weight: 700;
-	line-height: 49px;
-	letter-spacing: 0em;
-	${HomepageResponsive({
-		fontSize: '43px',
-	})}
-`;
-
 const One = () => {
 	return (
 		<>

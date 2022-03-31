@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { GlobalContext } from '../../../../../../context/GlobalProvider';
 import { getDataPlans } from '../../../../../../helper/noauthrequests';
@@ -69,12 +69,13 @@ const ServiceProvider = ({
 	mb,
 	filter,
 	data,
+	airtimeId,
+	setAirtimeId,
 }) => {
 	const { dataType } = useContext(GlobalContext);
-	const [airtimeId, setAirtimeId] = useState(0);
-
 	useEffect(() => {
-		if (airtimeId === 0 || dataType === 'Airtime') return;
+		if (airtimeId === 0 || dataType === 'Airtime' || dataType === 'Cable TV')
+			return;
 		const awaitData = async () => {
 			try {
 				const response = await getDataPlans(serviceName);
@@ -94,20 +95,25 @@ const ServiceProvider = ({
 		awaitData();
 	}, [airtimeId, dataType, serviceName, setDataPlans]);
 
+	const handleClick = (each) => {
+		console.log(each);
+		setAirtimeId(each.id);
+		if (dataType === 'Airtime') {
+			setServiceName(each.airtime);
+		} else if (dataType === 'Data') {
+			setServiceName(each.data);
+			getDataPlans(each.data);
+		} else {
+			setServiceName(each.type);
+		}
+	};
+
 	return (
 		<Container mb={mb} gridTemplate={type}>
 			{data.map((each) => {
 				return (
 					<Item
-						onClick={() => {
-							setAirtimeId(each.id);
-							if (dataType === 'Airtime') {
-								setServiceName(each.airtime);
-							} else {
-								setServiceName(each.data);
-								getDataPlans(each.data);
-							}
-						}}
+						onClick={() => handleClick(each)}
 						className={each.id === airtimeId && 'active'}
 						key={each.id}>
 						<Image

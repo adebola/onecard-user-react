@@ -14,8 +14,6 @@ import {
 import auto from '../../../../../assets/auto.png';
 import inst from '../../../../../assets/inst.png';
 import schde from '../../../../../assets/schde.png';
-import down from '../../../../../assets/down.png';
-import down1 from '../../../../../assets/downlong.png';
 
 const Container = styled.div`
 	flex: 1;
@@ -24,8 +22,6 @@ const Container = styled.div`
 		margin: 20px 0;
 	}
 `;
-
-const Inner = styled.div``;
 
 const Two = () => {
 	return (

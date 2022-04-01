@@ -8,6 +8,7 @@ import { makeCableRecharge } from '../../../../../../helper/requests';
 import { GlobalContext } from '../../../../../../context/GlobalProvider';
 import { convertDate } from '../../../../../../utils/dateformat';
 import { ModalContext } from '../../../../../../context/ModalProvider';
+import ModePayment from '../../../../../PaymentType/index';
 
 const Container = styled.div`
 	background-color: var(--light-background);
@@ -54,14 +55,24 @@ const Error = styled.p`
 `;
 
 const Loading = ({ cardNumber, cableType }) => {
+	const [btnDisabled, setBtnDisabled] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [details, setDetails] = useState([]);
 	const [selected, setSelected] = useState({});
 	const [name, setName] = useState('');
 	const [error, setError] = useState('');
 
-	const { startDate } = useContext(GlobalContext);
+	const [authUrl, setAuthUrl] = useState('')
+	const { startDate, paymentMode } = useContext(GlobalContext);
 	const { rechargeType } = useContext(ModalContext);
+
+	useEffect(() => {
+		if(authUrl !== ''){
+			window.location = authUrl;
+			return;
+		}
+		return;
+	}, [authUrl])
 
 	useEffect(() => {
 		const data = {
@@ -98,6 +109,7 @@ const Loading = ({ cardNumber, cableType }) => {
 	};
 
 	const handleSubmit = async (e) => {
+		setBtnDisabled(true);
 		e.preventDefault();
 		const scheduledDate = convertDate(startDate);
 		let data;
@@ -108,6 +120,7 @@ const Loading = ({ cardNumber, cableType }) => {
 				serviceCost: selected.price,
 				productId: selected.code,
 				scheduledDate,
+				paymentMode,
 				serviceCode: cableType,
 			};
 		} else {
@@ -117,12 +130,20 @@ const Loading = ({ cardNumber, cableType }) => {
 				serviceCost: selected.price,
 				productId: selected.code,
 				serviceCode: cableType,
+				paymentMode
 			};
 		}
 
 		try {
 			const response = await makeCableRecharge(data);
 			console.log(response);
+			setBtnDisabled(false)
+			if(response.data.authorizationUrl){
+				setBtnDisabled(false)
+				console.log(response);
+				setAuthUrl(response.data.authorizationUrl)
+			}
+
 		} catch (error) {
 			console.log(error);
 		}
@@ -152,7 +173,10 @@ const Loading = ({ cardNumber, cableType }) => {
 						options={details}
 					/>
 				</MinHeight>
+
+			<ModePayment />
 				<MyStyledButton
+					clicked={btnDisabled}
 					disabled={disabled}
 					name='Submit'
 					myStyles={{ width: '100%' }}

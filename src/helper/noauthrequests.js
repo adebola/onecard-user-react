@@ -14,3 +14,7 @@ export const getSingleRechargeResponse = (id) => {
 export const getCardDetails = (data) => {
 	return axios.post('/recharge/plans', data);
 };
+
+export const makeCableRecharge = (data) => {
+	return axios.post('/recharge', data);
+};

@@ -30,12 +30,13 @@ const data = [
 ];
 
 const RechargeDetails = () => {
-	const { setDataType } = useContext(GlobalContext);
+	const { setDataType , setAirtimeId} = useContext(GlobalContext);
 
 	const [id, setId] = useState(0);
 
 	const handleClick = (each) => {
 		setId(each.id);
+		setAirtimeId(0)
 		setDataType(each.text);
 	};
 

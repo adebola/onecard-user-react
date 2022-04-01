@@ -69,14 +69,13 @@ const ServiceProvider = ({
 	mb,
 	filter,
 	data,
-	airtimeId,
-	setAirtimeId,
 }) => {
-	const { dataType } = useContext(GlobalContext);
+	const { dataType,airtimeId,setAirtimeId } = useContext(GlobalContext);
 	useEffect(() => {
 		if (airtimeId === 0 || dataType === 'Airtime' || dataType === 'Cable TV')
 			return;
-		const awaitData = async () => {
+		if(airtimeId !== 0 && dataType === 'Data'){	
+			const awaitData = async () => {
 			try {
 				const response = await getDataPlans(serviceName);
 				setDataPlans(
@@ -93,10 +92,10 @@ const ServiceProvider = ({
 			}
 		};
 		awaitData();
+	}
 	}, [airtimeId, dataType, serviceName, setDataPlans]);
 
 	const handleClick = (each) => {
-		console.log(each);
 		setAirtimeId(each.id);
 		if (dataType === 'Airtime') {
 			setServiceName(each.airtime);
@@ -104,7 +103,7 @@ const ServiceProvider = ({
 			setServiceName(each.data);
 			getDataPlans(each.data);
 		} else {
-			setServiceName(each.type);
+			setServiceName(each.data);
 		}
 	};
 
@@ -124,7 +123,6 @@ const ServiceProvider = ({
 					</Item>
 				);
 			})}
-			{/* <p>{serviceName}</p> */}
 		</Container>
 	);
 };

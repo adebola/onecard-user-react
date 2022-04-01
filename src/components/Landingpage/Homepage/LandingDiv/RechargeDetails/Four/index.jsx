@@ -15,6 +15,7 @@ const InputDiv = styled.input`
 	border: 1px solid var(--text-color);
 	border-radius: 4px;
 	outline: none;
+	margin-top: 30px;
 	padding: 0.5rem;
 	color: var(--text-color);
 	&::placeholder {
@@ -30,6 +31,7 @@ const Four = () => {
 		{ id: 2, data: 'GOTV', img: gotv, filter: true },
 		{ id: 3, data: 'STARTIMES', img: startimes },
 	];
+
 
 	const [serviceName, setServiceName] = useState('');
 	const [cardNumber, setCardNumber] = useState('');
@@ -65,9 +67,6 @@ const Four = () => {
 					}
 				/>
 			)}
-
-			{airtimeId}
-
 			{loading && <Loading cardNumber={cardNumber} cableType={serviceName} />}
 		</div>
 	);

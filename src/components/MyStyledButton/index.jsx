@@ -5,7 +5,7 @@ import { Container, Button as ButtonContainer, ButtonRipple } from './styles';
 const ANIMATION_MS = 400;
 const CIRCLE_SIZE = 50;
 
-const Button = ({ color, to, name, myStyles, disabled }) => {
+const Button = ({ color, btnDisabled,to, name, myStyles, disabled }) => {
 	const navigate = useNavigate();
 
 	const [ripples, setRipples] = useState([]);

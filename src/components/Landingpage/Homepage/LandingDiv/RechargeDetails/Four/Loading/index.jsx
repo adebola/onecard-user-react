@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import { SyncLoader } from 'react-spinners';
 import MySelect from 'react-select';
 import MyStyledButton from '../../../../../../MyStyledButton';
-import { getCardDetails } from '../../../../../../../helper/noauthrequests';
-import { makeCableRecharge } from '../../../../../../../helper/requests';
+import { getCardDetails ,makeCableRecharge} from '../../../../../../../helper/noauthrequests';
 import { GlobalContext } from '../../../../../../../context/GlobalProvider';
 import { convertDate } from '../../../../../../../utils/dateformat';
 import { ModalContext } from '../../../../../../../context/ModalProvider';
@@ -55,6 +54,7 @@ const Error = styled.p`
 
 const Loading = ({ cardNumber, cableType }) => {
 	const [isLoading, setIsLoading] = useState(true);
+	const [authUrl, setAuthUrl] = useState('');
 	const [details, setDetails] = useState([]);
 	const [selected, setSelected] = useState({});
 	const [name, setName] = useState('');
@@ -62,6 +62,16 @@ const Loading = ({ cardNumber, cableType }) => {
 
 	const { startDate } = useContext(GlobalContext);
 	const { rechargeType } = useContext(ModalContext);
+
+
+	useEffect(() => {
+		if (authUrl !== '') {
+			window.location = authUrl;
+			return;
+		}
+		return;
+	}, [authUrl]);
+
 
 	useEffect(() => {
 		const data = {
@@ -109,6 +119,7 @@ const Loading = ({ cardNumber, cableType }) => {
 				productId: selected.code,
 				serviceCode: cableType,
 				scheduledDate,
+				paymentMode: 'paystack'
 			};
 		} else {
 			data = {
@@ -116,14 +127,17 @@ const Loading = ({ cardNumber, cableType }) => {
 				name: selected.name,
 				serviceCost: selected.price,
 				productId: selected.code,
-
 				serviceCode: cableType,
+				paymentMode: 'paystack'
 			};
 		}
 
 		try {
 			const response = await makeCableRecharge(data);
-			console.log(response);
+			if (response.data.authorizationUrl !== null) {
+				setAuthUrl(response.data.authorizationUrl);
+				return;
+			}
 		} catch (error) {
 			console.log(error);
 		}

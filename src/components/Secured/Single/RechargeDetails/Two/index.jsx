@@ -76,10 +76,10 @@ const Two = () => {
 		singleAmount,
 		setSingleAmount,
 		setSinglePhoneNumber,
-		paymentMode,
 		setResponseMessage,
 		startDate,
 		airtimeId,
+		paymentMode,
 	} = useContext(GlobalContext);
 
 	const {

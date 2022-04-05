@@ -36,56 +36,72 @@ const Input = styled.input`
   margin-top: 10px;
 `;
 
-const renderEko = (acc, setAcc) => {
-  return (
-    <Container>
-      <Inner>
-        <Select options={options} />
-        <Input
-          maxLength="11"
-          placeholder="Enter account number"
-          value={acc}
-          onChange={({ target }) => setAcc(target.value.replace(/[^0-9]/g, ""))}
-        />
-      </Inner>
-    </Container>
-  );
-};
-
-const renderJos = (acc, setAcc) => {
-  return (
-    <Container>
-      <Inner>
-        <Input
-          maxLength="11"
-          placeholder="Enter account number"
-          value={acc}
-          onChange={({ target }) => setAcc(target.value.replace(/[^0-9]/g, ""))}
-        />
-      </Inner>
-    </Container>
-  );
-};
-
 const Three = () => {
   const [serviceName, setServiceName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
+  const [selected, setSelected] = useState({});
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!accountNumber) return;
-    if (accountNumber.length === 11) {
+    if (serviceName === "EKEDP" && accountNumber.length === 13) {
+      setLoading(true);
+    } else if (serviceName === "JED" && accountNumber.length === 11) {
       setLoading(true);
     } else {
       setLoading(false);
     }
-  }, [accountNumber]);
+  }, [accountNumber, setLoading, serviceName]);
 
   useEffect(() => {
     setAccountNumber("");
     setLoading(false);
   }, [serviceName]);
+
+  const handleChange = (each) => {
+    setSelected(each);
+  };
+
+  const renderEko = () => {
+    return (
+      <Container>
+        <Inner>
+          <Select
+            placeholder="Select a plan"
+            options={options}
+            value={
+              Object.entries(selected).length > 0 ? selected : "Select a plan"
+            }
+            onChange={handleChange}
+          />
+          <Input
+            maxLength="13"
+            placeholder="0433877877-89"
+            value={accountNumber}
+            onChange={({ target }) => setAccountNumber(target.value)}
+          />
+        </Inner>
+      </Container>
+    );
+  };
+
+  const renderJos = () => {
+    return (
+      <Container>
+        <Inner>
+          <Input
+            maxLength="11"
+            placeholder="09890900009"
+            value={accountNumber}
+            onChange={({ target }) =>
+              setAccountNumber(target.value.replace(/[^0-9]/g, ""))
+            }
+          />
+        </Inner>
+      </Container>
+    );
+  };
 
   return (
     <>
@@ -95,9 +111,15 @@ const Three = () => {
         setServiceName={setServiceName}
         data={nepa}
       />
-      {serviceName === "EKEDP" && renderEko(accountNumber, setAccountNumber)}
-      {serviceName === "JED" && renderJos(accountNumber, setAccountNumber)}
-      {loading && <Loading />}
+      {serviceName === "EKEDP" && renderEko()}
+      {serviceName === "JED" && renderJos()}
+      {loading && (
+        <Loading
+          accountNumber={accountNumber}
+          selected={selected}
+          serviceName={serviceName}
+        />
+      )}
     </>
   );
 };

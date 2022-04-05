@@ -36,55 +36,79 @@ const Input = styled.input`
   margin-top: 10px;
 `;
 
-const renderEko = (acc, setAcc) => {
-  return (
-    <Container>
-      <Inner>
-        <Select options={options} />
-        <Input
-          placeholder="Enter account number"
-          maxLength="11"
-          value={acc}
-          onChange={({ target }) => setAcc(target.value.replace(/[^0-9]/g, ""))}
-        />
-      </Inner>
-    </Container>
-  );
-};
-
-const renderJos = (acc, setAcc) => {
-  return (
-    <Container>
-      <Inner>
-        <Input
-          placeholder="Enter account number"
-          value={acc}
-          maxLength="11"
-          onChange={({ target }) => setAcc(target.value.replace(/[^0-9]/g, ""))}
-        />
-      </Inner>
-    </Container>
-  );
-};
-
-const Three = ({ serviceName, setServiceName }) => {
-  const [accountNumber, setAccountNumber] = useState("");
-
-  const [loading, setLoading] = useState(false);
-
+const Three = ({
+  serviceName,
+  name,
+  selected,
+  setSelected,
+  setName,
+  loading,
+  setLoading,
+  amount,
+  telephone,
+  setTelephone,
+  setAmount,
+  setServiceName,
+  accountNumber,
+  setAccountNumber,
+}) => {
   useEffect(() => {
     if (!accountNumber) return;
-    if (accountNumber.length === 11) {
+    if (serviceName === "EKEDP" && accountNumber.length === 13) {
+      setLoading(true);
+    } else if (serviceName === "JED" && accountNumber.length === 11) {
       setLoading(true);
     } else {
       setLoading(false);
     }
-  }, [accountNumber]);
+  }, [accountNumber, setLoading, serviceName]);
 
   useEffect(() => {
     setAccountNumber("");
     setLoading(false);
-  }, [serviceName]);
+  }, [serviceName, setLoading, setAccountNumber]);
+
+  const handleChange = (each) => {
+    setSelected(each);
+  };
+
+  const renderEko = () => {
+    return (
+      <Container>
+        <Inner>
+          <Select
+            placeholder="Select a plan"
+            onChange={handleChange}
+            options={options}
+            value={
+              Object.entries(selected).length > 0 ? selected : "Select a plan"
+            }
+          />
+          <Input
+            placeholder="Enter account number"
+            maxLength="13"
+            value={accountNumber}
+            onChange={({ target }) => setAccountNumber(target.value)}
+          />
+        </Inner>
+      </Container>
+    );
+  };
+
+  const renderJos = () => {
+    return (
+      <Container>
+        <Inner>
+          <Input
+            placeholder="Enter account number"
+            value={accountNumber}
+            maxLength="11"
+            onChange={({ target }) => setAccountNumber(target.value)}
+          />
+        </Inner>
+      </Container>
+    );
+  };
 
   return (
     <>
@@ -94,9 +118,21 @@ const Three = ({ serviceName, setServiceName }) => {
         setServiceName={setServiceName}
         data={nepa}
       />
-      {serviceName === "EKEDP" && renderEko(accountNumber, setAccountNumber)}
-      {serviceName === "JED" && renderJos(accountNumber, setAccountNumber)}
-      {loading && <Loading />}
+      {serviceName === "EKEDP" && renderEko()}
+      {serviceName === "JED" && renderJos()}
+      {loading && (
+        <Loading
+          accountNumber={accountNumber}
+          name={name}
+          selected={selected}
+          setName={setName}
+          amount={amount}
+          telephone={telephone}
+          setTelephone={setTelephone}
+          setAmount={setAmount}
+          serviceName={serviceName}
+        />
+      )}
     </>
   );
 };

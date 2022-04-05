@@ -57,6 +57,10 @@ const RechargeDetails = ({ rechargeId }) => {
   const [optionId, setOptionId] = useState(1);
   const [rechargeType, setRechargeType] = useState("");
   const [fileSelect, setFileSelect] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [name, setName] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const resetDetails = () => {
     setPhoneNumber("");
@@ -65,6 +69,10 @@ const RechargeDetails = ({ rechargeId }) => {
     setSelected({});
     setSelectedSingleDataPlans({});
     setCardNumber("");
+    setLoading(false);
+    setTelephone("");
+    setAmount("");
+    setSelected({});
   };
 
   const handleAdd = () => {
@@ -92,16 +100,27 @@ const RechargeDetails = ({ rechargeId }) => {
         serviceCode: serviceName,
       };
     } else if (rechargeType === "Electricity") {
-      singleDetails = {
-        recipient: cardNumber,
-        name: selected.name,
-        serviceCost: selected.price,
-        productId: selected.code,
-        serviceCode: serviceName,
-      };
+      if (serviceName === "JED") {
+        singleDetails = {
+          recipient: cardNumber,
+          name: name.trim(),
+          serviceCost: amount,
+          serviceCode: serviceName,
+        };
+      } else {
+        singleDetails = {
+          recipient: cardNumber,
+          name: name.trim(),
+          serviceCost: amount,
+          productId: selected.code,
+          serviceCode: serviceName,
+        };
+      }
     } else {
       //TO-DO
     }
+
+    console.log(singleDetails);
 
     setListOfBulk([...listOfBulk, singleDetails]);
     resetDetails();
@@ -119,7 +138,9 @@ const RechargeDetails = ({ rechargeId }) => {
     !selectedSingleDataPlans ||
     (phoneNumber === "" &&
       accountNumber === "" &&
-      Object.entries(selected).length === 0);
+      Object.entries(selected).length === 0 &&
+      amount === "" &&
+      telephone === "");
 
   return (
     <RechargeDetailsContainer>
@@ -156,9 +177,21 @@ const RechargeDetails = ({ rechargeId }) => {
             {id === 2 && <Two rechargeType={rechargeType} />}
             {id === 3 && (
               <Three
+                amount={amount}
+                name={name}
+                accountNumber={cardNumber}
+                setAccountNumber={setCardNumber}
+                setName={setName}
+                setAmount={setAmount}
+                selected={selected}
+                setSelected={setSelected}
                 serviceName={serviceName}
                 setServiceName={setServiceName}
+                loading={loading}
+                setLoading={setLoading}
                 rechargeType={rechargeType}
+                telephone={telephone}
+                setTelephone={setTelephone}
               />
             )}
             {id === 4 && (

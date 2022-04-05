@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { SyncLoader } from "react-spinners";
-import ModePayment from "../../../../../PaymentType";
-import MyStyledButton from "../../../../../MyStyledButton";
+import { getCardDetails } from "../../../../../../helper/noauthrequests";
 
 const Container = styled.div`
   background-color: var(--light-background);
@@ -42,7 +41,7 @@ const Span = styled.div`
   color: var(--text-color);
 `;
 
-const FullContainer = styled.form`
+const FullContainer = styled.div`
   width: 100%;
   margin-top: 10px;
 `;
@@ -50,22 +49,57 @@ const FullContainer = styled.form`
 const Error = styled.p`
   color: red;
   text-align: center;
+  line-height: 30px;
   font-size: 12px;
 `;
-const Loading = () => {
-  const [name, setName] = useState("");
+const Loading = ({
+  serviceName,
+  name,
+  setName,
+  amount,
+  setAmount,
+  selected,
+  accountNumber,
+  telephone,
+  setTelephone,
+}) => {
   const [error, setError] = useState("");
-  const [btnDisabled, setBtnDisabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(!true);
-  const [amount, setAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = {};
-    console.log(data);
-  };
+  useEffect(() => {
+    if (!accountNumber) return;
+    const awaitResponse = async () => {
+      let data;
+      if (serviceName === "JED") {
+        data = {
+          recipient: accountNumber,
+          serviceCode: serviceName,
+        };
+      } else {
+        data = {
+          recipient: accountNumber,
+          serviceCode: serviceName,
+          accountType: selected.value.toLowerCase(),
+        };
+      }
+      try {
+        const response = await getCardDetails(data);
+        setIsLoading(false);
+        if (response.data.status === 400) {
+          setError("User with card number not found, please try again");
+          return;
+        }
+        setIsLoading(false);
+        setError("");
+        setName(response.data.customerName);
+      } catch (error) {
+        setIsLoading(false);
+        setError(error.response.data.message);
+      }
+    };
 
-  const disabled = !amount;
+    awaitResponse();
+  }, [setIsLoading, serviceName, setName, accountNumber, selected.value]);
 
   if (isLoading) {
     return (
@@ -75,7 +109,7 @@ const Loading = () => {
     );
   } else if (!error) {
     return (
-      <FullContainer onSubmit={handleSubmit}>
+      <FullContainer>
         <MinHeight>
           <Container>
             <Span>Name:</Span>
@@ -84,7 +118,16 @@ const Loading = () => {
           <Input
             placeholder="Enter Amount"
             value={amount}
-            onChange={({ target }) => setAmount(target.value)}
+            onChange={({ target }) =>
+              setAmount(target.value.replace(/[^0-9]/g, ""))
+            }
+          />
+          <Input
+            placeholder="Enter telephone"
+            value={telephone}
+            onChange={({ target }) =>
+              setTelephone(target.value.replace(/[^0-9]/g, ""))
+            }
           />
         </MinHeight>
       </FullContainer>

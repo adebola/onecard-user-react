@@ -120,8 +120,6 @@ const RechargeDetails = ({ rechargeId }) => {
       //TO-DO
     }
 
-    console.log(singleDetails);
-
     setListOfBulk([...listOfBulk, singleDetails]);
     resetDetails();
   };
@@ -139,7 +137,7 @@ const RechargeDetails = ({ rechargeId }) => {
     (phoneNumber === "" &&
       accountNumber === "" &&
       Object.entries(selected).length === 0 &&
-      amount === "" &&
+      amount < 500 &&
       telephone === "");
 
   return (
@@ -206,7 +204,7 @@ const RechargeDetails = ({ rechargeId }) => {
               />
             )}
             {id === 5 && <Five rechargeType={rechargeType} />}
-            <ModePayment />
+            {id !== 0 && <ModePayment />}
             <Button
               disabled={disabled}
               onClick={() => handleAdd()}

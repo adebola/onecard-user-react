@@ -64,7 +64,14 @@ const Loading = ({
   setTelephone,
 }) => {
   const [error, setError] = useState("");
+  const [amountError, setAmountError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (amount < 500) {
+      setAmountError("Minimum amount is #1,000");
+    }
+  }, [amount]);
 
   useEffect(() => {
     if (!accountNumber) return;
@@ -129,6 +136,7 @@ const Loading = ({
               setTelephone(target.value.replace(/[^0-9]/g, ""))
             }
           />
+          <Error>{amountError}</Error>
         </MinHeight>
       </FullContainer>
     );

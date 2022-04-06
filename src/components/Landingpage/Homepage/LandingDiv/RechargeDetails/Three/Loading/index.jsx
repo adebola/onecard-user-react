@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { SyncLoader } from "react-spinners";
-import ModePayment from "../../../../../PaymentType";
-import MyStyledButton from "../../../../../MyStyledButton";
-import { getCardDetails } from "../../../../../../helper/noauthrequests";
-import { GlobalContext } from "../../../../../../context/GlobalProvider";
-import { ModalContext } from "../../../../../../context/ModalProvider";
-import { convertDate } from "../../../../../../utils/dateformat";
-import { makeCableRecharge } from "../../../../../../helper/requests";
+import MyStyledButton from "../../../../../../MyStyledButton";
+import {
+  getCardDetails,
+  makeCableRecharge,
+} from "../../../../../../../helper/noauthrequests";
+import { ModalContext } from "../../../../../../../context/ModalProvider";
 
 const Container = styled.div`
   background-color: var(--light-background);
@@ -25,9 +24,13 @@ const SpinnerContainer = styled.div`
 `;
 
 const Input = styled.input`
-  margin-top: 20px;
+  margin-top: 15px;
   width: 100%;
   padding: 9px 12px;
+  @media (max-width: 768px) {
+    margin-bottom: 5px;
+    margin-top: 9px;
+  }
 `;
 
 const MinHeight = styled.div`
@@ -59,19 +62,15 @@ const Error = styled.p`
   font-size: 12px;
 `;
 const Loading = ({ serviceName, accountNumber, selected }) => {
-  const { paymentMode, startDate, setResponseMessage } =
-    useContext(GlobalContext);
-
-  const { rechargeType, setErrorModal, setErrorMessage, setResponseModal } =
-    useContext(ModalContext);
-
   const [name, setName] = useState("");
+  const [authUrl, setAuthUrl] = useState("");
   const [error, setError] = useState("");
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [telephone, setTelephone] = useState("");
-  const [authUrl, setAuthUrl] = useState("");
+
+  const { setErrorModal, setErrorMessage } = useContext(ModalContext);
 
   useEffect(() => {
     if (authUrl !== "") {
@@ -125,70 +124,30 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
     }
     let finalData;
 
-    if (rechargeType === 2) {
-      const scheduledDate = convertDate(startDate);
-      if (serviceName === "JED") {
-        finalData = {
-          recipient: accountNumber,
-          serviceCode: serviceName,
-          serviceCost: amount,
-          telephone,
-          paymentMode,
-          scheduledDate,
-          redirectUrl:
-            paymentMode === "wallet"
-              ? ""
-              : `${window.origin}${window.location.pathname}`,
-        };
-      } else {
-        finalData = {
-          recipient: accountNumber,
-          serviceCode: serviceName,
-          serviceCost: amount,
-          telephone,
-          accountType: selected.value.toLowerCase(),
-          paymentMode,
-          scheduledDate,
-          redirectUrl:
-            paymentMode === "wallet"
-              ? ""
-              : `${window.origin}${window.location.pathname}`,
-        };
-      }
+    if (serviceName === "JED") {
+      finalData = {
+        recipient: accountNumber,
+        serviceCode: serviceName,
+        serviceCost: amount,
+        telephone,
+        paymentMode: "paystack",
+        redirectUrl: `${window.origin}${window.location.pathname}`,
+      };
     } else {
-      if (serviceName === "JED") {
-        finalData = {
-          recipient: accountNumber,
-          serviceCode: serviceName,
-          serviceCost: amount,
-          telephone,
-          paymentMode,
-          redirectUrl:
-            paymentMode === "wallet"
-              ? ""
-              : `${window.origin}${window.location.pathname}`,
-        };
-      } else {
-        finalData = {
-          recipient: accountNumber,
-          serviceCode: serviceName,
-          serviceCost: amount,
-          telephone,
-          accountType: selected.value.toLowerCase(),
-          paymentMode,
-          redirectUrl:
-            paymentMode === "wallet"
-              ? ""
-              : `${window.origin}${window.location.pathname}`,
-        };
-      }
+      finalData = {
+        recipient: accountNumber,
+        serviceCode: serviceName,
+        serviceCost: amount,
+        telephone,
+        accountType: selected.value.toLowerCase(),
+        paymentMode: "paystack",
+        redirectUrl: `${window.origin}${window.location.pathname}`,
+      };
     }
 
+    console.log(finalData);
     try {
       const response = await makeCableRecharge(finalData);
-      setResponseModal(true);
-      setResponseMessage("Ringo Pay Electricity Successful");
-      setBtnDisabled(false);
       if (response.data.authorizationUrl) {
         setBtnDisabled(false);
         setAuthUrl(response.data.authorizationUrl);
@@ -233,7 +192,6 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
           />
         </MinHeight>
 
-        <ModePayment />
         <MyStyledButton
           clicked={btnDisabled}
           disabled={disabled}

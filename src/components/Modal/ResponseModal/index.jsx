@@ -227,6 +227,20 @@ const ResponseModal = () => {
                   </>
                 </>
               )}
+              {responseMessage === "Ringo Pay Electricity Successful" && (
+                <>
+                  <>
+                    <IconBox>
+                      <ImCheckmark color="#124A80" size={24} />
+                    </IconBox>
+                    <StrongText>Successful</StrongText>
+
+                    <LightText>
+                      Your electricity request has been successfully completed
+                    </LightText>
+                  </>
+                </>
+              )}
 
               {responseMessage === "Bulk Excel Successful" && (
                 <>

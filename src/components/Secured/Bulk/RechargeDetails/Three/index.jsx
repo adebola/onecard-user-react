@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import ServiceProvider from "../Service";
 
 import eko from "../../../../../assets/eko.jpg";

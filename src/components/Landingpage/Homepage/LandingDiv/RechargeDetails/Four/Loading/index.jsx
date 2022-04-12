@@ -125,6 +125,7 @@ const Loading = ({ cardNumber, cableType }) => {
       if (response.data.authorizationUrl !== null) {
         setAuthUrl(response.data.authorizationUrl);
         localStorage.setItem("id", JSON.stringify(response.data.id));
+
         return;
       }
     } catch (error) {

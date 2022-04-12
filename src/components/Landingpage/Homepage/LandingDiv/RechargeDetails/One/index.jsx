@@ -136,6 +136,10 @@ const One = () => {
       if (response.data.authorizationUrl !== null) {
         setAuthUrl(response.data.authorizationUrl);
         localStorage.setItem("id", JSON.stringify(response.data.id));
+        if (serviceName === "SPECTRANET-DATA") {
+          localStorage.setItem("name", JSON.stringify(serviceName));
+          return;
+        }
         localStorage.setItem("data", JSON.stringify(localData));
         setBtnDisabled(false);
         resetAllValue();

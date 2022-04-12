@@ -23,6 +23,7 @@ import WalletBalance from "../../../WalletBalance";
 import ModePayment from "../../../PaymentType";
 import Button from "../../../Button/normal";
 import ExcelFileUpload from "./ExcelFileUpload";
+import { ModalContext } from "../../../../context/ModalProvider";
 
 const data = [
   { id: 1, text: "Data", img: <FaDatabase /> },
@@ -50,6 +51,8 @@ const RechargeDetails = ({ rechargeId }) => {
     setAccountNumber,
     accountNumber,
   } = useContext(GlobalContext);
+
+  const { amountError } = useContext(ModalContext);
 
   const [cardNumber, setCardNumber] = useState("");
   const [id, setId] = useState(0);
@@ -137,8 +140,8 @@ const RechargeDetails = ({ rechargeId }) => {
     (phoneNumber === "" &&
       accountNumber === "" &&
       Object.entries(selected).length === 0 &&
-      amount < 500 &&
-      telephone === "");
+      amount < 999) ||
+    (telephone === "" && amountError === "");
 
   return (
     <RechargeDetailsContainer>

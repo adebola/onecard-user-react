@@ -11,13 +11,28 @@ const Landing = () => {
   const { authId } = useContext(AuthContext);
 
   const { setResponseMessage } = useContext(GlobalContext);
-  const { setResponseModal } = useContext(ModalContext);
+  const { setResponseModal, setCableMessage } = useContext(ModalContext);
 
   useEffect(() => {
     if (authId === null) {
       return;
     }
     const awaitResponse = async () => {
+      if (localStorage.getItem("name")) {
+        if (localStorage.getItem("id")) {
+          try {
+            const parsedId = JSON.parse(localStorage.getItem("id"));
+            const response = await getSingleRechargeResponse(parsedId);
+            setResponseModal(true);
+            setCableMessage(response.data.message);
+          } catch (error) {
+            setResponseModal(true);
+            setResponseMessage("Something went wrong, please try again");
+          }
+        }
+        return;
+      }
+
       if (localStorage.getItem("id")) {
         try {
           const parsedId = JSON.parse(localStorage.getItem("id"));
@@ -29,9 +44,25 @@ const Landing = () => {
           setResponseMessage("Something went wrong, please try again");
         }
       }
+
+      if (localStorage.getItem("cable")) {
+        if (localStorage.getItem("id")) {
+          try {
+            const parsedId = JSON.parse(localStorage.getItem("id"));
+            const response = await getSingleRechargeResponse(parsedId);
+            setResponseModal(true);
+            setCableMessage(response.data.message);
+          } catch (error) {
+            setResponseModal(true);
+            setResponseMessage("Something went wrong, please try again");
+          }
+        }
+        return;
+      }
     };
+
     awaitResponse();
-  }, [authId, setResponseMessage, setResponseModal]);
+  }, [authId, setResponseMessage, setCableMessage, setResponseModal]);
 
   return (
     <NoAuthContainer top="true">

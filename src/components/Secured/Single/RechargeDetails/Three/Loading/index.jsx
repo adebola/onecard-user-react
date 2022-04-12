@@ -58,20 +58,41 @@ const Error = styled.p`
   line-height: 30px;
   font-size: 12px;
 `;
+
+const AmountError = styled.p`
+  color: red;
+  font-size: 11px;
+  margin-top: 5px;
+`;
+
 const Loading = ({ serviceName, accountNumber, selected }) => {
+  const min = 1000;
+  const max = 999;
   const { paymentMode, startDate, setResponseMessage } =
     useContext(GlobalContext);
 
-  const { rechargeType, setErrorModal, setErrorMessage, setResponseModal } =
-    useContext(ModalContext);
+  const {
+    rechargeType,
+    setErrorModal,
+    setErrorMessage,
+    setCableMessage,
+    setResponseModal,
+  } = useContext(ModalContext);
 
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [amountError, setAmountError] = useState("");
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [telephone, setTelephone] = useState("");
   const [authUrl, setAuthUrl] = useState("");
+
+  useEffect(() => {
+    if (amount > max) {
+      setAmountError("");
+    }
+  }, [amount]);
 
   useEffect(() => {
     if (authUrl !== "") {
@@ -116,6 +137,12 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
 
     awaitResponse();
   }, [setIsLoading, serviceName, accountNumber, selected.value]);
+
+  const handleAmount = (e) => {
+    if (amount < min) {
+      setAmountError("Minimum amount is #1,000");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,12 +214,18 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
     try {
       const response = await makeCableRecharge(finalData);
       setResponseModal(true);
-      setResponseMessage("Ringo Pay Electricity Successful");
+      if (rechargeType === 1) {
+        setCableMessage(response.data.message);
+      } else {
+        setResponseMessage("Ringo Pay Cable Successful");
+      }
       setBtnDisabled(false);
       if (response.data.authorizationUrl) {
         setBtnDisabled(false);
         setAuthUrl(response.data.authorizationUrl);
         localStorage.setItem("id", JSON.stringify(response.data.id));
+        localStorage.setItem("type", JSON.stringify(rechargeType));
+        localStorage.setItem("cable", JSON.stringify(true));
       }
     } catch (error) {
       const message = error.response.data.message;
@@ -201,7 +234,7 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
     }
   };
 
-  const disabled = !amount || !telephone;
+  const disabled = amount < min || !telephone;
 
   if (isLoading) {
     return (
@@ -220,10 +253,12 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
           <Input
             placeholder="Enter Amount"
             value={amount}
+            onBlur={handleAmount}
             onChange={({ target }) =>
               setAmount(target.value.replace(/[^0-9]/g, ""))
             }
           />
+          <AmountError>{amountError}</AmountError>
           <Input
             placeholder="Enter telephone"
             value={telephone}

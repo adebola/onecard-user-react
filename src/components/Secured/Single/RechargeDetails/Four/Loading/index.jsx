@@ -59,6 +59,7 @@ const Loading = ({ cardNumber, cableType }) => {
   const { setResponseModal } = useContext(ModalContext);
 
   const [btnDisabled, setBtnDisabled] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
   const [details, setDetails] = useState([]);
   const [selected, setSelected] = useState({});

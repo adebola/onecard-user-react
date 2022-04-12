@@ -24,12 +24,12 @@ const SpinnerContainer = styled.div`
 `;
 
 const Input = styled.input`
-  margin-top: 15px;
+  margin-top: 7px;
   width: 100%;
   padding: 9px 12px;
   @media (max-width: 768px) {
-    margin-bottom: 5px;
-    margin-top: 9px;
+    margin-bottom: 2px;
+    margin-top: 6px;
   }
 `;
 
@@ -61,7 +61,16 @@ const Error = styled.p`
   line-height: 30px;
   font-size: 12px;
 `;
+
+const AmountError = styled.p`
+  color: red;
+  margin-top: 4px;
+  font-size: 10px;
+`;
+
 const Loading = ({ serviceName, accountNumber, selected }) => {
+  const min = 1000;
+  const max = 999;
   const [name, setName] = useState("");
   const [authUrl, setAuthUrl] = useState("");
   const [error, setError] = useState("");
@@ -69,8 +78,15 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [telephone, setTelephone] = useState("");
+  const [amountError, setAmountError] = useState("");
 
   const { setErrorModal, setErrorMessage } = useContext(ModalContext);
+
+  useEffect(() => {
+    if (amount > max) {
+      setAmountError("");
+    }
+  }, [amount]);
 
   useEffect(() => {
     if (authUrl !== "") {
@@ -145,13 +161,13 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
       };
     }
 
-    console.log(finalData);
     try {
       const response = await makeCableRecharge(finalData);
       if (response.data.authorizationUrl) {
         setBtnDisabled(false);
         setAuthUrl(response.data.authorizationUrl);
         localStorage.setItem("id", JSON.stringify(response.data.id));
+        localStorage.setItem("cable", JSON.stringify(true));
       }
     } catch (error) {
       const message = error.response.data.message;
@@ -160,7 +176,13 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
     }
   };
 
-  const disabled = !amount || !telephone;
+  const disabled = amount < min || !telephone;
+
+  const handleAmount = (e) => {
+    if (amount < min) {
+      setAmountError("Minimum amount is #1,000");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -179,10 +201,12 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
           <Input
             placeholder="Enter Amount"
             value={amount}
+            onBlur={handleAmount}
             onChange={({ target }) =>
               setAmount(target.value.replace(/[^0-9]/g, ""))
             }
           />
+          <AmountError>{amountError}</AmountError>
           <Input
             placeholder="Enter telephone"
             value={telephone}
@@ -196,7 +220,7 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
           clicked={btnDisabled}
           disabled={disabled}
           name="Submit"
-          myStyles={{ width: "100%" }}
+          myStyles={{ width: "100%", marginTop: "10px" }}
         />
       </FullContainer>
     );

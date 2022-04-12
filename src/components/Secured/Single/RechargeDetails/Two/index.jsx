@@ -115,7 +115,6 @@ const Two = () => {
 
     if (rechargeType === 2) {
       if (paymentMode === "wallet") {
-        console.log("Wallet");
         data = {
           paymentMode,
           rechargeType: "single",
@@ -152,8 +151,6 @@ const Two = () => {
           recipient: singlePhoneNumber,
         };
       }
-
-      console.log(data);
       try {
         const response = await makeScheduledRecharge(data);
         if (response.data.authorizationUrl !== null) {

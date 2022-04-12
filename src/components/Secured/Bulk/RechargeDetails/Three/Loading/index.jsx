@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { SyncLoader } from "react-spinners";
 import { getCardDetails } from "../../../../../../helper/noauthrequests";
+import { ModalContext } from "../../../../../../context/ModalProvider";
 
 const Container = styled.div`
   background-color: var(--light-background);
@@ -52,6 +53,13 @@ const Error = styled.p`
   line-height: 30px;
   font-size: 12px;
 `;
+
+const AmountError = styled.p`
+  color: red;
+  font-size: 11px;
+  margin-top: 5px;
+`;
+
 const Loading = ({
   serviceName,
   name,
@@ -63,15 +71,18 @@ const Loading = ({
   telephone,
   setTelephone,
 }) => {
+  const min = 1000;
+  const max = 999;
   const [error, setError] = useState("");
-  const [amountError, setAmountError] = useState("");
+  const { amountError, setAmountError } = useContext(ModalContext);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (amount < 500) {
-      setAmountError("Minimum amount is #1,000");
+    if (amount > max) {
+      setAmountError("");
     }
-  }, [amount]);
+  }, [amount, setAmountError]);
 
   useEffect(() => {
     if (!accountNumber) return;
@@ -108,6 +119,12 @@ const Loading = ({
     awaitResponse();
   }, [setIsLoading, serviceName, setName, accountNumber, selected.value]);
 
+  const handleAmount = (e) => {
+    if (amount < min) {
+      setAmountError("Minimum amount is #1,000");
+    }
+  };
+
   if (isLoading) {
     return (
       <SpinnerContainer>
@@ -125,10 +142,12 @@ const Loading = ({
           <Input
             placeholder="Enter Amount"
             value={amount}
+            onBlur={handleAmount}
             onChange={({ target }) =>
               setAmount(target.value.replace(/[^0-9]/g, ""))
             }
           />
+          <AmountError>{amountError}</AmountError>
           <Input
             placeholder="Enter telephone"
             value={telephone}
@@ -136,7 +155,6 @@ const Loading = ({
               setTelephone(target.value.replace(/[^0-9]/g, ""))
             }
           />
-          <Error>{amountError}</Error>
         </MinHeight>
       </FullContainer>
     );

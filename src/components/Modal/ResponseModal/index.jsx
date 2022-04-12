@@ -20,8 +20,13 @@ import Button from "../../Button/normal";
 const ResponseModal = () => {
   const { responseMessage, setResponseMessage, setListOfBulk } =
     useContext(GlobalContext);
-  const { responseDetail, setResponseDetail, setResponseModal } =
-    useContext(ModalContext);
+  const {
+    responseDetail,
+    cableMessage,
+    setCableMessage,
+    setResponseDetail,
+    setResponseModal,
+  } = useContext(ModalContext);
 
   const { setAuthId, setType } = useContext(AuthContext);
 
@@ -33,8 +38,11 @@ const ResponseModal = () => {
     localStorage.removeItem("data");
     localStorage.removeItem("id");
     localStorage.removeItem("type");
+    localStorage.removeItem("cable");
+    localStorage.removeItem("name");
     setType(null);
     setListOfBulk([]);
+    setCableMessage("");
   };
 
   useEffect(() => {
@@ -213,6 +221,16 @@ const ResponseModal = () => {
                   </>
                 </>
               )}
+              {cableMessage && (
+                <>
+                  <IconBox>
+                    <ImCheckmark color="#124A80" size={24} />
+                  </IconBox>
+                  <StrongText>Successful</StrongText>
+
+                  <LightText>{cableMessage}</LightText>
+                </>
+              )}
               {responseMessage === "Ringo Pay Cable Successful" && (
                 <>
                   <>
@@ -255,6 +273,16 @@ const ResponseModal = () => {
                       be mailed to you
                     </LightText>
                   </>
+                </>
+              )}
+
+              {responseMessage === "Password Success" && (
+                <>
+                  <IconBox>
+                    <ImCheckmark color="#124A80" size={24} />
+                  </IconBox>
+                  <StrongText>Success</StrongText>
+                  <LightText>Password has been updated successfully</LightText>
                 </>
               )}
 

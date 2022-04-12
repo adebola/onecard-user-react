@@ -4,7 +4,7 @@ import { GlobalContext } from "../../context/GlobalProvider";
 
 const Container = styled.div`
   margin-bottom: 50px;
-  margin-top: 14px;
+  margin-top: 30px;
 `;
 
 const Inner = styled.div`

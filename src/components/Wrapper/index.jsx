@@ -9,6 +9,7 @@ import ResponseModal from "../Modal/ResponseModal";
 import { ModalContext } from "../../context/ModalProvider";
 import ErrorModal from "../Modal/ErrorModal";
 import PasswordModal from "../Secured/Profile/PasswordModal";
+import QuestionModal from "../Modal/QuestionModal";
 
 const Container = styled.div`
   ${({ responseModal }) => {
@@ -77,21 +78,27 @@ const FullWidth = styled.div`
 
 const Wrapper = ({ children }) => {
   const { beneModal } = useContext(GlobalContext);
-  const { sendToBeneModal, responseModal, errorModal, passwordModal } =
-    useContext(ModalContext);
+  const {
+    sendToBeneModal,
+    questionModal,
+    responseModal,
+    errorModal,
+    passwordModal,
+  } = useContext(ModalContext);
   return (
     <Container
       sendToBeneModal={sendToBeneModal}
       beneModal={beneModal}
       errorModal={errorModal}
+      questionModal={questionModal}
       passwordModal={passwordModal}
     >
       {beneModal && <ModalCompo />}
       {sendToBeneModal && <SendBeneModal />}
       {responseModal && <ResponseModal />}
       {errorModal && <ErrorModal />}
-
       {passwordModal && <PasswordModal />}
+      {questionModal && <QuestionModal />}
 
       <Inner>
         <Sidebar />

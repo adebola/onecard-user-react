@@ -12,8 +12,12 @@ const ModalContextProvider = ({ children }) => {
   const [responseDetail, setResponseDetail] = useState({});
   const [rechargeType, setRechargeType] = useState(1);
   const [cableMessage, setCableMessage] = useState("");
-
   const [amountError, setAmountError] = useState("");
+
+  const [questionModal, setQuestionModal] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [organizationId, setOrganizationId] = useState("");
+  const [reload, setReload] = useState(false);
 
   return (
     <ModalContext.Provider
@@ -38,6 +42,14 @@ const ModalContextProvider = ({ children }) => {
         setCableMessage,
         passwordModal,
         setPasswordModal,
+        questionModal,
+        setQuestionModal,
+        userId,
+        setUserId,
+        organizationId,
+        setOrganizationId,
+        reload,
+        setReload,
       }}
     >
       {children}

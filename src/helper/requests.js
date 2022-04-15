@@ -92,5 +92,25 @@ export const getUserGeneratedSecret = () => {
 };
 
 export const getOrganizationDetails = (id) => {
-  return axios.get(`/organization/${id}`);
+  return axios.get(`/organization/orgusers/${id}`);
+};
+
+export const getUserRoles = (id) => {
+  return axios.get(`/role/company/${id}`);
+};
+
+export const getUserAssignedRoles = (id) => {
+  return axios.get(`/role/assignable/${id}`);
+};
+
+export const removeUserFromOrganization = (id, data) => {
+  return axios.post(`/organization/removeuser/${id}`, data);
+};
+
+export const removeUserRoleRequest = (id, data) => {
+  return axios.put(`/role/companyremove/${id}`, data);
+};
+
+export const addUserRoleRequest = (id, data) => {
+  return axios.put(`/role/companyadd/${id}`, data);
 };

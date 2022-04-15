@@ -67,7 +67,7 @@ const Sidebar = () => {
   const isAdmin =
     process.env.NODE_ENV === "development"
       ? UserServices.checkAdminRole("offline_access")
-      : UserServices.checkAdminRole("Company_Admins");
+      : UserServices.checkAdminRole("Company_Admin");
 
   return (
     <Container>

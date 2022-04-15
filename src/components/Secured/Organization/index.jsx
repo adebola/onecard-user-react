@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Container from "../../Container";
 import SmallText from "../../SmallText";
 import TopHeader from "../../TopNav";
@@ -7,17 +7,21 @@ import HamburgerMenu from "../../Hamburger";
 import MenuList from "../../Hamburger/Menulist";
 import styled from "styled-components";
 import {
+  addUserRoleRequest,
   getOrganizationDetails,
+  getUserAssignedRoles,
   getUserDetails,
+  getUserRoles,
+  removeUserRoleRequest,
 } from "../../../helper/requests";
-import UserServices from "../../../services/UserServices";
+import { ModalContext } from "../../../context/ModalProvider";
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: end;
 `;
 const Inner = styled.div`
-  min-height: 250px;
+  min-height: 350px;
 `;
 
 const Button = styled.button`
@@ -71,22 +75,173 @@ const AssignedRoles = styled.div`
   padding: 10px;
 `;
 
+const OrganizationName = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+`;
+
+const OrganizationLabel = styled.div`
+  background: var(--light-background);
+  padding: 10px;
+  min-width: 150px;
+  margin-left: 9px;
+  border-radius: 6px;
+
+  color: var(--text-color);
+  font-weight: bold;
+`;
+
+const OrganizationUsers = styled.div`
+  height: 300px;
+  overflow-y: scroll;
+`;
+
+const SingleUser = styled.div`
+  margin: 10px;
+  background: var(--light-background);
+  width: 92%;
+  padding: 15px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--text-color);
+
+  &.active {
+    background: var(--text-color);
+    color: var(--white);
+  }
+
+  &:hover {
+    background: var(--text-color);
+    color: var(--white);
+  }
+`;
+
+const UserText = styled.p``;
+
+const OrganizationText = styled(UserText)`
+  color: var(--text-color);
+`;
+
 const Organization = () => {
+  const [organizationUsers, setOrganizationUsers] = useState([]);
+  const [organizationName, setOrganizationName] = useState("");
+  const [firstRoleId, setFirstRoleId] = useState("");
+  const [secondRoleId, setSecondRoleId] = useState("");
+
+  const {
+    setUserId,
+    userId,
+    setQuestionModal,
+    setOrganizationId,
+    reload,
+    setReload,
+  } = useContext(ModalContext);
+
+  const [userRole, setUserRole] = useState([]);
+  const [assignedRole, setAssignedRole] = useState([]);
+
   useEffect(() => {
     const awaitResponse = async () => {
-      const firstResponse = await getUserDetails();
-      const response = await getOrganizationDetails(
-        firstResponse.data.account.userId
-      );
-      console.log(response.data);
+      try {
+        const firstResponse = await getUserDetails();
+        const response = await getOrganizationDetails(
+          firstResponse.data.organizationId
+        );
+        setOrganizationId(firstResponse.data.organizationId);
+        setOrganizationUsers(response.data.users);
+        setOrganizationName(response.data.organizationName);
+      } catch (error) {
+        const message = error.response.data.message;
+        console.log(message);
+      }
     };
 
     awaitResponse();
-  }, []);
+  }, [reload, setOrganizationId]);
 
-  console.log(UserServices._kc);
+  useEffect(() => {
+    if (!userId) return;
+    const awaitResponse = async () => {
+      try {
+        const firstRes = await getUserRoles(userId);
+        const secRes = await getUserAssignedRoles(userId);
+        setUserRole(firstRes.data);
+        setAssignedRole(secRes.data);
+        setReload(false);
+        setFirstRoleId("");
+        setSecondRoleId("");
+      } catch (error) {
+        const message = error.response.data.message;
+        console.log(message);
+      }
+    };
+    awaitResponse();
+  }, [reload, setReload, userId]);
 
   const [toggle, setToggle] = useState(false);
+
+  const handleClick = async (id) => {
+    setUserId(id);
+    try {
+      const firstRes = await getUserRoles(id);
+      const secRes = await getUserAssignedRoles(id);
+      setUserRole(firstRes.data);
+      setAssignedRole(secRes.data);
+    } catch (error) {
+      const message = error.response.data.message;
+      console.log(message);
+    }
+  };
+
+  const handleRemove = () => {
+    setQuestionModal(true);
+  };
+
+  const removeUserRole = async () => {
+    const data = { roleList: [firstRoleId] };
+    try {
+      await removeUserRoleRequest(userId, data);
+      setReload(true);
+    } catch (error) {
+      const message = error.response.data.message;
+      console.log(message);
+    }
+  };
+
+  const addUserRole = async () => {
+    const data = { roleList: [secondRoleId] };
+    try {
+      await addUserRoleRequest(userId, data);
+      setReload(true);
+    } catch (error) {
+      const message = error.response.data.message;
+      console.log(message);
+    }
+  };
+
+  const renderUsers = (arr) => {
+    return (
+      <OrganizationUsers>
+        {organizationUsers.map((user) => {
+          return (
+            <SingleUser
+              className={user.id === userId && "active"}
+              onClick={() => {
+                setUserId(user.id);
+                handleClick(user.id);
+              }}
+              key={user.id}
+            >
+              <UserText>
+                {user.firstName} {user.lastName}
+              </UserText>
+            </SingleUser>
+          );
+        })}
+      </OrganizationUsers>
+    );
+  };
 
   return (
     <>
@@ -94,32 +249,79 @@ const Organization = () => {
       <MenuList toggle={toggle} setToggle={setToggle} />
       <Wrapper>
         <TopHeader header="Organization" />
+
+        {organizationName && (
+          <OrganizationName>
+            <OrganizationText>Organization Name</OrganizationText>
+            <OrganizationLabel>{organizationName}</OrganizationLabel>
+          </OrganizationName>
+        )}
+
         <Container>
           <Users>
             <Inner>
               <SmallText text="Users" />
+
+              {renderUsers()}
             </Inner>
             <ButtonContainer>
-              <Button>Remove</Button>
+              {userRole.length > 0 && (
+                <Button onClick={handleRemove}>Remove</Button>
+              )}
             </ButtonContainer>
           </Users>
-          <AvailableRoles>
-            <Inner>
-              <SmallText text="Available Roles" />
-            </Inner>
-            <ButtonContainer>
-              <Button>add</Button>
-            </ButtonContainer>
-          </AvailableRoles>
-          <AssignedRoles>
-            <Inner>
-              <SmallText text="Assigned Roles" />
-            </Inner>
+          {userRole.length > 0 && (
+            <AvailableRoles>
+              <Inner>
+                <SmallText text="Assigned Roles" />
 
-            <ButtonContainer>
-              <Button>Remove</Button>
-            </ButtonContainer>
-          </AssignedRoles>
+                <OrganizationUsers>
+                  {userRole.map((user) => {
+                    return (
+                      <SingleUser
+                        className={user.id === firstRoleId && "active"}
+                        key={user.id}
+                        onClick={() => setFirstRoleId(user.id)}
+                      >
+                        <UserText>{user.name}</UserText>
+                      </SingleUser>
+                    );
+                  })}
+                </OrganizationUsers>
+              </Inner>
+              {firstRoleId && (
+                <ButtonContainer>
+                  <Button onClick={removeUserRole}>Remove</Button>
+                </ButtonContainer>
+              )}
+            </AvailableRoles>
+          )}
+
+          {assignedRole.length > 0 && (
+            <AssignedRoles>
+              <Inner>
+                <SmallText text="Available Roles" />
+
+                <OrganizationUsers>
+                  {assignedRole.map((user) => {
+                    return (
+                      <SingleUser
+                        className={user.id === secondRoleId && "active"}
+                        key={user.id}
+                      >
+                        <UserText>{user.name}</UserText>
+                      </SingleUser>
+                    );
+                  })}
+                </OrganizationUsers>
+              </Inner>
+              {secondRoleId && (
+                <ButtonContainer>
+                  <Button onClick={addUserRole}>add</Button>
+                </ButtonContainer>
+              )}
+            </AssignedRoles>
+          )}
         </Container>
       </Wrapper>
     </>

@@ -42,11 +42,11 @@ const MenuList = ({ toggle, setToggle }) => {
       name: "Beneficiaries",
       link: "/bene",
     },
-    // {
-    // 	id: 6,
-    // 	name: 'Auto & Scheduled',
-    // 	link: '/auto',
-    // },
+    {
+      id: 6,
+      name: "Auto Recharge",
+      link: "/auto",
+    },
     {
       id: 7,
       name: "Transactions",
@@ -81,11 +81,13 @@ const MenuList = ({ toggle, setToggle }) => {
             <LinkItem>
               <SideLink to="/profile">Profile</SideLink>
             </LinkItem>
+
             {isAdmin && (
               <LinkItem>
                 <SideLink to="/organization">Organization</SideLink>
               </LinkItem>
             )}
+
             <LinkItem logout="true" onClick={UserServices.doLogout}>
               Logout
             </LinkItem>

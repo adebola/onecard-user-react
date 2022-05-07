@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { GlobalContext } from "../../context/GlobalProvider";
 
 const Container = styled.div`
-  margin-bottom: 50px;
-  margin-top: 30px;
+  margin-bottom: 20px;
+  margin-top: 20px;
 `;
 
 const Inner = styled.div`
@@ -24,7 +24,7 @@ const Text = styled.p`
 
 const RadioButton = styled.input``;
 
-const ModePayment = () => {
+const ModePayment = ({ rechargeId }) => {
   const { paymentMode, setPaymentMode } = useContext(GlobalContext);
 
   const handlePaymentMode = (e) => {
@@ -43,16 +43,18 @@ const ModePayment = () => {
           />
           <Text>Wallet</Text>
         </RadioButtonContainer>
-        <RadioButtonContainer>
-          <RadioButton
-            type="radio"
-            checked={paymentMode === "paystack"}
-            onChange={handlePaymentMode}
-            name="payment"
-            value="paystack"
-          />
-          <Text>PayStack</Text>
-        </RadioButtonContainer>
+        {rechargeId !== 3 && (
+          <RadioButtonContainer>
+            <RadioButton
+              type="radio"
+              checked={paymentMode === "paystack"}
+              onChange={handlePaymentMode}
+              name="payment"
+              value="paystack"
+            />
+            <Text>Bank</Text>
+          </RadioButtonContainer>
+        )}
       </Inner>
     </Container>
   );

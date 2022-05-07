@@ -1,108 +1,120 @@
-import { createContext, useState } from 'react';
-import setHours from 'date-fns/setHours';
-import setMinutes from 'date-fns/setMinutes';
+import { createContext, useState } from "react";
+import setHours from "date-fns/setHours";
+import setMinutes from "date-fns/setMinutes";
 
 export const GlobalContext = createContext();
 
 const GlobalProvider = ({ children }) => {
-	//balance amount
-	const [balance, setBalance] = useState(0);
+  //balance amount
+  const [balance, setBalance] = useState(0);
 
-	//allTransactions
-	const [transactions, setTransactions] = useState([]);
+  //allTransactions
+  const [transactions, setTransactions] = useState([]);
 
-	//date
-	const [startDate, setStartDate] = useState(
-		setHours(setMinutes(new Date(), 30), 16)
-	);
+  //date
+  const [startDate, setStartDate] = useState(
+    setHours(setMinutes(new Date(), 30), 16)
+  );
 
-	//data-type
-	const [dataType, setDataType] = useState('');
+  const [endDate, setEndDate] = useState();
+  //data-type
+  const [dataType, setDataType] = useState("");
 
-	//beneficiaries
-	const [bene, setBene] = useState([]);
-	//singlebene
-	const [singleBene, setSingleBene] = useState({});
+  //beneficiaries
+  const [bene, setBene] = useState([]);
+  //singlebene
+  const [singleBene, setSingleBene] = useState({});
 
-	//single-phoneNumber
-	const [singlePhoneNumber, setSinglePhoneNumber] = useState('');
+  //single-phoneNumber
+  const [singlePhoneNumber, setSinglePhoneNumber] = useState("");
 
-	//single-accountNumber
-	const [accountNumber, setAccountNumber] = useState('');
+  //single-accountNumber
+  const [accountNumber, setAccountNumber] = useState("");
 
-	//single-amount
-	const [singleAmount, setSingleAmount] = useState('');
+  //single-amount
+  const [singleAmount, setSingleAmount] = useState("");
 
-	//single-dataplans
-	const [selectedSingleDataPlans, setSelectedSingleDataPlans] = useState({});
+  //bulk-single amount
+  const [bulkSingleAmount, setBulkSingleAmount] = useState("");
 
-	//bulk-phoneNumber
-	const [phoneNumber, setPhoneNumber] = useState('');
+  //single-dataplans
+  const [selectedSingleDataPlans, setSelectedSingleDataPlans] = useState({});
 
-	//listofbulkNo
-	const [listOfBulk, setListOfBulk] = useState([]);
+  //bulk-phoneNumber
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [bulkPhoneNumber, setBulkPhoneNumber] = useState("");
 
-	//serviceName
-	const [serviceName, setServiceName] = useState('');
+  //listofbulkNo
+  const [listOfBulk, setListOfBulk] = useState([]);
 
-	//selectedDataPlans
-	const [selectedDataPlans, setSelectedDataPlans] = useState({});
+  //serviceName
+  const [serviceName, setServiceName] = useState("");
 
-	//chooseBene
-	const [beneModal, setBeneModal] = useState(false);
+  //selectedDataPlans
+  const [selectedDataPlans, setSelectedDataPlans] = useState({});
 
-	//airtimeId
-	const [airtimeId, setAirtimeId] = useState(0);
+  //chooseBene
+  const [beneModal, setBeneModal] = useState(false);
 
-	//paymentType
-	const [paymentMode, setPaymentMode] = useState('wallet');
+  //airtimeId
+  const [airtimeId, setAirtimeId] = useState(0);
 
-	//response message
-	const [responseMessage, setResponseMessage] = useState('');
+  //paymentType
+  const [paymentMode, setPaymentMode] = useState("wallet");
 
-	return (
-		<GlobalContext.Provider
-			value={{
-				balance,
-				setBalance,
-				startDate,
-				setStartDate,
-				transactions,
-				setTransactions,
-				dataType,
-				setDataType,
-				bene,
-				setBene,
-				singleBene,
-				setSingleBene,
-				phoneNumber,
-				setPhoneNumber,
-				listOfBulk,
-				setListOfBulk,
-				serviceName,
-				setServiceName,
-				selectedDataPlans,
-				setSelectedDataPlans,
-				beneModal,
-				setBeneModal,
-				airtimeId,
-				setAirtimeId,
-				paymentMode,
-				setPaymentMode,
-				singleAmount,
-				setSingleAmount,
-				singlePhoneNumber,
-				setSinglePhoneNumber,
-				selectedSingleDataPlans,
-				setSelectedSingleDataPlans,
-				responseMessage,
-				setResponseMessage,
-				accountNumber,
-				setAccountNumber,
-			}}>
-			{children}
-		</GlobalContext.Provider>
-	);
+  //response message
+  const [responseMessage, setResponseMessage] = useState("");
+
+  return (
+    <GlobalContext.Provider
+      value={{
+        balance,
+        setBalance,
+        startDate,
+        setStartDate,
+        endDate,
+        setEndDate,
+        transactions,
+        setTransactions,
+        dataType,
+        setDataType,
+        bene,
+        setBene,
+        singleBene,
+        setSingleBene,
+        phoneNumber,
+        setPhoneNumber,
+        listOfBulk,
+        setListOfBulk,
+        serviceName,
+        setServiceName,
+        selectedDataPlans,
+        setSelectedDataPlans,
+        beneModal,
+        setBeneModal,
+        airtimeId,
+        setAirtimeId,
+        paymentMode,
+        setPaymentMode,
+        singleAmount,
+        setSingleAmount,
+        singlePhoneNumber,
+        setSinglePhoneNumber,
+        selectedSingleDataPlans,
+        setSelectedSingleDataPlans,
+        responseMessage,
+        setResponseMessage,
+        accountNumber,
+        setAccountNumber,
+        bulkSingleAmount,
+        setBulkSingleAmount,
+        bulkPhoneNumber,
+        setBulkPhoneNumber,
+      }}
+    >
+      {children}
+    </GlobalContext.Provider>
+  );
 };
 
 export default GlobalProvider;

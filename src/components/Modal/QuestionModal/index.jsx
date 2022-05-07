@@ -29,7 +29,7 @@ const Box = styled(Inner)`
   font-size: 16px;
   width: 500px;
   height: 400px;
-  @media (max-width: 460px) {
+  @media (max-width: 580px) {
     width: 100%;
     padding: 20px;
   }
@@ -40,8 +40,9 @@ const Div = styled(InnerBox)`
   width: 500px;
   height: 260px;
 
-  @media (max-width: 460px) {
-    width: 500px;
+  @media (max-width: 580px) {
+    width: 100%;
+    background: transparent;
   }
 `;
 

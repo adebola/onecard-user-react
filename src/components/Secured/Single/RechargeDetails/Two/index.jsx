@@ -10,11 +10,14 @@ import Button from "../../../../Button/normal";
 import ModePayment from "../../../../PaymentType";
 import { GlobalContext } from "../../../../../context/GlobalProvider";
 import {
+  makeAutoRechargeRequest,
   makeScheduledRecharge,
   makeSingleRecharge,
 } from "../../../../../helper/requests";
 import { ModalContext } from "../../../../../context/ModalProvider";
 import { convertDate } from "../../../../../utils/dateformat";
+import Bene from "../Beneficiary";
+import NumberFormat from "react-number-format";
 const airtime = [
   { id: 1, airtime: "MTN-AIRTIME", data: "MTN-DATA", name: "mtn", img: mtn },
   {
@@ -49,7 +52,7 @@ const Input = styled(ReactInputMask)`
   }
 `;
 
-const NormalInput = styled.input`
+const NormalInput = styled(NumberFormat)`
   width: 100%;
   height: 50px;
   margin: 10px 0;
@@ -65,21 +68,36 @@ const NormalInput = styled.input`
 
 const Form = styled.form``;
 
+const ErrorBox = styled.div`
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+`;
+
+const BoldText = styled.div`
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--btn-color);
+`;
+
 const Two = () => {
+  const [disabled, setDisabled] = useState(false);
+
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [authUrl, setAuthUrl] = useState("");
 
   const {
-    singlePhoneNumber,
+    phoneNumber,
     singleAmount,
     setSingleAmount,
-    setSinglePhoneNumber,
+    setPhoneNumber,
     setResponseMessage,
     startDate,
     airtimeId,
     paymentMode,
+    endDate,
   } = useContext(GlobalContext);
 
   const {
@@ -88,6 +106,13 @@ const Two = () => {
     setErrorModal,
     setErrorMessage,
     rechargeType,
+    setRechargeType,
+    rechargeName,
+    weeklyAutoRecharge,
+    monthlyAutoRecharge,
+    error,
+    setError,
+    setCableMessage,
   } = useContext(ModalContext);
 
   useEffect(() => {
@@ -98,7 +123,20 @@ const Two = () => {
     return;
   }, [authUrl]);
 
-  const disabled = singlePhoneNumber === "" || singleAmount === "";
+  useEffect(() => {
+    if (!phoneNumber || !singleAmount || !serviceName) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [phoneNumber, serviceName, singleAmount]);
+
+  useEffect(() => {
+    if (weeklyAutoRecharge.length > 0 || monthlyAutoRecharge.length > 0) {
+      setBtnDisabled(false);
+      setError("");
+    }
+  }, [setError, weeklyAutoRecharge, monthlyAutoRecharge]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -113,6 +151,52 @@ const Two = () => {
 
     const scheduledDate = convertDate(startDate);
 
+    if (rechargeType === 3) {
+      let scheduledEndDate;
+      if (!endDate) {
+        scheduledEndDate = "";
+      } else {
+        scheduledEndDate = convertDate(endDate);
+      }
+
+      if (weeklyAutoRecharge.length === 0 && monthlyAutoRecharge.length === 0) {
+        setError("Please choose a recharge plan (weekly or monthly)");
+        return;
+      }
+
+      const data = {
+        paymentMode,
+        title: rechargeName,
+        startDate: scheduledDate,
+        endDate: scheduledEndDate,
+        daysOfWeek: weeklyAutoRecharge,
+        daysOfMonth: monthlyAutoRecharge,
+        recipients: [
+          {
+            recipient: phoneNumber.replace(/\D+/g, ""),
+            serviceCode: serviceName,
+            serviceCost: singleAmount.replace(/\D+/g, ""),
+          },
+        ],
+      };
+
+      try {
+        const response = await makeAutoRechargeRequest(data);
+
+        setResponseModal(true);
+        setBtnDisabled(false);
+        resetAllValue();
+        setRechargeType(1);
+        setCableMessage(response.data.message);
+      } catch (error) {
+        setErrorModal(true);
+        setErrorMessage(error.response.data.message);
+        setBtnDisabled(false);
+        resetAllValue();
+      }
+      return;
+    }
+
     if (rechargeType === 2) {
       if (paymentMode === "wallet") {
         data = {
@@ -121,15 +205,15 @@ const Two = () => {
           scheduledDate,
           recipients: [
             {
-              recipient: singlePhoneNumber.replace(/\D+/g, ""),
+              recipient: phoneNumber.replace(/\D+/g, ""),
               serviceCode: serviceName,
-              serviceCost: singleAmount,
+              serviceCost: singleAmount.replace(/\D+/g, ""),
             },
           ],
         };
         const dataToDisplay = {
           amount: singleAmount,
-          recipient: singlePhoneNumber,
+          recipient: phoneNumber,
         };
         setResponseDetail(dataToDisplay);
       } else {
@@ -139,16 +223,16 @@ const Two = () => {
           rechargeType: "single",
           recipients: [
             {
-              recipient: singlePhoneNumber.replace(/\D+/g, ""),
+              recipient: phoneNumber.replace(/\D+/g, ""),
               serviceCode: serviceName,
-              serviceCost: singleAmount,
+              serviceCost: singleAmount.replace(/\D+/g, ""),
             },
           ],
           redirectUrl: `${window.origin}${window.location.pathname}`,
         };
         localData = {
           amount: singleAmount,
-          recipient: singlePhoneNumber,
+          recipient: phoneNumber,
         };
       }
       try {
@@ -175,27 +259,27 @@ const Two = () => {
     } else {
       if (paymentMode === "wallet") {
         data = {
-          serviceCost: singleAmount,
-          recipient: singlePhoneNumber.replace(/\D+/g, ""),
+          serviceCost: singleAmount.replace(/\D+/g, ""),
+          recipient: phoneNumber.replace(/\D+/g, ""),
           paymentMode,
           serviceCode: serviceName,
         };
         const dataToDisplay = {
           amount: singleAmount,
-          recipient: singlePhoneNumber,
+          recipient: phoneNumber,
         };
         setResponseDetail(dataToDisplay);
       } else {
         data = {
-          serviceCost: singleAmount,
-          recipient: singlePhoneNumber.replace(/\D+/g, ""),
+          serviceCost: singleAmount.replace(/\D+/g, ""),
+          recipient: phoneNumber.replace(/\D+/g, ""),
           paymentMode,
           serviceCode: serviceName,
           redirectUrl: `${window.origin}${window.location.pathname}`,
         };
         localData = {
           amount: singleAmount,
-          recipient: singlePhoneNumber,
+          recipient: phoneNumber,
         };
       }
       try {
@@ -222,7 +306,7 @@ const Two = () => {
   };
 
   const resetAllValue = () => {
-    setSinglePhoneNumber("");
+    setPhoneNumber("");
     setSingleAmount("");
   };
 
@@ -233,9 +317,11 @@ const Two = () => {
         serviceName={serviceName}
         setServiceName={setServiceName}
       />
+      <Bene />
+      <BoldText>Amount</BoldText>
       <NormalInput
+        thousandSeparator={true}
         placeholder="Enter amount"
-        type="number"
         value={singleAmount}
         onChange={({ target }) => {
           setSingleAmount(target.value);
@@ -251,18 +337,23 @@ const Two = () => {
           }}
         />
       ) : (
-        <Input
-          onChange={({ target }) => {
-            setSinglePhoneNumber(target.value);
-          }}
-          type="tel"
-          maskChar=" "
-          value={singlePhoneNumber}
-          mask="999 9999 9999"
-          placeholder="Enter phone number"
-        />
+        <>
+          <BoldText>Phone number</BoldText>
+          <Input
+            onChange={({ target }) => {
+              setPhoneNumber(target.value);
+            }}
+            type="tel"
+            maskChar=" "
+            value={phoneNumber}
+            mask="999 9999 9999"
+            placeholder="Enter phone number"
+          />
+        </>
       )}
-      <ModePayment />
+      <ModePayment rechargeId={rechargeType} />
+
+      {error && <ErrorBox>{error}</ErrorBox>}
       <Button
         className={btnDisabled && "not-allowed"}
         disabled={disabled}

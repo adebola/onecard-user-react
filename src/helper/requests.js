@@ -114,3 +114,23 @@ export const removeUserRoleRequest = (id, data) => {
 export const addUserRoleRequest = (id, data) => {
   return axios.put(`/role/companyadd/${id}`, data);
 };
+
+export const makeAutoRechargeRequest = (data) => {
+  return axios.post("/auth-recharge/auto", data);
+};
+
+export const getAutoRechargePlans = () => {
+  return axios.get("/auth-recharge/getauto");
+};
+
+export const getSingleAutoRechargePlan = (id) => {
+  return axios.get(`/auth-recharge/auto/${id}`);
+};
+
+export const editSingleAutoRechargePlan = (id, data) => {
+  return axios.put(`/auth-recharge/auto/${id}`, data);
+};
+
+export const deleteSingleAutoRechargePlan = (id) => {
+  return axios.delete(`/auth-recharge/auto/${id}`);
+};

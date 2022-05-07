@@ -65,8 +65,10 @@ const Three = ({
 
   useEffect(() => {
     setAccountNumber("");
+    setTelephone("");
+    setAmount("");
     setLoading(false);
-  }, [serviceName, setLoading, setAccountNumber]);
+  }, [serviceName, setLoading, setAccountNumber, setTelephone, setAmount]);
 
   const handleChange = (each) => {
     setSelected(each);

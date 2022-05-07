@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
 import styled from "styled-components";
 import { GlobalContext } from "../../../../../context/GlobalProvider";
-import { GrFormClose } from "react-icons/gr";
+import { MdOutlineClose } from "react-icons/md";
 import {
+  makeAutoRechargeRequest,
   makeBulkRecharge,
   makeScheduledRecharge,
 } from "../../../../../helper/requests";
@@ -91,7 +92,7 @@ const ItemText = styled.p`
 
 const Action = styled.div`
   color: #eb6a2b;
-
+  cursor: pointer;
   .icon {
     color: #eb6a2b;
     /* background-color: #eb6a2b; */
@@ -127,9 +128,25 @@ const ListOfBene = ({ rechargeType }) => {
     paymentMode,
     setResponseMessage,
     startDate,
+    endDate,
   } = useContext(GlobalContext);
-  const { setResponseModal, setErrorMessage, setErrorModal } =
-    useContext(ModalContext);
+  const {
+    setResponseModal,
+    rechargeName,
+    weeklyAutoRecharge,
+    monthlyAutoRecharge,
+    setError,
+    setErrorMessage,
+    setErrorModal,
+    setCableMessage,
+  } = useContext(ModalContext);
+
+  useEffect(() => {
+    if (weeklyAutoRecharge.length > 0 || monthlyAutoRecharge.length > 0) {
+      setBtnDisabled(false);
+      setError("");
+    }
+  }, [setError, weeklyAutoRecharge, monthlyAutoRecharge]);
 
   const handleDelete = (index) => {
     setListOfBulk(listOfBulk.filter((e, b) => b !== index));
@@ -151,6 +168,38 @@ const ListOfBene = ({ rechargeType }) => {
       ...each,
     }));
 
+    if (rechargeType === 3) {
+      let scheduledEndDate;
+      if (!endDate) {
+        scheduledEndDate = "";
+      } else {
+        scheduledEndDate = convertDate(endDate);
+      }
+
+      bulkData = {
+        paymentMode,
+        startDate: scheduledDate,
+        endDate: scheduledEndDate,
+        title: rechargeName,
+        daysOfWeek: weeklyAutoRecharge,
+        daysOfMonth: monthlyAutoRecharge,
+        rechargeType: "bulk",
+        recipients: finalData,
+      };
+      try {
+        const response = await makeAutoRechargeRequest(bulkData);
+
+        setResponseModal(true);
+        setBtnDisabled(false);
+        setCableMessage(response.data.message);
+      } catch (error) {
+        setErrorModal(true);
+        setErrorMessage(error.response.data.message);
+        setBtnDisabled(false);
+      }
+      return;
+    }
+
     if (rechargeType === 2) {
       bulkData = {
         paymentMode,
@@ -162,7 +211,6 @@ const ListOfBene = ({ rechargeType }) => {
             ? ""
             : `${window.origin}${window.location.pathname}`,
       };
-
       try {
         const response = await makeScheduledRecharge(bulkData);
         if (response.data.authorizationUrl) {
@@ -191,9 +239,15 @@ const ListOfBene = ({ rechargeType }) => {
             ? ""
             : `${window.origin}${window.location.pathname}`,
       };
-
       try {
         const response = await makeBulkRecharge(bulkData);
+        if (response.data.status === 300) {
+          setBtnDisabled(false);
+          const message = response.data.message;
+          setErrorModal(true);
+          setErrorMessage(message);
+          return;
+        }
 
         if (response.data.authorizationUrl) {
           setAuthUrl(response.data.authorizationUrl);
@@ -223,9 +277,12 @@ const ListOfBene = ({ rechargeType }) => {
                 <ItemDetails>
                   <ItemText>{each.recipient}</ItemText>
                   <ItemText>{each.serviceCode || each.name}</ItemText>
+                  <ItemText>
+                    {each.serviceCost ? "#" + each.serviceCost : each.value}
+                  </ItemText>
                 </ItemDetails>
                 <Action>
-                  <GrFormClose
+                  <MdOutlineClose
                     onClick={() => handleDelete(index)}
                     style={{ fill: "red" }}
                     className="icon"

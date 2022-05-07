@@ -39,11 +39,11 @@ const Sidebar = () => {
       name: "Beneficiaries",
       link: "/bene",
     },
-    // {
-    // 	id: 6,
-    // 	name: 'Auto & Scheduled',
-    // 	link: '/auto',
-    // },
+    {
+      id: 6,
+      name: "Auto Recharge",
+      link: "/auto",
+    },
     {
       id: 7,
       name: "Transactions",

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Grid,
   GridInner,
@@ -8,6 +8,7 @@ import {
   SmallText,
   TopContainer,
 } from "./styles";
+import styled from "styled-components";
 
 import { FaDatabase } from "react-icons/fa";
 import { BiPhoneCall } from "react-icons/bi";
@@ -33,12 +34,19 @@ const data = [
   { id: 5, text: "Others", img: <MdOutlineAddCircleOutline /> },
 ];
 
+const ErrorBox = styled.div`
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+`;
+
 const RechargeDetails = ({ rechargeId }) => {
+  const [disabled, setDisabled] = useState(false);
+
   const {
     setDataType,
     setServiceName,
     serviceName,
-    phoneNumber,
     setPhoneNumber,
     setListOfBulk,
     listOfBulk,
@@ -46,13 +54,22 @@ const RechargeDetails = ({ rechargeId }) => {
     setAirtimeId,
     selectedSingleDataPlans,
     setSelectedSingleDataPlans,
-    singleAmount,
     setSingleAmount,
     setAccountNumber,
     accountNumber,
+    bulkSingleAmount,
+    bulkPhoneNumber,
+    setBulkPhoneNumber,
+    setBulkSingleAmount,
   } = useContext(GlobalContext);
 
-  const { amountError } = useContext(ModalContext);
+  const {
+    amountError,
+    error,
+    setError,
+    weeklyAutoRecharge,
+    monthlyAutoRecharge,
+  } = useContext(ModalContext);
 
   const [cardNumber, setCardNumber] = useState("");
   const [id, setId] = useState(0);
@@ -65,6 +82,12 @@ const RechargeDetails = ({ rechargeId }) => {
   const [telephone, setTelephone] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    setAmount("");
+    setTelephone("");
+    setBulkPhoneNumber("");
+  }, [setBulkPhoneNumber]);
+
   const resetDetails = () => {
     setPhoneNumber("");
     setAccountNumber("");
@@ -76,29 +99,55 @@ const RechargeDetails = ({ rechargeId }) => {
     setTelephone("");
     setAmount("");
     setSelected({});
+    setBulkPhoneNumber("");
+    setBulkSingleAmount("");
   };
+
+  useEffect(() => {
+    if (
+      (error && weeklyAutoRecharge.length > 0) ||
+      monthlyAutoRecharge.length > 0
+    ) {
+      setError("");
+    }
+  }, [monthlyAutoRecharge, weeklyAutoRecharge, setError, error]);
 
   const handleAdd = () => {
     let singleDetails;
+
+    if (
+      (rechargeType === "Data" || rechargeType === "Airtime") &&
+      rechargeId === 3
+    ) {
+      if (weeklyAutoRecharge.length === 0 && monthlyAutoRecharge.length === 0) {
+        setError("Please choose a recharge plan (weekly or monthly)");
+        return;
+      }
+    }
+
     if (rechargeType === "Data") {
       singleDetails = {
         recipient:
-          phoneNumber !== "" ? phoneNumber.replace(/\D+/g, "") : accountNumber,
+          bulkPhoneNumber !== ""
+            ? bulkPhoneNumber.replace(/\D+/g, "")
+            : accountNumber,
         serviceCode: serviceName,
+        value: selectedSingleDataPlans.label,
         productId: selectedSingleDataPlans.id,
       };
     } else if (rechargeType === "Airtime") {
       singleDetails = {
         recipient:
-          phoneNumber !== "" ? phoneNumber.replace(/\D+/g, "") : accountNumber,
+          bulkPhoneNumber !== ""
+            ? bulkPhoneNumber.replace(/\D+/g, "")
+            : accountNumber,
         serviceCode: serviceName,
-        serviceCost: singleAmount,
+        serviceCost: bulkSingleAmount.replace(/\D+/g, ""),
       };
     } else if (rechargeType === "Cable TV") {
       singleDetails = {
         recipient: cardNumber,
         name: selected.name,
-        serviceCost: selected.price,
         productId: selected.code,
         serviceCode: serviceName,
       };
@@ -135,13 +184,33 @@ const RechargeDetails = ({ rechargeId }) => {
     setAirtimeId(0);
   };
 
-  const disabled =
-    !selectedSingleDataPlans ||
-    (phoneNumber === "" &&
-      accountNumber === "" &&
-      Object.entries(selected).length === 0 &&
-      amount < 999) ||
-    (telephone === "" && amountError === "");
+  useEffect(() => {
+    if (
+      ((id === 1 || id === 0) &&
+        (Object.keys(selectedSingleDataPlans).length === 0 ||
+          bulkPhoneNumber === "")) ||
+      ((id === 2 || id === 0) &&
+        (bulkSingleAmount === "" || bulkPhoneNumber === "")) ||
+      ((id === 3 || id === 0) && (amount === "" || telephone === "")) ||
+      ((id === 4 || id === 0) && Object.entries(selected).length === 0)
+    ) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [
+    setDisabled,
+    selectedSingleDataPlans,
+    id,
+    amountError,
+    amount,
+    telephone,
+    disabled,
+    selected,
+    accountNumber,
+    bulkSingleAmount,
+    bulkPhoneNumber,
+  ]);
 
   return (
     <RechargeDetailsContainer>
@@ -207,7 +276,9 @@ const RechargeDetails = ({ rechargeId }) => {
               />
             )}
             {id === 5 && <Five rechargeType={rechargeType} />}
-            {id !== 0 && <ModePayment />}
+            {id !== 0 && <ModePayment rechargeId={rechargeId} />}
+
+            {error && <ErrorBox>{error}</ErrorBox>}
             <Button
               disabled={disabled}
               onClick={() => handleAdd()}
@@ -217,6 +288,7 @@ const RechargeDetails = ({ rechargeId }) => {
           </>
         )}
       </MinHeight>
+
       {optionId === 1 && <WalletBalance balance={balance} />}
     </RechargeDetailsContainer>
   );

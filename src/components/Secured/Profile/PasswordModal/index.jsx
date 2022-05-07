@@ -16,14 +16,13 @@ const PasswordContainer = styled.form`
   z-index: 90;
   justify-content: center;
 
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     background-color: rgba(0, 0, 0, 0.3);
   }
 `;
 
 export const Inner = styled.div`
   width: 700px;
-  /* height: 400px; */
   background-color: var(--text-color);
   border-radius: 20px;
   padding: 3rem;
@@ -31,8 +30,9 @@ export const Inner = styled.div`
   align-items: center;
   justify-content: center;
 
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     background-color: transparent;
+    padding: 1rem;
   }
 `;
 
@@ -44,7 +44,7 @@ export const InnerBox = styled.div`
   padding: 2rem 1rem;
   margin-right: 10px;
 
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     width: 100%;
     height: 450px;
   }
@@ -68,8 +68,8 @@ const InputDiv = styled.div`
   margin: auto;
   margin-bottom: 20px;
 
-  @media (max-width: 400px) {
-    width: 320px;
+  @media (max-width: 500px) {
+    width: 100%;
     margin: auto;
     margin-bottom: 20px;
   }
@@ -165,9 +165,9 @@ const PasswordModal = () => {
           <Title>Update Password</Title>
 
           <InputDiv>
-            <Label>Confirm Password</Label>
+            <Label>Password</Label>
             <Input
-              placeholder="Confirm password"
+              placeholder="Password"
               type="password"
               value={password.confirmPassword}
               onChange={({ target }) => {

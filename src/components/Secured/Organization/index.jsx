@@ -270,58 +270,56 @@ const Organization = () => {
               )}
             </ButtonContainer>
           </Users>
-          {userRole.length > 0 && (
-            <AvailableRoles>
-              <Inner>
-                <SmallText text="Assigned Roles" />
 
-                <OrganizationUsers>
-                  {userRole.map((user) => {
-                    return (
-                      <SingleUser
-                        className={user.id === firstRoleId && "active"}
-                        key={user.id}
-                        onClick={() => setFirstRoleId(user.id)}
-                      >
-                        <UserText>{user.name}</UserText>
-                      </SingleUser>
-                    );
-                  })}
-                </OrganizationUsers>
-              </Inner>
-              {firstRoleId && (
-                <ButtonContainer>
-                  <Button onClick={removeUserRole}>Remove</Button>
-                </ButtonContainer>
-              )}
-            </AvailableRoles>
-          )}
+          <AvailableRoles>
+            <Inner>
+              <SmallText text="Assigned Roles" />
 
-          {assignedRole.length > 0 && (
-            <AssignedRoles>
-              <Inner>
-                <SmallText text="Available Roles" />
+              <OrganizationUsers>
+                {userRole.map((user) => {
+                  return (
+                    <SingleUser
+                      className={user.id === firstRoleId && "active"}
+                      key={user.id}
+                      onClick={() => setFirstRoleId(user.id)}
+                    >
+                      <UserText>{user.name}</UserText>
+                    </SingleUser>
+                  );
+                })}
+              </OrganizationUsers>
+            </Inner>
+            {firstRoleId && (
+              <ButtonContainer>
+                <Button onClick={removeUserRole}>Remove</Button>
+              </ButtonContainer>
+            )}
+          </AvailableRoles>
 
-                <OrganizationUsers>
-                  {assignedRole.map((user) => {
-                    return (
-                      <SingleUser
-                        className={user.id === secondRoleId && "active"}
-                        key={user.id}
-                      >
-                        <UserText>{user.name}</UserText>
-                      </SingleUser>
-                    );
-                  })}
-                </OrganizationUsers>
-              </Inner>
-              {secondRoleId && (
-                <ButtonContainer>
-                  <Button onClick={addUserRole}>add</Button>
-                </ButtonContainer>
-              )}
-            </AssignedRoles>
-          )}
+          <AssignedRoles>
+            <Inner>
+              <SmallText text="Available Roles" />
+
+              <OrganizationUsers>
+                {assignedRole.map((user) => {
+                  return (
+                    <SingleUser
+                      onClick={() => setSecondRoleId(user.id)}
+                      className={user.id === secondRoleId && "active"}
+                      key={user.id}
+                    >
+                      <UserText>{user.name}</UserText>
+                    </SingleUser>
+                  );
+                })}
+              </OrganizationUsers>
+            </Inner>
+            {secondRoleId && (
+              <ButtonContainer>
+                <Button onClick={addUserRole}>add</Button>
+              </ButtonContainer>
+            )}
+          </AssignedRoles>
         </Container>
       </Wrapper>
     </>

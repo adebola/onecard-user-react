@@ -14,10 +14,14 @@ import { GlobalContext } from "../../../../../context/GlobalProvider";
 import ModePayment from "../../../../PaymentType";
 import { ModalContext } from "../../../../../context/ModalProvider";
 import {
+  makeAutoRechargeRequest,
   makeScheduledRecharge,
   makeSingleRecharge,
 } from "../../../../../helper/requests";
 import { convertDate } from "../../../../../utils/dateformat";
+
+import Bene from "../Beneficiary";
+import { css } from "styled-components";
 
 const airtime = [
   { id: 1, airtime: "MTN-AIRTIME", data: "MTN-DATA", name: "mtn", img: mtn },
@@ -90,7 +94,27 @@ const MySelect = styled(Select)`
 
 const Form = styled.form``;
 
+const ErrorBox = styled.div`
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+`;
+
+const BoldText = styled.div`
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--btn-color);
+
+  ${({ mt }) =>
+    mt &&
+    css`
+      margin-top: ${mt}px;
+    `}
+`;
+
 const One = () => {
+  const [disabled, setDisabled] = useState(false);
+
   const [authUrl, setAuthUrl] = useState("");
   const [dataPlans, setDataPlans] = useState([]);
   const [btnDisabled, setBtnDisabled] = useState(false);
@@ -105,8 +129,8 @@ const One = () => {
   }, [authUrl]);
 
   const {
-    singlePhoneNumber,
-    setSinglePhoneNumber,
+    phoneNumber,
+    setPhoneNumber,
     selectedSingleDataPlans,
     setSelectedSingleDataPlans,
     paymentMode,
@@ -115,6 +139,7 @@ const One = () => {
     accountNumber,
     setAccountNumber,
     startDate,
+    endDate,
   } = useContext(GlobalContext);
 
   const {
@@ -123,25 +148,98 @@ const One = () => {
     setErrorMessage,
     setErrorModal,
     rechargeType,
+    setRechargeType,
     setCableMessage,
+    rechargeName,
+    weeklyAutoRecharge,
+    monthlyAutoRecharge,
+    error,
+    setError,
   } = useContext(ModalContext);
+
+  useEffect(() => {
+    if (!selectedSingleDataPlans || !phoneNumber || !serviceName) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [phoneNumber, serviceName, selectedSingleDataPlans]);
+
+  useEffect(() => {
+    if (
+      paymentMode === "wallet" ||
+      weeklyAutoRecharge.length > 0 ||
+      monthlyAutoRecharge.length > 0
+    ) {
+      setBtnDisabled(false);
+      setError("");
+    }
+  }, [paymentMode, setError, weeklyAutoRecharge, monthlyAutoRecharge]);
+
+  useEffect(() => {}, []);
 
   const handelSelectedDataPlans = (e) => {
     setSelectedSingleDataPlans(e);
   };
 
-  const disabled =
-    !selectedSingleDataPlans ||
-    (singlePhoneNumber === "" && accountNumber === "");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setBtnDisabled(true);
+    // setBtnDisabled(true);
 
-    if (btnDisabled) {
+    // if (btnDisabled) {
+    //   return;
+    // }
+    const scheduledDate = convertDate(startDate);
+
+    if (rechargeType === 3) {
+      let scheduledEndDate;
+      if (!endDate) {
+        scheduledEndDate = "";
+      } else {
+        scheduledEndDate = convertDate(endDate);
+      }
+
+      if (weeklyAutoRecharge.length === 0 && monthlyAutoRecharge.length === 0) {
+        setError("Please choose a recharge plan (weekly or monthly)");
+        return;
+      }
+
+      if (weeklyAutoRecharge.length > 0 && monthlyAutoRecharge.length > 0) {
+        setError("Select either weekly or monthly recharge");
+        return;
+      }
+
+      const data = {
+        paymentMode,
+        title: rechargeName,
+        startDate: scheduledDate,
+        endDate: scheduledEndDate,
+        daysOfWeek: weeklyAutoRecharge,
+        daysOfMonth: monthlyAutoRecharge,
+        recipients: [
+          {
+            recipient: phoneNumber.replace(/\D+/g, ""),
+            serviceCode: serviceName,
+            productId: selectedSingleDataPlans.id,
+          },
+        ],
+      };
+
+      try {
+        const response = await makeAutoRechargeRequest(data);
+        setResponseModal(true);
+        setBtnDisabled(false);
+        resetAllValue();
+        setRechargeType(1);
+        setCableMessage(response.data.message);
+      } catch (error) {
+        setErrorModal(true);
+        setErrorMessage(error.response.data.message);
+        setBtnDisabled(false);
+        resetAllValue();
+      }
       return;
     }
-    const scheduledDate = convertDate(startDate);
 
     if (rechargeType === 2) {
       let data, localData;
@@ -153,8 +251,8 @@ const One = () => {
           recipients: [
             {
               recipient:
-                singlePhoneNumber !== ""
-                  ? singlePhoneNumber.replace(/\D+/g, "")
+                phoneNumber !== ""
+                  ? phoneNumber.replace(/\D+/g, "")
                   : accountNumber,
               productId: selectedSingleDataPlans.id,
               serviceCode: serviceName,
@@ -165,8 +263,8 @@ const One = () => {
         const dataToDisplay = {
           amount: selectedSingleDataPlans.value,
           recipient:
-            singlePhoneNumber !== ""
-              ? singlePhoneNumber.replace(/\D+/g, "")
+            phoneNumber !== ""
+              ? phoneNumber.replace(/\D+/g, "")
               : accountNumber,
         };
         setResponseDetail(dataToDisplay);
@@ -178,8 +276,8 @@ const One = () => {
           recipients: [
             {
               recipient:
-                singlePhoneNumber !== ""
-                  ? singlePhoneNumber.replace(/\D+/g, "")
+                phoneNumber !== ""
+                  ? phoneNumber.replace(/\D+/g, "")
                   : accountNumber,
               productId: selectedSingleDataPlans.id,
               serviceCode: serviceName,
@@ -191,8 +289,8 @@ const One = () => {
         localData = {
           amount: selectedSingleDataPlans.value,
           recipient:
-            singlePhoneNumber !== ""
-              ? singlePhoneNumber.replace(/\D+/g, "")
+            phoneNumber !== ""
+              ? phoneNumber.replace(/\D+/g, "")
               : accountNumber,
         };
       }
@@ -224,8 +322,8 @@ const One = () => {
         data = {
           productId: selectedSingleDataPlans.id,
           recipient:
-            singlePhoneNumber !== ""
-              ? singlePhoneNumber.replace(/\D+/g, "")
+            phoneNumber !== ""
+              ? phoneNumber.replace(/\D+/g, "")
               : accountNumber,
           paymentMode,
           serviceCode: serviceName,
@@ -233,8 +331,8 @@ const One = () => {
         const dataToDisplay = {
           amount: selectedSingleDataPlans.value,
           recipient:
-            singlePhoneNumber !== ""
-              ? singlePhoneNumber.replace(/\D+/g, "")
+            phoneNumber !== ""
+              ? phoneNumber.replace(/\D+/g, "")
               : accountNumber,
         };
         setResponseDetail(dataToDisplay);
@@ -242,8 +340,8 @@ const One = () => {
         data = {
           productId: selectedSingleDataPlans.id,
           recipient:
-            singlePhoneNumber !== ""
-              ? singlePhoneNumber.replace(/\D+/g, "")
+            phoneNumber !== ""
+              ? phoneNumber.replace(/\D+/g, "")
               : accountNumber,
           paymentMode,
           serviceCode: serviceName,
@@ -252,8 +350,8 @@ const One = () => {
         localData = {
           amount: selectedSingleDataPlans.value,
           recipient:
-            singlePhoneNumber !== ""
-              ? singlePhoneNumber.replace(/\D+/g, "")
+            phoneNumber !== ""
+              ? phoneNumber.replace(/\D+/g, "")
               : accountNumber,
         };
       }
@@ -293,7 +391,7 @@ const One = () => {
   };
 
   const resetAllValue = () => {
-    setSinglePhoneNumber("");
+    setPhoneNumber("");
     setAccountNumber("");
     setSelectedSingleDataPlans({});
   };
@@ -307,6 +405,8 @@ const One = () => {
         data={airtime}
         type={1}
       />
+      <Bene />
+      <BoldText>Select a data plan</BoldText>
       <MySelect
         value={
           Object.entries(selectedSingleDataPlans).length > 0
@@ -333,23 +433,27 @@ const One = () => {
           }}
         />
       ) : (
-        <Input
-          onChange={({ target }) => {
-            setSinglePhoneNumber(target.value);
-          }}
-          type="tel"
-          maskChar=" "
-          value={singlePhoneNumber}
-          mask="999 9999 9999"
-          placeholder="Enter phone number"
-        />
+        <>
+          <BoldText mt="17">Phone number</BoldText>
+          <Input
+            onChange={({ target }) => {
+              setPhoneNumber(target.value);
+            }}
+            type="tel"
+            maskChar=" "
+            value={phoneNumber}
+            mask="999 9999 9999"
+            placeholder="Enter phone number"
+          />
+        </>
       )}
-      <ModePayment />
+      <ModePayment rechargeId={rechargeType} />
+      {error && <ErrorBox>{error}</ErrorBox>}
       <Button
         className={btnDisabled && "not-allowed"}
-        disabled={disabled}
         name="Submit"
         type={"submit"}
+        disabled={disabled}
       />
     </Form>
   );

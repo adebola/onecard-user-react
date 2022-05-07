@@ -19,6 +19,13 @@ const ModalContextProvider = ({ children }) => {
   const [organizationId, setOrganizationId] = useState("");
   const [reload, setReload] = useState(false);
 
+  const [rechargeName, setRechargeName] = useState("");
+  const [weeklyAutoRecharge, setWeeklyAutoRecharge] = useState([]);
+  const [monthlyAutoRecharge, setMonthlyAutoRecharge] = useState([]);
+  const [error, setError] = useState(false);
+
+  const [beneId, setBeneId] = useState(0);
+
   return (
     <ModalContext.Provider
       value={{
@@ -26,6 +33,8 @@ const ModalContextProvider = ({ children }) => {
         setSendToBeneModal,
         name,
         setName,
+        rechargeName,
+        setRechargeName,
         responseModal,
         setResponseModal,
         responseDetail,
@@ -50,6 +59,14 @@ const ModalContextProvider = ({ children }) => {
         setOrganizationId,
         reload,
         setReload,
+        monthlyAutoRecharge,
+        setMonthlyAutoRecharge,
+        weeklyAutoRecharge,
+        setWeeklyAutoRecharge,
+        setError,
+        error,
+        beneId,
+        setBeneId,
       }}
     >
       {children}

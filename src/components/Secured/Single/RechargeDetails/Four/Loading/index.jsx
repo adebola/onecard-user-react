@@ -93,6 +93,7 @@ const Loading = ({ cardNumber, cableType }) => {
           setIsLoading(false);
           return;
         }
+
         setDetails(
           response.data.object.map((each, index) => {
             return {
@@ -127,7 +128,6 @@ const Loading = ({ cardNumber, cableType }) => {
       data = {
         recipient: cardNumber,
         name: selected.name,
-        serviceCost: selected.price,
         productId: selected.code,
         scheduledDate,
         paymentMode,
@@ -141,7 +141,6 @@ const Loading = ({ cardNumber, cableType }) => {
       data = {
         recipient: cardNumber,
         name: selected.name,
-        serviceCost: selected.price,
         productId: selected.code,
         serviceCode: cableType,
         paymentMode,

@@ -85,6 +85,11 @@ const Loading = ({
   }, [amount, setAmountError]);
 
   useEffect(() => {
+    setAmount("");
+    setTelephone("");
+  }, [setTelephone, setAmount]);
+
+  useEffect(() => {
     if (!accountNumber) return;
     const awaitResponse = async () => {
       let data;

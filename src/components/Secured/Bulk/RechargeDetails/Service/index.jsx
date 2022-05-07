@@ -51,6 +51,7 @@ const ServiceProvider = ({
   setServiceName,
   id,
   filter,
+  setCardNumber,
 }) => {
   const {
     dataType,
@@ -135,7 +136,6 @@ const ServiceProvider = ({
           </Item>
         );
       })}
-      {/* <p>{serviceName}</p> */}
     </Container>
   );
 };

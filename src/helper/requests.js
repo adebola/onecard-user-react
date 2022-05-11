@@ -62,6 +62,10 @@ export const getScheduledRechargeResponse = (id) => {
   return axios.get(`/auth-recharge/scheduled/${id}`);
 };
 
+export const makeBulkAutoRechargeWithExcel = (data) => {
+  return axios.post("/auth-recharge/autofile");
+};
+
 export const makeBulkRechargeWithExcel = (data) => {
   return axios.post("/auth-recharge/bulkfile", data);
 };

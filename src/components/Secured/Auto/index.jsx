@@ -280,9 +280,7 @@ const AutoRecharge = () => {
   }, []);
 
   useEffect(() => {
-    console.log(done);
     if (searchID !== null && done) {
-      console.log("running");
       const newUpdatedResult = async () => {
         try {
           const response = await getSingleAutoRechargePlan(searchID);
@@ -330,8 +328,6 @@ const AutoRecharge = () => {
     }
     setReload(false);
   }, [reload, text, done]);
-
-  console.log(recharge);
 
   const handleClick = async (e, title) => {
     setId(e);
@@ -403,10 +399,13 @@ const AutoRecharge = () => {
         setDone(false);
         setId(0);
         setRechargeEdit(false);
+        setStartDateEdit(false);
+        setEndDateEdit(false);
       }
     } catch (error) {
       const message = error.response.data.message;
       console.log(message);
+      setDone(false);
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import Select from "./Select";
 import { monthly, weekly } from "./data";
@@ -53,6 +53,12 @@ const AutoRecharge = () => {
     setMonthlyAutoRecharge,
     setWeeklyAutoRecharge,
   } = useContext(ModalContext);
+
+  useEffect(() => {
+    setRechargeName("");
+    setMonthlyAutoRecharge([]);
+    setWeeklyAutoRecharge([]);
+  }, [setRechargeName, setMonthlyAutoRecharge, setWeeklyAutoRecharge]);
 
   const renderInput = () => {
     return (

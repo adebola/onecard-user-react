@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { AiOutlineUpload } from "react-icons/ai";
 import Button from "../../../../Button/normal";
 import {
+  makeBulkAutoRechargeWithExcel,
   makeBulkRechargeWithExcel,
   makeBulkScheduleRechargeWithExcel,
 } from "../../../../../helper/requests";
@@ -10,6 +11,7 @@ import { GlobalContext } from "../../../../../context/GlobalProvider";
 import { ModalContext } from "../../../../../context/ModalProvider";
 import { convertDate } from "../../../../../utils/dateformat";
 import Hover from "../TabButton";
+import axios from "axios";
 
 const Container = styled.form`
   /* display: flex;
@@ -104,9 +106,15 @@ const ExcelFileUpload = ({
   const [error, setError] = useState(null);
   const [left, setLeft] = useState(0);
 
-  const { setResponseMessage, startDate } = useContext(GlobalContext);
-  const { setResponseModal, setErrorMessage, setErrorModal } =
-    useContext(ModalContext);
+  const { setResponseMessage, startDate, endDate } = useContext(GlobalContext);
+  const {
+    setResponseModal,
+    setErrorMessage,
+    setErrorModal,
+    rechargeName,
+    monthlyAutoRecharge,
+    weeklyAutoRecharge,
+  } = useContext(ModalContext);
 
   useEffect(() => {
     const getName = (name) => {
@@ -146,6 +154,35 @@ const ExcelFileUpload = ({
     e.preventDefault();
     let data = new FormData();
 
+    if (rechargeId === 3) {
+      const auto = {
+        title: rechargeName,
+        daysOfWeek: weeklyAutoRecharge,
+        daysOfMonth: monthlyAutoRecharge,
+        startDate,
+        endDate,
+        paymentMode: "wallet",
+      };
+      const dataForm = new Blob([JSON.stringify(auto)], {
+        type: "application/json",
+      });
+
+      data.append("auto", dataForm);
+      data.append("file", selectedFile);
+
+      try {
+        const fresponse = await axios.post("https://httpbin.org/post", data);
+        console.log(fresponse);
+
+        const response = await makeBulkAutoRechargeWithExcel(data);
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+
+      return;
+    }
+
     if (rechargeId === 1) {
       data.append("file", selectedFile);
       try {
@@ -170,6 +207,8 @@ const ExcelFileUpload = ({
 
       // makeBulkScheduleRechargeWithExcel;
       try {
+        const fresponse = await axios.post("https://httpbin.org/post", data);
+        console.log(fresponse);
         await makeBulkScheduleRechargeWithExcel(data);
         setResponseModal(true);
         setResponseMessage("Bulk Excel Successful");

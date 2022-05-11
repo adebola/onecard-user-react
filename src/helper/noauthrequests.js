@@ -18,3 +18,8 @@ export const getCardDetails = (data) => {
 export const makeCableRecharge = (data) => {
   return axios.post("/recharge", data);
 };
+
+export const makeContactRequest = (data) => {
+  console.log(data);
+  return axios.post("/contactus", data);
+};

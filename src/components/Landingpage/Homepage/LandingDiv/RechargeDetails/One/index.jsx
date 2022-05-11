@@ -140,6 +140,7 @@ const One = () => {
           localStorage.setItem("name", JSON.stringify(serviceName));
           return;
         }
+
         localStorage.setItem("data", JSON.stringify(localData));
         setBtnDisabled(false);
         resetAllValue();

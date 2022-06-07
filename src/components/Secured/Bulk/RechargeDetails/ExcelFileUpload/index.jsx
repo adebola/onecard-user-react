@@ -11,7 +11,7 @@ import { GlobalContext } from "../../../../../context/GlobalProvider";
 import { ModalContext } from "../../../../../context/ModalProvider";
 import { convertDate } from "../../../../../utils/dateformat";
 import Hover from "../TabButton";
-import axios from "axios";
+// import axios from "axios";
 
 const Container = styled.form`
   /* display: flex;
@@ -37,6 +37,10 @@ const FileContainer = styled.div`
   color: var(--white);
   border-radius: 4px;
   margin-bottom: 10px;
+
+  &.disabled {
+    opacity: 0.5;
+  }
 `;
 
 const FileUploadIcon = styled.div`
@@ -105,6 +109,7 @@ const ExcelFileUpload = ({
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const [left, setLeft] = useState(0);
+  const [clicked, setClicked] = useState(false);
 
   const { setResponseMessage, startDate, endDate } = useContext(GlobalContext);
   const {
@@ -153,6 +158,7 @@ const ExcelFileUpload = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     let data = new FormData();
+    setClicked(true);
 
     if (rechargeId === 3) {
       const auto = {
@@ -163,6 +169,7 @@ const ExcelFileUpload = ({
         endDate,
         paymentMode: "wallet",
       };
+
       const dataForm = new Blob([JSON.stringify(auto)], {
         type: "application/json",
       });
@@ -171,8 +178,8 @@ const ExcelFileUpload = ({
       data.append("file", selectedFile);
 
       try {
-        const fresponse = await axios.post("https://httpbin.org/post", data);
-        console.log(fresponse);
+        // const fresponse = await axios.post("https://httpbin.org/post", data);
+        // console.log(fresponse);
 
         const response = await makeBulkAutoRechargeWithExcel(data);
         console.log(response);
@@ -198,7 +205,6 @@ const ExcelFileUpload = ({
       }
     } else {
       const scheduledDate = convertDate(startDate);
-
       const dateData = new Blob([JSON.stringify({ scheduledDate })], {
         type: "application/json",
       });
@@ -207,8 +213,6 @@ const ExcelFileUpload = ({
 
       // makeBulkScheduleRechargeWithExcel;
       try {
-        const fresponse = await axios.post("https://httpbin.org/post", data);
-        console.log(fresponse);
         await makeBulkScheduleRechargeWithExcel(data);
         setResponseModal(true);
         setResponseMessage("Bulk Excel Successful");
@@ -220,6 +224,7 @@ const ExcelFileUpload = ({
         setSelectedFile(null);
       }
     }
+    setClicked(false);
   };
 
   const disabled = !selectedFile;
@@ -238,13 +243,18 @@ const ExcelFileUpload = ({
           <>
             <SelectBox>
               <ButtonAndLink>
-                <FileContainer>
+                <FileContainer className={clicked && "disabled"}>
                   <FileUploadIcon>
                     <AiOutlineUpload size={19} fill="white" />
                   </FileUploadIcon>
                   <FileText>Choose an excel file</FileText>
 
-                  <FileUpload type="file" onChange={handleChange} name="file" />
+                  <FileUpload
+                    disabled={selectedFile?.name}
+                    type="file"
+                    onChange={handleChange}
+                    name="file"
+                  />
                 </FileContainer>
                 <Link href="https://delifrost.s3.amazonaws.com/bulk-request.xlsx">
                   Download excel sample

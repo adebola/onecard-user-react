@@ -139,6 +139,7 @@ const ListOfBene = ({ rechargeType }) => {
     setErrorMessage,
     setErrorModal,
     setCableMessage,
+    setNameError,
   } = useContext(ModalContext);
 
   useEffect(() => {
@@ -154,6 +155,12 @@ const ListOfBene = ({ rechargeType }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!rechargeName) {
+      setNameError("Enter a name");
+      return;
+    }
+
     setBtnDisabled(true);
     if (btnDisabled) {
       return;

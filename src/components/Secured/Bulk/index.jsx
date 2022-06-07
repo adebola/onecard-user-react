@@ -19,13 +19,18 @@ import {
 
 const Bulk = () => {
   const [toggle, setToggle] = useState(false);
-  const [rechargeType, setRechargeType] = useState(1);
+  // const [rechargeType, setRechargeType] = useState(1);
 
   const { authId } = useContext(AuthContext);
 
   const { setResponseMessage } = useContext(GlobalContext);
-  const { setResponseModal, setErrorModal, setErrorMessage } =
-    useContext(ModalContext);
+  const {
+    setResponseModal,
+    setErrorModal,
+    setErrorMessage,
+    rechargeType,
+    setRechargeType,
+  } = useContext(ModalContext);
 
   useEffect(() => {
     if (authId === null) {

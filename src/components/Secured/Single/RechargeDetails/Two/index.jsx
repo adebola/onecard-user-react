@@ -124,12 +124,16 @@ const Two = () => {
   }, [authUrl]);
 
   useEffect(() => {
-    if (!phoneNumber || !singleAmount || !serviceName) {
+    setPhoneNumber("");
+  }, [setPhoneNumber]);
+
+  useEffect(() => {
+    if (!phoneNumber || !singleAmount || !serviceName || !rechargeName) {
       setDisabled(true);
     } else {
       setDisabled(false);
     }
-  }, [phoneNumber, serviceName, singleAmount]);
+  }, [phoneNumber, serviceName, singleAmount, rechargeName]);
 
   useEffect(() => {
     if (weeklyAutoRecharge.length > 0 || monthlyAutoRecharge.length > 0) {
@@ -140,8 +144,10 @@ const Two = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setBtnDisabled(true);
 
+    if (error) return;
+
+    setBtnDisabled(true);
     if (btnDisabled) {
       return;
     }
@@ -305,6 +311,20 @@ const Two = () => {
     }
   };
 
+  const handleBlur = () => {
+    if (phoneNumber === "             ") return;
+
+    if (
+      phoneNumber.startsWith("0") &&
+      phoneNumber.replace(/\D+/g, "").match(/^\d{11}$/g)
+    ) {
+      setError("");
+      return;
+    } else {
+      setError("Enter a valid phone number");
+    }
+  };
+
   const resetAllValue = () => {
     setPhoneNumber("");
     setSingleAmount("");
@@ -346,6 +366,7 @@ const Two = () => {
             type="tel"
             maskChar=" "
             value={phoneNumber}
+            onBlur={handleBlur}
             mask="999 9999 9999"
             placeholder="Enter phone number"
           />

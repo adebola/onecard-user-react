@@ -27,11 +27,11 @@ export const makeScheduleRecharge = (data) => {
 };
 
 export const makeBulkRecharge = (data) => {
-  return axios.post("/auth-recharge/newbulk", data);
+  return axios.post("/auth-recharge/bulk", data);
 };
 
 export const getBulkRechargeResponse = (id) => {
-  return axios.get(`/auth-recharge/newbulk/${id}`);
+  return axios.get(`/auth-recharge/bulk/${id}`);
 };
 
 export const fundWallet = (data) => {
@@ -63,15 +63,15 @@ export const getScheduledRechargeResponse = (id) => {
 };
 
 export const makeBulkAutoRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/autofile");
+  return axios.post("/auth-recharge/auto/file", data);
 };
 
 export const makeBulkRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/bulkfile", data);
+  return axios.post("/auth-recharge/bulk/file", data);
 };
 
 export const makeBulkScheduleRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/schedulefile", data);
+  return axios.post("/auth-recharge/scheduled/file", data);
 };
 
 export const makeCableRecharge = (data) => {
@@ -124,11 +124,15 @@ export const makeAutoRechargeRequest = (data) => {
 };
 
 export const getAutoRechargePlans = () => {
-  return axios.get("/auth-recharge/getauto");
+  return axios.get("/auth-recharge/auto/list");
 };
 
 export const getSingleAutoRechargePlan = (id) => {
   return axios.get(`/auth-recharge/auto/${id}`);
+};
+
+export const getSingleAutoRechargePlanBulk = (id) => {
+  return axios.get(`/auth-recharge/auto/bulk/${id}`);
 };
 
 export const editSingleAutoRechargePlan = (id, data) => {
@@ -137,4 +141,64 @@ export const editSingleAutoRechargePlan = (id, data) => {
 
 export const deleteSingleAutoRechargePlan = (id) => {
   return axios.delete(`/auth-recharge/auto/${id}`);
+};
+
+export const getAllSingleRequest = (num = 1) => {
+  return axios.get(`/auth-recharge/singlelist?pageNumber=${num}&pageSize=20`);
+};
+
+export const getSingleDetail = (id) => {
+  return axios.get(`/auth-recharge/single/${id}`);
+};
+
+export const searchSingleDetail = (query, num = 1) => {
+  return axios.get(
+    `/auth-recharge/single/searchrecipient?searchString=${query}&pageNumber=${num}&pageSize=20`
+  );
+};
+
+export const getAllBulkRequest = (num = 1) => {
+  return axios.get(`/auth-recharge/bulk/list?pageNumber=${num}&pageSize=20`);
+};
+
+export const searchByDate = (data) => {
+  return axios.post("/auth-recharge/bulk/searchdate", data);
+};
+
+export const searchByDateSchedule = (data) => {
+  return axios.post("/auth-recharge/scheduled/searchdate", data);
+};
+
+export const searchByName = (query) => {
+  return axios.get(`/auth-recharge/auto/searchname?name=${query}`);
+};
+
+export const searchByDateAuto = (data) => {
+  return axios.post("/auth-recharge/auto/searchdate", data);
+};
+
+export const getBulkDetail = (id) => {
+  return axios.get(`/auth-recharge/bulk/individual/${id}`);
+};
+
+export const getAllScheduledRequest = (num = 1) => {
+  return axios.get(
+    `/auth-recharge/scheduled/list?pageNumber=${num}&pageSize=20`
+  );
+};
+
+export const getAllScheduledRequestDetail = (id) => {
+  return axios.get(`/auth-recharge/scheduled/individual/${id}`);
+};
+
+export const downloadExcelBulk = (id) => {
+  return axios.get(`/auth-recharge/bulk/download/${id}`);
+};
+
+export const downloadExcelSchedule = (id) => {
+  return axios.get(`/auth-recharge/scheduled/download/${id}`);
+};
+
+export const downloadExcelAuto = (id) => {
+  return axios.get(`/auth-recharge/bulk/download/${id}`);
 };

@@ -1,5 +1,11 @@
 export const weekly = [
   {
+    id: 8,
+    value: "Weekly",
+    label: "Weekly",
+    isDisabled: true,
+  },
+  {
     id: 1,
     value: "Sunday",
     label: "Sunday",
@@ -47,12 +53,6 @@ export const weekly = [
     label: "Saturday",
     background: "#6F686D",
     color: "white",
-  },
-  {
-    id: 8,
-    value: "Weekly",
-    label: "Weekly",
-    isDisabled: true,
   },
 ];
 

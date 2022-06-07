@@ -67,6 +67,7 @@ const AutoRecharge = () => {
         <Input
           value={rechargeName}
           placeholder="Recharge name"
+          required
           onChange={({ target }) => setRechargeName(target.value)}
         />
       </Container>

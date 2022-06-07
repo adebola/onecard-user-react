@@ -115,6 +115,8 @@ const RechargeDetails = ({ rechargeId }) => {
   const handleAdd = () => {
     let singleDetails;
 
+    if (error) return;
+
     if (
       (rechargeType === "Data" || rechargeType === "Airtime") &&
       rechargeId === 3

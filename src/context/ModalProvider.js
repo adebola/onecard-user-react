@@ -23,8 +23,9 @@ const ModalContextProvider = ({ children }) => {
   const [weeklyAutoRecharge, setWeeklyAutoRecharge] = useState([]);
   const [monthlyAutoRecharge, setMonthlyAutoRecharge] = useState([]);
   const [error, setError] = useState(false);
-
   const [beneId, setBeneId] = useState(0);
+
+  const [nameError, setNameError] = useState("");
 
   return (
     <ModalContext.Provider
@@ -67,6 +68,8 @@ const ModalContextProvider = ({ children }) => {
         error,
         beneId,
         setBeneId,
+        nameError,
+        setNameError,
       }}
     >
       {children}

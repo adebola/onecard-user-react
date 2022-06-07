@@ -20,6 +20,43 @@ html {
   scroll-behavior: smooth;
 }
 
+
+
+
+
+table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table td,
+table th {
+  border: 1px solid #ddd;
+  font-size: 13px;
+  padding: 8px;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table tr:hover {
+  background-color: #ddd;
+  cursor: pointer;
+}
+
+table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  font-size: 13px;
+  color: black;
+  background: white;
+}
+
+
+
 body {
 	--white: #fff;
 	--text-color: #124a80;

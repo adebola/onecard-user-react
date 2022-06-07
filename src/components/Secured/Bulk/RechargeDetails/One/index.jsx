@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ServiceProvider from "../Service";
 import mtn from "../../../../../assets/mtn.svg";
 import glo from "../../../../../assets/glo.svg";
@@ -12,6 +12,7 @@ import Select from "react-select";
 import Bene from "../Beneficiary";
 import { GlobalContext } from "../../../../../context/GlobalProvider";
 import { css } from "styled-components";
+import { ModalContext } from "../../../../../context/ModalProvider";
 
 const airtime = [
   { id: 1, airtime: "MTN-AIRTIME", data: "MTN-DATA", name: "mtn", img: mtn },
@@ -106,10 +107,29 @@ const One = () => {
     setAccountNumber,
   } = useContext(GlobalContext);
 
+  const { setError } = useContext(ModalContext);
+
+  useEffect(() => {
+    setError("");
+  }, [setError]);
+
   const [dataPlans, setDataPlans] = useState([]);
 
   const handelSelectedDataPlans = (e) => {
     setSelectedSingleDataPlans(e);
+  };
+
+  const handleBlur = () => {
+    if (bulkPhoneNumber === "             ") return;
+    if (
+      bulkPhoneNumber.startsWith("0") &&
+      bulkPhoneNumber.replace(/\D+/g, "").match(/^\d{11}$/g)
+    ) {
+      setError("");
+      return;
+    } else {
+      setError("Enter a valid phone number");
+    }
   };
 
   return (
@@ -160,6 +180,7 @@ const One = () => {
                 type="tel"
                 maskChar=" "
                 value={bulkPhoneNumber}
+                onBlur={handleBlur}
                 mask="999 9999 9999"
                 placeholder="Enter phone number"
               />

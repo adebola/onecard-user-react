@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ServiceProvider from "../Service";
 import mtn from "../../../../../assets/mtn.svg";
 import glo from "../../../../../assets/glo.svg";
@@ -10,6 +10,7 @@ import Bene from "../Beneficiary";
 import { GlobalContext } from "../../../../../context/GlobalProvider";
 import { css } from "styled-components";
 import NumberFormat from "react-number-format";
+import { ModalContext } from "../../../../../context/ModalProvider";
 
 const airtime = [
   { id: 1, airtime: "MTN-AIRTIME", data: "MTN-DATA", name: "mtn", img: mtn },
@@ -73,6 +74,25 @@ const BoldText = styled.div`
 const Two = () => {
   const [accountNumber, setAccountNumber] = useState("");
 
+  const { setError } = useContext(ModalContext);
+
+  useEffect(() => {
+    setError("");
+  }, [setError]);
+
+  const handleBlur = () => {
+    if (bulkPhoneNumber === "             ") return;
+    if (
+      bulkPhoneNumber.startsWith("0") &&
+      bulkPhoneNumber.replace(/\D+/g, "").match(/^\d{11}$/g)
+    ) {
+      setError("");
+      return;
+    } else {
+      setError("Enter a valid phone number");
+    }
+  };
+
   const {
     airtimeId,
     serviceName,
@@ -119,6 +139,7 @@ const Two = () => {
                 type="tel"
                 maskChar=" "
                 value={bulkPhoneNumber}
+                onBlur={handleBlur}
                 mask="999 9999 9999"
                 placeholder="Enter phone number"
               />

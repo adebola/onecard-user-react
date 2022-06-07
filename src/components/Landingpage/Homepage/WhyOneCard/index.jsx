@@ -5,14 +5,20 @@ import Two from "./Two";
 
 const WhyOneCard = () => {
   return (
-    <NoAuthContainer>
-      <>
-        <One />
-      </>
-      <>
-        <Two />
-      </>
-    </NoAuthContainer>
+    <div
+      style={{
+        marginTop: "100px",
+      }}
+    >
+      <NoAuthContainer>
+        <>
+          <One />
+        </>
+        <>
+          <Two />
+        </>
+      </NoAuthContainer>
+    </div>
   );
 };
 

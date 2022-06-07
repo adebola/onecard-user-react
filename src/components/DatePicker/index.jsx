@@ -25,7 +25,6 @@ const ScheduleDatePicker = ({ left, right }) => {
   return (
     <>
       {right && <Schedule className={right && "left"}>End Date</Schedule>}
-
       {left && <Schedule className={left && "left"}>Start Date</Schedule>}
 
       {!left && !right && (

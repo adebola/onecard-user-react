@@ -7,9 +7,9 @@ import MenuList from "../../Hamburger/Menulist";
 import styled from "styled-components";
 import Container from "../../Container";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { MdEdit, MdDeleteOutline } from "react-icons/md";
+import { MdEdit, MdDeleteOutline, MdOutlineClose, MdAdd } from "react-icons/md";
 import { monthly, weekly } from "./data";
 
 import DatePicker from "react-datepicker";
@@ -23,6 +23,7 @@ import { convertNewDate } from "../../../utils/format.start.end";
 import Select from "./Select";
 import { ModalContext } from "../../../context/ModalProvider";
 import { convertDate } from "../../../utils/dateformat";
+import AutoModal from "./Modal";
 
 const One = styled.div`
   width: 50%;
@@ -102,7 +103,7 @@ const Detail = styled.div`
 
   div {
     display: flex;
-    margin-bottom: 4px;
+    margin-bottom: 1px;
   }
 
   p {
@@ -227,13 +228,54 @@ const Modal = styled.div`
   background: rgb(255, 255, 255, 0.7);
 `;
 
+const CreateButton = styled(Link)`
+  width: 150px;
+  cursor: pointer;
+  padding: 17px 10px;
+  text-decoration: none;
+  margin-top: 20px;
+  background: var(--btn-color);
+  outline: none;
+  border: none;
+  color: var(--white);
+  border-radius: 6px;
+  margin-bottom: 30px;
+
+  &:hover {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  @media (max-width: 768px) {
+    width: 150px;
+  }
+`;
+
+const AddRechargeModal = styled(Modal)`
+  background: rgb(0, 0, 0, 0.6);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  z-index: 20;
+  justify-content: center;
+`;
+
+const Blank = styled.div`
+  width: 20px;
+  cursor: pointer;
+`;
+
+const IconBlank = styled(Blank)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const AutoRecharge = () => {
   const navigate = useNavigate();
-  const search = useLocation().search;
 
-  const searchID = new URLSearchParams(search).get("id");
-
-  const { monthlyAutoRecharge, weeklyAutoRecharge } = useContext(ModalContext);
+  const { monthlyAutoRecharge, weeklyAutoRecharge, setRechargeType } =
+    useContext(ModalContext);
 
   const [name, setName] = useState("");
   const [showOutline, setShowOutline] = useState(false);
@@ -261,6 +303,8 @@ const AutoRecharge = () => {
   const [autoRecharge, setAutoRecharge] = useState([]);
   const [recharge, setRecharge] = useState([]);
 
+  const [modal, setModal] = useState(false);
+
   useEffect(() => {
     const awaitResponse = async () => {
       try {
@@ -278,33 +322,6 @@ const AutoRecharge = () => {
 
     awaitResponse();
   }, []);
-
-  useEffect(() => {
-    if (searchID !== null && done) {
-      const newUpdatedResult = async () => {
-        try {
-          const response = await getSingleAutoRechargePlan(searchID);
-          setId(0);
-          setName(response.data.title);
-          setStartDate(response.data.startDate);
-          setEndDate(response.data.endDate);
-          setRecharge(response.data.recipients);
-          if (response.data.daysOfWeek) {
-            setBoldText("Weekly");
-            setAutoRecharge(response.data.daysOfWeek);
-          } else {
-            setAutoRecharge(response.data.daysOfMonth);
-            setBoldText("Monthly");
-          }
-        } catch (error) {
-          const message = error.response.data.message;
-          console.log(message);
-        }
-        return;
-      };
-      newUpdatedResult();
-    }
-  }, [searchID, done]);
 
   useEffect(() => {
     if (reload || !done) {
@@ -359,6 +376,7 @@ const AutoRecharge = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // setModal(true);
     setDone(true);
     let splitStartDate = startDate.toString().split(" ")[0];
 
@@ -586,12 +604,50 @@ const AutoRecharge = () => {
           <div>
             <BoldText>Recipient</BoldText>
             <Detail>
-              {recharge.map((each) => {
+              {recharge.map((each, i) => {
                 return (
-                  <div key={each.id}>
-                    <p>{each.recipient}</p>
-                    <p>{each.serviceCode}</p>
-                    <p>{each.serviceCost}</p>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                    key={each.id}
+                  >
+                    <div>
+                      <p>{each.recipient}</p>
+                      <p>{each.serviceCode}</p>
+                      <p>{each.serviceCost}</p>
+                    </div>
+                    {i === 0 ? (
+                      <div>
+                        <Blank />
+                        <IconBlank>
+                          <MdAdd
+                            color="#114A80"
+                            onClick={() => setModal(true)}
+                          />
+                        </IconBlank>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <IconBlank>
+                          <MdOutlineClose color="#eb6a2b" />
+                        </IconBlank>
+                        <IconBlank>
+                          <MdAdd
+                            color="#114A80"
+                            onClick={() => setModal(true)}
+                          />
+                        </IconBlank>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -610,6 +666,14 @@ const AutoRecharge = () => {
     return <Modal></Modal>;
   };
 
+  const renderAddRecharge = () => {
+    return (
+      <AddRechargeModal>
+        <AutoModal />
+      </AddRechargeModal>
+    );
+  };
+
   return (
     <>
       <HamburgerMenu toggle={toggle} setToggle={setToggle} />
@@ -620,16 +684,39 @@ const AutoRecharge = () => {
           <One>
             <SmallText text="Recharges" />
             {renderRecharge()}
+
+            <div
+              style={{
+                marginTop: "40px",
+                marginBottom: "30px",
+              }}
+            >
+              {(text || details.length !== 0) && (
+                <CreateButton
+                  to="/bulk"
+                  onClick={() => {
+                    setRechargeType(3);
+                  }}
+                >
+                  Create AutoRecharge
+                </CreateButton>
+              )}
+            </div>
           </One>
-          {id !== 0 && (
+          {id !== 0 && recharge.length > 0 && (
             <Two>
-              <SmallText text={`${name}'s Recharge Details`} />
+              <SmallText
+                text={`${name ? name : singleDetail}'s Recharge Details`}
+              />
               {id !== 0 && renderDetails()}
             </Two>
           )}
+
+          {/* <Two>{renderDetails()}</Two> */}
         </Container>
 
         {done && renderModal()}
+        {/* {modal && renderAddRecharge()} */}
       </Wrapper>
     </>
   );

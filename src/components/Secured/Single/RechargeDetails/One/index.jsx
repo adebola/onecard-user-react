@@ -158,12 +158,20 @@ const One = () => {
   } = useContext(ModalContext);
 
   useEffect(() => {
-    if (!selectedSingleDataPlans || !phoneNumber || !serviceName) {
+    if (
+      !selectedSingleDataPlans ||
+      !phoneNumber ||
+      !serviceName ||
+      !rechargeName
+    ) {
       setDisabled(true);
     } else {
       setDisabled(false);
     }
-  }, [phoneNumber, serviceName, selectedSingleDataPlans]);
+  }, [phoneNumber, serviceName, selectedSingleDataPlans, rechargeName]);
+  useEffect(() => {
+    setPhoneNumber("");
+  }, [setPhoneNumber]);
 
   useEffect(() => {
     if (
@@ -176,7 +184,18 @@ const One = () => {
     }
   }, [paymentMode, setError, weeklyAutoRecharge, monthlyAutoRecharge]);
 
-  useEffect(() => {}, []);
+  const handleBlur = () => {
+    if (phoneNumber === "             ") return;
+    if (
+      phoneNumber.startsWith("0") &&
+      phoneNumber.replace(/\D+/g, "").match(/^\d{11}$/g)
+    ) {
+      setError("");
+      return;
+    } else {
+      setError("Enter a valid phone number");
+    }
+  };
 
   const handelSelectedDataPlans = (e) => {
     setSelectedSingleDataPlans(e);
@@ -184,11 +203,12 @@ const One = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setBtnDisabled(true);
+    if (error) return;
+    setBtnDisabled(true);
 
-    // if (btnDisabled) {
-    //   return;
-    // }
+    if (btnDisabled) {
+      return;
+    }
     const scheduledDate = convertDate(startDate);
 
     if (rechargeType === 3) {
@@ -442,6 +462,7 @@ const One = () => {
             type="tel"
             maskChar=" "
             value={phoneNumber}
+            onBlur={handleBlur}
             mask="999 9999 9999"
             placeholder="Enter phone number"
           />

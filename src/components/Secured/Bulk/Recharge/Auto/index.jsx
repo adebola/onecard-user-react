@@ -45,6 +45,12 @@ const RadioText = styled.p`
 
 const RadioButton = styled.input``;
 
+const ErrorBox = styled.div`
+  color: red;
+  font-size: 12px;
+  margin: 10px 0;
+`;
+
 const AutoRecharge = () => {
   const [type, setType] = useState("");
 
@@ -53,6 +59,8 @@ const AutoRecharge = () => {
     setRechargeName,
     setMonthlyAutoRecharge,
     setWeeklyAutoRecharge,
+    nameError,
+    setNameError,
   } = useContext(ModalContext);
 
   useEffect(() => {
@@ -68,8 +76,15 @@ const AutoRecharge = () => {
         <Input
           value={rechargeName}
           placeholder="Recharge name"
-          onChange={({ target }) => setRechargeName(target.value)}
+          onChange={({ target }) => {
+            if (nameError) {
+              setNameError("");
+            }
+            setRechargeName(target.value);
+          }}
         />
+
+        {<ErrorBox>{nameError}</ErrorBox>}
       </Container>
     );
   };

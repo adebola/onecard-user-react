@@ -49,6 +49,11 @@ const Sidebar = () => {
       name: "Transactions",
       link: "/transactions",
     },
+    {
+      id: 8,
+      name: "History",
+      link: "/history",
+    },
   ];
 
   const bottom = [

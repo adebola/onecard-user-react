@@ -67,7 +67,7 @@ body {
 
 .react-datepicker__input-container input{
 	width: 100%;
-	margin-top: 10px;
+	margin-top: 5px;
 	padding: 0.6rem;
 	color: var(--text-color);
 }

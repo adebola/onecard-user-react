@@ -11,7 +11,6 @@ export const PublicRoute = () => {
 
 export const PrivateRoute = () => {
   const { auth } = useContext(AuthContext);
-  // const auth = true;
   return auth ? <Outlet /> : <Navigate to="/" />;
 };
 

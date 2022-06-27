@@ -8,14 +8,16 @@ import mobile from "../../../../../../assets/9mobile.svg";
 import airtel from "../../../../../../assets/airtel.svg";
 import ReactInputMask from "react-input-mask";
 import styled from "styled-components";
-import Button from "../../../../../Button/normal";
 import Select from "react-select";
-import ModePayment from "../../../../../PaymentType";
+import MyStyledButton from "../../../../../MyStyledButton";
 import Bene from "../Beneficiary";
 import { css } from "styled-components";
 import { SingleContext } from "../../../../../../context/SingleRecharge";
 import { GlobalContext } from "../../../../../../context/GlobalProvider";
-import { makeSingleRecharge } from "../../../../../../helper/requests";
+import {
+  makeAutoRechargeRequest,
+  makeSingleRecharge,
+} from "../../../../../../helper/requests";
 
 const airtime = [
   { id: 1, airtime: "MTN-AIRTIME", data: "MTN-DATA", name: "mtn", img: mtn },
@@ -148,7 +150,7 @@ const One = () => {
     setRechargeData([]);
   }, [setServiceProviderError, setPhoneNumber, setRechargeData]);
 
-  console.log(message);
+  // console.log(message);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -170,20 +172,14 @@ const One = () => {
     )
       return;
     const data = populateData();
+    console.log(data);
 
-    if (rechargeId === 1) {
-      console.log(data);
-      makeSingleRecharge(data)
-        .then((res) => console.log(res))
-        .catch((err) => {
-          const message = err.response.data.message;
-          console.log(message);
-        });
-    } else if (rechargeId === 2) {
-      console.log(data);
-    } else {
-      console.log(data);
-    }
+    makeAutoRechargeRequest(data)
+      .then((res) => console.log(res))
+      .catch((err) => {
+        const message = err.response.data.message;
+        console.log(message);
+      });
 
     //makeSingleRechargeRequest
     // try {
@@ -196,70 +192,22 @@ const One = () => {
   const populateData = () => {
     let message;
 
-    let data;
-    if (rechargeId === 1) {
-      data = {
-        paymentMode,
-        productId: selectedDataPlan.id,
-        recipient: phoneNumber.replace(/\D+/g, ""),
-        serviceCode: serviceName,
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
+    let data = {
+      paymentMode,
+      productId: selectedDataPlan.id,
+      recipient: phoneNumber.replace(/\D+/g, ""),
+      serviceCode: serviceName,
+      redirectUrl: "",
+      rechargeType: "bulk",
+    };
 
-        rechargeType: "single",
-      };
+    message = {
+      phoneNumber,
+      amount: selectedDataPlan.value,
+      serviceName,
+    };
 
-      message = {
-        phoneNumber,
-        amount: selectedDataPlan.value,
-        serviceName,
-      };
-
-      setMessage(message);
-    } else if (rechargeId === 2) {
-      data = {
-        productId: selectedDataPlan.id,
-        recipient: phoneNumber.replace(/\D+/g, ""),
-        serviceCode: serviceName,
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
-
-        rechargeType: "single",
-        paymentMode,
-      };
-      message = {
-        phoneNumber,
-        amount: selectedDataPlan.value,
-        serviceName,
-      };
-
-      setMessage(message);
-    } else {
-      data = {
-        productId: selectedDataPlan.id,
-        recipient: phoneNumber.replace(/\D+/g, ""),
-        serviceCode: serviceName,
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
-
-        rechargeType: "single",
-        paymentMode,
-      };
-      message = {
-        phoneNumber,
-        amount: selectedDataPlan.value,
-        serviceName,
-      };
-
-      setMessage(message);
-    }
-
+    setMessage(message);
     return data;
   };
 
@@ -332,8 +280,11 @@ const One = () => {
         onChange={({ target }) => setPhoneNumber(target.value)}
       />
       <ErrorBox>{phoneError}</ErrorBox>
-      <ModePayment />
-      <Button name="Submit" />
+      {/* <Button name="Submit" /> */}
+      <MyStyledButton
+        name="Submit"
+        myStyles={{ width: "100%", marginTop: "30px" }}
+      />
     </Form>
   );
 };

@@ -1,31 +1,14 @@
-import { dateFormat } from "../../../../utils/format.created.date";
-
-export const columns = [
-  { Header: "id", accessor: "id" },
-  { Header: "Name", accessor: "title" },
-  {
-    Header: "Start Date",
-    accessor: "startDate",
-    // Cell: ({ value }) => getFormattedDate(value),
-    Cell: ({ value }) => {
-      return dateFormat(value);
-    },
-  },
-  {
-    Header: "End Date",
-    accessor: "endDate",
-    // Cell: ({ value }) => getFormattedDate(value),
-    Cell: ({ value }) => {
-      return dateFormat(value);
-    },
-  },
+export const header = [
+  { id: 1, name: "id" },
+  { id: 2, name: "Name" },
+  { id: 3, name: "Start Date" },
+  { id: 4, name: "End Date" },
+  { id: 5, name: "Recurring Type" },
 ];
 
-export const columnsTwo = [
-  { Header: "id", accessor: "id" },
-  { Header: "Name", accessor: "title" },
-  { Header: "DaysOfWeek", accessor: "daysOfWeek" },
-  { Header: "DaysOfMonth", accessor: "daysOfMonth" },
-  { Header: "Start Date", accessor: "startDate" },
-  { Header: "End Date", accessor: "endDate" },
+export const tableHeaderTwo = [
+  { id: 1, name: "id" },
+  { id: 2, name: "Payment Mode" },
+  { id: 3, name: "Total Cost" },
+  { id: 4, name: "Date" },
 ];

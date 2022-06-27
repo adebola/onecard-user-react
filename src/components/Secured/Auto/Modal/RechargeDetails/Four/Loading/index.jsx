@@ -3,19 +3,18 @@ import styled from "styled-components";
 import { SyncLoader } from "react-spinners";
 import MySelect from "react-select";
 import MyStyledButton from "../../../../../../MyStyledButton";
-import { getCardDetails } from "../../../../../../../helper/noauthrequests";
-import { makeCableRecharge } from "../../../../../../../helper/requests";
 import { GlobalContext } from "../../../../../../../context/GlobalProvider";
+import { getCardDetails } from "../../../../../../../helper/noauthrequests";
+import { SingleContext } from "../../../../../../../context/SingleRecharge";
 import { convertDate } from "../../../../../../../utils/dateformat";
-import { ModalContext } from "../../../../../../../context/ModalProvider";
-import ModePayment from "../../../../../../PaymentType/index";
 
 const Container = styled.div`
   background-color: var(--light-background);
-  padding: 10px;
+  padding: 15px 10px;
   border-radius: 4px;
   display: flex;
   align-items: center;
+  margin: 10px 0;
 `;
 
 const SpinnerContainer = styled.div`
@@ -26,7 +25,7 @@ const SpinnerContainer = styled.div`
 `;
 
 const MinHeight = styled.div`
-  height: 150px;
+  height: 100px;
 `;
 
 const Text = styled.div`
@@ -42,7 +41,21 @@ const Span = styled.div`
   color: var(--text-color);
 `;
 
-const NewSelect = styled(MySelect)``;
+const NewSelect = styled(MySelect)`
+  border: ${({ error }) =>
+    error ? "1px solid red" : "1px solid var(--text-color)"};
+  border-radius: 4px;
+  background: transparent;
+  padding: 5px;
+
+  svg {
+    fill: ${({ error }) => (error ? "red" : "var(--text-color)")};
+  }
+
+  .css-1okebmr-indicatorSeparator {
+    background: none;
+  }
+`;
 
 const FullContainer = styled.form`
   width: 100%;
@@ -55,9 +68,6 @@ const Error = styled.p`
 `;
 
 const Loading = ({ cardNumber, cableType }) => {
-  const { setResponseMessage } = useContext(GlobalContext);
-  const { setResponseModal } = useContext(ModalContext);
-
   const [btnDisabled, setBtnDisabled] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -67,9 +77,16 @@ const Loading = ({ cardNumber, cableType }) => {
   const [error, setError] = useState("");
 
   const [authUrl, setAuthUrl] = useState("");
+  const {
+    setServiceProviderError,
+    serviceProviderError,
+    rechargeId,
+    serviceProviderType,
+    setServiceProviderType,
+    setMessage,
+    serviceName,
+  } = useContext(SingleContext);
   const { startDate, paymentMode } = useContext(GlobalContext);
-  const { rechargeType, setErrorModal, setErrorMessage } =
-    useContext(ModalContext);
 
   useEffect(() => {
     if (authUrl !== "") {
@@ -86,31 +103,26 @@ const Loading = ({ cardNumber, cableType }) => {
     };
 
     const awaitResponse = async () => {
-      try {
-        const response = await getCardDetails(data);
-        if (response.data.status === 400) {
-          setError("User with card number not found, please try again");
-          setIsLoading(false);
-          return;
-        }
+      const response = await getCardDetails(data);
 
-        setDetails(
-          response.data.object.map((each, index) => {
-            return {
-              label: `${each.name} ${each.price}`,
-              value: `${each.name} ${each.price}`,
-              id: index,
-              ...each,
-            };
-          })
-        );
+      if (response.data.status === 400) {
+        setError("User with card number not found, please try again");
         setIsLoading(false);
-        setError("");
-        setName(response.data.customerName);
-      } catch (error) {
-        setIsLoading(false);
-        setError("Something went wrong, please try again");
+        return;
       }
+      setName(response.data.customerName);
+      setDetails(
+        response.data.object.map((each, index) => {
+          return {
+            label: `${each.name} ${each.price}`,
+            value: `${each.name} ${each.price}`,
+            id: index,
+            ...each,
+          };
+        })
+      );
+      setIsLoading(false);
+      setError("");
     };
     awaitResponse();
   }, [cardNumber, cableType]);
@@ -119,12 +131,20 @@ const Loading = ({ cardNumber, cableType }) => {
     setSelected(e);
   };
 
-  const handleSubmit = async (e) => {
-    setBtnDisabled(true);
+  const disabled = Object.entries(selected).length === 0;
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    const data = populateData();
+    console.log(data);
+  };
+
+  const populateData = () => {
     const scheduledDate = convertDate(startDate);
+
+    let message;
     let data;
-    if (rechargeType === 2) {
+    if (rechargeId === 2) {
       data = {
         recipient: cardNumber,
         name: selected.name,
@@ -150,25 +170,8 @@ const Loading = ({ cardNumber, cableType }) => {
             : `${window.origin}${window.location.pathname}`,
       };
     }
-
-    try {
-      const response = await makeCableRecharge(data);
-      setResponseModal(true);
-      setResponseMessage("Ringo Pay Cable Successful");
-      setBtnDisabled(false);
-      if (response.data.authorizationUrl) {
-        setBtnDisabled(false);
-        setAuthUrl(response.data.authorizationUrl);
-        localStorage.setItem("id", JSON.stringify(response.data.id));
-      }
-    } catch (error) {
-      const message = error.response.data.message;
-      setErrorModal(true);
-      setErrorMessage(message);
-    }
+    return data;
   };
-
-  const disabled = Object.entries(selected).length === 0;
 
   if (isLoading) {
     return (
@@ -190,10 +193,15 @@ const Loading = ({ cardNumber, cableType }) => {
             }
             onChange={handleChange}
             options={details}
+            styles={{
+              control: () => ({
+                backgroundColor: "transparent",
+                display: "flex",
+              }),
+            }}
           />
         </MinHeight>
 
-        <ModePayment />
         <MyStyledButton
           clicked={btnDisabled}
           disabled={disabled}

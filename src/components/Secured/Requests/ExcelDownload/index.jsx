@@ -32,20 +32,20 @@ const Download = ({ id, type }) => {
     if (type === "Bulk" || type === "Auto") {
       try {
         const res = await downloadExcelBulk(id);
-        console.log(res);
-        saveAs(res, `${id}.xlsx`);
+        saveAs(res.data, `${id}.xlsx`);
       } catch (error) {
         console.log(error);
       }
     } else {
       try {
         const res = await downloadExcelSchedule(id);
-        console.log(res);
+        saveAs(res.data, `${id}.xlsx`);
       } catch (error) {
         console.log(error);
       }
     }
   };
+
   return (
     <Container onClick={downloadFile}>
       <Icon>

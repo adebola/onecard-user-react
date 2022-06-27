@@ -11,7 +11,8 @@ import Profile from "./components/Secured/Profile";
 import Single from "./components/Secured/Single";
 import Transactions from "./components/Secured/Transactions";
 import Auto from "./components/Secured/Auto";
-import Request from "./components/Secured/Requests";
+import History from "./components/Secured/History";
+import Requests from "./components/Secured/Requests/index";
 
 const App = () => {
   return (
@@ -28,7 +29,7 @@ const App = () => {
         <Route exact path="/auto" element={<Auto />} />
         <Route exact path="/bene" element={<Beneficiaries />} />
         <Route exact path="/profile" element={<Profile />} />
-        <Route exact path="/history" element={<Request />} />
+        <Route exact path="/history" element={<Requests />} />
         <Route exact path="/transactions" element={<Transactions />} />
         <Route exact path="/organization" element={<Organization />} />
       </Route>

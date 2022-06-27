@@ -9,13 +9,33 @@ import {
   TopContainer,
 } from "./styles";
 
-import { FaDatabase } from "react-icons/fa";
+import { FaDatabase, FaTimes } from "react-icons/fa";
 import { BiPhoneCall } from "react-icons/bi";
 import { GiElectric } from "react-icons/gi";
 import { MdLiveTv, MdOutlineAddCircleOutline } from "react-icons/md";
 import { SingleContext } from "../../../../../context/SingleRecharge";
 import One from "./One";
 import Two from "./Two";
+import Three from "./Three/index";
+import Four from "./Four/index";
+import styled from "styled-components";
+
+const Close = styled.div`
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+`;
 
 const data = [
   { id: 1, text: "Data", img: <FaDatabase /> },
@@ -25,12 +45,15 @@ const data = [
   { id: 5, text: "Others", img: <MdOutlineAddCircleOutline /> },
 ];
 
-const RechargeDetails = () => {
+const RechargeDetails = ({ setModal }) => {
   const [id, setId] = useState(0);
   const { setDataText } = useContext(SingleContext);
   return (
     <>
       <RechargeDetailsContainer>
+        <Close onClick={() => setModal(false)}>
+          <FaTimes size={20} />
+        </Close>
         <SmallText>What will you like to do ?</SmallText>
         <MinHeight>
           <TopContainer>
@@ -54,7 +77,10 @@ const RechargeDetails = () => {
           </TopContainer>
           {id === 1 && <One />}
           {id === 2 && <Two />}
+          {id === 3 && <Three />}
+          {id === 4 && <Four />}
         </MinHeight>
+        {/* <button onClick={() => {}}>Close</button> */}
       </RechargeDetailsContainer>
     </>
   );

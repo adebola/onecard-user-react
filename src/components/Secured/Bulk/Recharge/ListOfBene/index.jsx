@@ -156,7 +156,7 @@ const ListOfBene = ({ rechargeType }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!rechargeName) {
+    if (!rechargeName && rechargeType === 3) {
       setNameError("Enter a name");
       return;
     }

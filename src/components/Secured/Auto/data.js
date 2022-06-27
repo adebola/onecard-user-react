@@ -15,8 +15,6 @@ export const weekly = [
   {
     id: 2,
     value: "Monday",
-    label: "Monday",
-    background: "#476A6F",
     color: "white",
   },
   {

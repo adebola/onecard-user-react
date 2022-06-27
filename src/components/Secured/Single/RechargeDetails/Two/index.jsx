@@ -128,12 +128,17 @@ const Two = () => {
   }, [setPhoneNumber]);
 
   useEffect(() => {
-    if (!phoneNumber || !singleAmount || !serviceName || !rechargeName) {
+    if (
+      !phoneNumber ||
+      !singleAmount ||
+      !serviceName ||
+      (!rechargeName && rechargeType === 3)
+    ) {
       setDisabled(true);
     } else {
       setDisabled(false);
     }
-  }, [phoneNumber, serviceName, singleAmount, rechargeName]);
+  }, [phoneNumber, serviceName, singleAmount, rechargeName, rechargeType]);
 
   useEffect(() => {
     if (weeklyAutoRecharge.length > 0 || monthlyAutoRecharge.length > 0) {

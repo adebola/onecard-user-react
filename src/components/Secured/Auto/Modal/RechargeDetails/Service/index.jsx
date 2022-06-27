@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { css } from "styled-components";
 import { SingleContext } from "../../../../../../context/SingleRecharge";
@@ -33,13 +33,17 @@ const Item = styled.div`
 `;
 
 const Image = styled.img`
-  width: 34px;
+  width: ${({ width }) => (width ? `${width}px` : "34px")};
   ${({ filter }) => {
     return filter && "filter: brightness(0) invert(1)";
   }};
+
+  &.big {
+    width: 48px;
+  }
 `;
 
-const ServiceProvider = ({ data, setSelectedDataPlan }) => {
+const ServiceProvider = ({ data, setSelectedDataPlan, id }) => {
   //singleContext
   const {
     dataText,
@@ -49,7 +53,16 @@ const ServiceProvider = ({ data, setSelectedDataPlan }) => {
     setServiceProviderError,
     serviceProviderError,
     setServiceName,
+    serviceName,
+    cableId,
+    setCableId,
   } = useContext(SingleContext);
+
+  useEffect(() => {
+    setServiceName("");
+  }, [setServiceName]);
+
+  // console.log(filter, serviceName);
 
   //handleServiceProvider Click
   const handleClick = (each) => {
@@ -60,10 +73,15 @@ const ServiceProvider = ({ data, setSelectedDataPlan }) => {
       setSelectedDataPlan(null);
       setServiceName(each.data);
       getAllDataPlans(each.data);
-    } else {
+    } else if (dataText === "Airtime") {
       //TODO
       setServiceName(each.airtime);
       // return;
+    } else if (dataText === "Cable TV") {
+      setCableId(each.id);
+      setServiceName(each.data);
+    } else {
+      setServiceName(each.type);
     }
   };
 
@@ -92,10 +110,17 @@ const ServiceProvider = ({ data, setSelectedDataPlan }) => {
         return (
           <Item
             onClick={() => handleClick(each)}
-            className={each.id === serviceProviderType && "active"}
+            className={
+              each.id === serviceProviderType && serviceName !== "" && "active"
+            }
             key={each.id}
           >
-            <Image src={each.img} className={"big"} />
+            <Image
+              filter={serviceName && each.filter && each.id === cableId}
+              src={each.img}
+              width={each.width}
+              className={id && "big"}
+            />
           </Item>
         );
       })}

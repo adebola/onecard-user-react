@@ -6,14 +6,16 @@ import mobile from "../../../../../../assets/9mobile.svg";
 import airtel from "../../../../../../assets/airtel.svg";
 import ReactInputMask from "react-input-mask";
 import styled from "styled-components";
-import Button from "../../../../../Button/normal";
-import ModePayment from "../../../../../PaymentType";
-
+import MyStyledButton from "../../../../../MyStyledButton";
 import Bene from "../Beneficiary";
 import NumberFormat from "react-number-format";
 import { SingleContext } from "../../../../../../context/SingleRecharge";
 import { GlobalContext } from "../../../../../../context/GlobalProvider";
-import { makeSingleRecharge } from "../../../../../../helper/requests";
+import {
+  makeAutoRechargeRequest,
+  makeSingleRecharge,
+} from "../../../../../../helper/requests";
+
 const data = [
   { id: 1, airtime: "MTN-AIRTIME", name: "mtn", img: mtn },
   {
@@ -86,9 +88,9 @@ const Two = () => {
     serviceProviderError,
     rechargeId,
     serviceProviderType,
-    serviceName,
     setServiceProviderType,
     setMessage,
+    serviceName,
   } = useContext(SingleContext);
 
   useEffect(() => {
@@ -145,83 +147,38 @@ const Two = () => {
     )
       return;
     const data = populateData();
-
-    if (rechargeId === 1) {
-      makeSingleRecharge(data)
-        .then((res) => console.log(res))
-        .catch((err) => {
-          const message = err.response.data.message;
-          console.log(message);
-        });
-    } else if (rechargeId === 2) {
-      console.log("2", data);
-    } else {
-      console.log("3", data);
-    }
+    console.log(data);
+    makeAutoRechargeRequest(data)
+      .then((res) => console.log(res))
+      .catch((err) => {
+        const message = err.response.data.message;
+        console.log(message);
+      });
   };
 
   const populateData = () => {
     let message;
-    let data;
-    if (rechargeId === 1) {
-      data = {
-        serviceCost: amount.replace(/\D+/g, ""),
-        recipient: phoneNumber.replace(/\D+/g, ""),
-        serviceCode: serviceName,
-        paymentMode,
-        rechargeType: "single",
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
-      };
 
-      message = {
-        phoneNumber,
-        amount,
-        serviceName,
-      };
+    let data = {
+      serviceCost: amount.replace(/\D+/g, ""),
+      recipient: phoneNumber.replace(/\D+/g, ""),
+      serviceCode: serviceName,
+      paymentMode,
+      rechargeType: "bulk",
+      redirectUrl:
+        paymentMode === "paystack"
+          ? `${window.origin}${window.location.pathname}`
+          : "",
+    };
 
-      setMessage(message);
-    } else if (rechargeId === 2) {
-      data = {
-        serviceCost: amount.replace(/\D+/g, ""),
-        recipient: phoneNumber.replace(/\D+/g, ""),
-        serviceCode: serviceName,
-        paymentMode,
-        rechargeType: "single",
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
-      };
-      message = {
-        phoneNumber,
-        amount,
-        serviceName,
-      };
+    message = {
+      phoneNumber,
+      amount,
+      serviceName,
+    };
 
-      setMessage(message);
-    } else {
-      data = {
-        serviceCost: amount.replace(/\D+/g, ""),
-        recipient: phoneNumber.replace(/\D+/g, ""),
-        serviceCode: serviceName,
-        paymentMode,
-        rechargeType: "single",
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
-      };
-      message = {
-        phoneNumber,
-        amount,
-        serviceName,
-      };
+    setMessage(message);
 
-      setMessage(message);
-    }
     return data;
   };
 
@@ -253,9 +210,11 @@ const Two = () => {
       />
 
       <ErrorBox>{phoneError}</ErrorBox>
-      <ModePayment />
 
-      <Button name="Submit" type={"submit"} />
+      <MyStyledButton
+        name="Submit"
+        myStyles={{ width: "100%", marginTop: "30px" }}
+      />
     </Form>
   );
 };

@@ -43,13 +43,16 @@ export const convertTime = (params) => {
   if (firstIndex === "00") {
     timeString = "12 AM";
   } else {
-    timeString = `${firstIndex} AM`;
-
-    if (firstIndex === "12") {
+    if (Number(firstIndex) < 12) {
+      timeString = `${firstIndex} AM`;
+    } else if (firstIndex === "12") {
       timeString = `${firstIndex} PM`;
     } else {
       const formatTime = Number(firstIndex) - 12;
-      if (formatTime.toString().charAt(0)) {
+      if (
+        formatTime.toString().length > 1 &&
+        formatTime.toString().charAt(0) === "1"
+      ) {
         timeString = `${formatTime} PM`;
       } else {
         timeString = `0${formatTime} PM`;

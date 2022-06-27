@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { SyncLoader } from "react-spinners";
-import ModePayment from "../../../../../../PaymentType";
 import MyStyledButton from "../../../../../../MyStyledButton";
 import { getCardDetails } from "../../../../../../../helper/noauthrequests";
 import { GlobalContext } from "../../../../../../../context/GlobalProvider";
@@ -268,7 +267,6 @@ const Loading = ({ serviceName, accountNumber, selected }) => {
           />
         </MinHeight>
 
-        <ModePayment />
         <MyStyledButton
           clicked={btnDisabled}
           disabled={disabled}

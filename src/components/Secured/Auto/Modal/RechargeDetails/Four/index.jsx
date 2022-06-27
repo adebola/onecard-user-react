@@ -6,15 +6,18 @@ import Loading from "./Loading";
 import dstv from "../../../../../../assets/dstv.png";
 import gotv from "../../../../../../assets/gotv.png";
 import startimes from "../../../../../../assets/startime.png";
-import { GlobalContext } from "../../../../../../context/GlobalProvider";
+import { SingleContext } from "../../../../../../context/SingleRecharge";
+import ReactInputMask from "react-input-mask";
 
-const InputDiv = styled.input`
+const Input = styled.input`
   width: 100%;
-  margin: 15px 0;
   height: 50px;
-  border: 1px solid var(--text-color);
+  margin-top: 5px;
+  border: ${({ error }) =>
+    error ? "1px solid red" : "1px solid var(--text-color)"};
   border-radius: 4px;
   outline: none;
+  background: none;
   padding: 0.5rem;
   color: var(--text-color);
   &::placeholder {
@@ -22,53 +25,62 @@ const InputDiv = styled.input`
   }
 `;
 
+const BoldText = styled.div`
+  font-size: 12px;
+  margin-top: 28px;
+  font-weight: bold;
+  color: var(--btn-color);
+`;
+
 const Four = () => {
-  const { airtimeId, setAirtimeId } = useContext(GlobalContext);
+  const [cardNumber, setCardNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { serviceName } = useContext(SingleContext);
 
   const cable = [
     { id: 1, data: "DSTV", img: dstv },
     { id: 2, data: "GOTV", img: gotv, filter: true },
-    { id: 3, data: "STARTIMES", img: startimes },
+    { id: 3, data: "STARTIMES", img: startimes, filter: true },
   ];
-
-  const [serviceName, setServiceName] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!cardNumber) return;
-    if (cardNumber.length === 11) {
-      setLoading(true);
-    } else if (serviceName === "GOTV" && cardNumber.length === 10) {
+
+    if (
+      cardNumber.length === 11 ||
+      (cardNumber.length === 10 && serviceName === "GOTV")
+    ) {
       setLoading(true);
     } else {
       setLoading(false);
     }
   }, [cardNumber, serviceName]);
 
+  useEffect(() => {
+    setLoading(false);
+    setCardNumber("");
+  }, [serviceName]);
+
   return (
     <div>
-      <ServiceProvider
-        filter="true"
-        airtimeId={airtimeId}
-        setAirtimeId={setAirtimeId}
-        setServiceName={setServiceName}
-        serviceName={serviceName}
-        data={cable}
-        id="true"
-      />
-      {airtimeId !== 0 && (
-        <InputDiv
-          placeholder="Enter card number"
-          maxLength={(airtimeId === 1 || airtimeId === 2) && "11"}
-          value={cardNumber}
-          onChange={({ target }) =>
-            setCardNumber(target.value.replace(/[^0-9]/g, ""))
-          }
-        />
+      <ServiceProvider data={cable} id="true" />
+      {serviceName && (
+        <>
+          <BoldText>Card Number</BoldText>
+          <Input
+            placeholder="Enter card number"
+            maxLength={serviceName === "GOTV" ? 10 : 11}
+            value={cardNumber}
+            onChange={({ target }) =>
+              setCardNumber(target.value.replace(/[^0-9]/g, ""))
+            }
+          />
+        </>
       )}
 
-      {loading && <Loading cardNumber={cardNumber} cableType={serviceName} />}
+      {loading && cardNumber.length !== 0 && (
+        <Loading cardNumber={cardNumber} cableType={serviceName} />
+      )}
     </div>
   );
 };

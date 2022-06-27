@@ -1,23 +1,20 @@
-import React, { useEffect, useMemo, useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   getAutoRechargePlans,
-  getSingleAutoRechargePlanBulk,
-  searchByDateAuto,
-  searchByName,
+  searchByDateSchedule,
+  singleAutoRechargePlanBulk,
 } from "../../../../helper/requests";
-import { useTable, usePagination, useSortBy } from "react-table";
-import { columns } from "./columns";
+import { header } from "./columns";
 import styled from "styled-components";
 
-import { FaSortDown, FaSortUp } from "react-icons/fa";
+// import { FaSortDown, FaSortUp } from "react-icons/fa";
 import TableTwo from "./TableTwo";
 import DatePicker from "react-datepicker";
 import { convertDate } from "../../../../utils/dateformat";
-import Select from "react-select";
-import useDebounce from "../../../../hooks/useDebounce";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ModalContext } from "../../../../context/ModalProvider";
-import Pagination from "../Pagination";
+
+import Table from "../Table";
 
 const Container = styled.div`
   display: flex;
@@ -25,10 +22,6 @@ const Container = styled.div`
   justify-content: space-between;
   margin-bottom: 15px;
   margin-top: 30px;
-
-  .css-b62m3t-container {
-    margin-top: 0px;
-  }
 `;
 
 const SearchContainer = styled.div`
@@ -95,21 +88,6 @@ const CustomDatePicker = styled(DatePicker)`
   padding: 1rem;
 `;
 
-const InnerContainer = styled.div`
-  display: flex;
-  align-items: center;
-
-  .css-qc6sy-singleValue {
-    font-size: 13px;
-  }
-`;
-
-const SmallText = styled.div`
-  margin-right: 5px;
-  color: #eb6a2b;
-  font-size: 14px;
-`;
-
 const NoRecharge = styled.p`
   font-size: 14px;
   color: var(--text-color);
@@ -121,15 +99,18 @@ const SingleLink = styled(Link)`
   font-weight: bold;
 `;
 
-const Search = ({ setData, setText, queryDate }) => {
-  const [query, setQuery] = useState("");
+const Search = ({ setData, setEntries, setPages, setPageSize, setText }) => {
+  const [queryDate, setQueryDate] = useState(null);
+
   useEffect(() => {
     if (queryDate === null) {
-      console.log("null", queryDate);
       const awaitResponse = async () => {
         try {
           const response = await getAutoRechargePlans();
-          setData(response.data);
+          setEntries(response.data.totalSize);
+          setPages(response.data.pages);
+          setPageSize(response.data.pageSize);
+          setData(response.data.list);
           setText(false);
         } catch (error) {
           console.error(error);
@@ -138,74 +119,13 @@ const Search = ({ setData, setText, queryDate }) => {
 
       awaitResponse();
     }
-  }, [queryDate, setData, setText]);
-
-  const debounceSearch = useDebounce(query);
-
-  useEffect(() => {
-    const awaitResponse = async () => {
-      const response = await searchByName(debounceSearch);
-      if (response.data.list.length === 0) {
-        setText(true);
-      } else {
-        setData(response.data.list);
-        setText(false);
-      }
-    };
-
-    if (debounceSearch) awaitResponse();
-    if (!debounceSearch) {
-      const awaitResponse = async () => {
-        try {
-          const response = await getAutoRechargePlans();
-          setData(response.data);
-          setText(false);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-      awaitResponse();
-    }
-  }, [debounceSearch, setData, setText]);
-
-  const handleInputChange = (e) => {
-    setQuery(e.target.value);
-  };
-
-  return (
-    <SearchContainer>
-      <div className="form">
-        <input
-          onChange={handleInputChange}
-          className="form__input"
-          placeholder=" "
-          required
-          type="tel"
-          value={query}
-        />
-        <label className="form__label">Search</label>
-      </div>
-    </SearchContainer>
-  );
-};
-
-const HistoryBoxFour = ({ type }) => {
-  const [data, setData] = useState([]);
-
-  const [entries, setEntries] = useState(1);
-  const [pages, setPages] = useState(0);
-  const [dataTwo, setDataTwo] = useState([]);
-  const [searchType, setSearchType] = useState("name");
-  const [queryDate, setQueryDate] = useState(null);
-  const [text, setText] = useState(false);
-
-  const { setRechargeType } = useContext(ModalContext);
+  }, [queryDate, setData, setText, setEntries, setPages, setPageSize]);
 
   useEffect(() => {
     const awaitResponse = async () => {
       const data = { scheduledDate: convertDate(queryDate) };
 
-      const response = await searchByDateAuto(data);
+      const response = await searchByDateSchedule(data);
       if (response.data.list.length === 0) {
         setText(true);
       } else {
@@ -216,195 +136,87 @@ const HistoryBoxFour = ({ type }) => {
     if (queryDate) awaitResponse();
   }, [setData, queryDate, setText]);
 
-  useEffect(() => {
-    if (queryDate === null) {
-      console.log("null", queryDate);
-      const awaitResponse = async () => {
-        try {
-          const response = await getAutoRechargePlans();
-          setData(response.data);
-          setText(false);
-        } catch (error) {
-          console.error(error);
-        }
-      };
+  const handleChange = (e) => {
+    setQueryDate(e);
+  };
 
-      awaitResponse();
-    }
-  }, [queryDate, setData, setText]);
+  return (
+    <SearchContainer>
+      <p> Search </p>
+      <CustomDatePicker
+        onChange={handleChange}
+        selected={queryDate}
+        placeholder=" "
+        dateFormat="dd-MM-yyyy"
+      />
+    </SearchContainer>
+  );
+};
 
-  const options = [
-    { value: "name", label: "Name" },
-    { value: "date", label: "Date" },
-  ];
-  const memorizeColumn = useMemo(() => columns, []);
-  const memorizeData = useMemo(() => data, [data]);
+const HistoryBoxFour = ({ type }) => {
+  const { setRechargeType } = useContext(ModalContext);
+  const navigate = useNavigate();
+
+  const [data, setData] = useState([]);
+  const [pageSize, setPageSize] = useState(0);
+  const [dataTwo, setDataTwo] = useState([]);
+
+  // console.log(dataTwo);
+
+  const [entries, setEntries] = useState(1);
+  const [id, setId] = useState(0);
+  const [pages, setPages] = useState(0);
+  const [text, setText] = useState(false);
+  const [isEmpty, setIsEmpty] = useState(false);
+
+  const [pageSizeTableTwo, setPageSizeTableTwo] = useState(0);
+  const [pagesTableTwo, setPagesTableTwo] = useState(0);
+  const [entriesTableTwo, setEntriesTableTwo] = useState(1);
 
   useEffect(() => {
     const awaitResponse = async () => {
       try {
         const response = await getAutoRechargePlans();
-        setData(response.data);
         setData(response.data.list);
         setEntries(response.data.totalSize);
         setPages(response.data.pages);
+        setIsEmpty(false);
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     };
-
     awaitResponse();
   }, []);
 
-  const tableInstance = useTable(
-    {
-      columns: memorizeColumn,
-      data: memorizeData,
-      initialState: {
-        pageSize: 20,
-      },
-    },
-    useSortBy,
-    usePagination
-  );
-
-  const {
-    headerGroups,
-    getTableProps,
-
-    page,
-    prepareRow,
-    setPageSize,
-    getTableBodyProps,
-  } = tableInstance;
-
-  useEffect(() => {
-    setPageSize(20);
-  }, [setPageSize]);
-
   const handleClick = async (id) => {
+    // navigate({
+    //   pathname: "/history",
+    //   search: `?id=${id}`,
+    // });
     try {
-      const response = await getSingleAutoRechargePlanBulk(id);
+      const response = await singleAutoRechargePlanBulk(id);
       setDataTwo(response.data.list);
+      setId(id);
+      setEntriesTableTwo(response.data.totalSize);
+      setPagesTableTwo(response.data.pages);
+      setPageSizeTableTwo(response.data.pageSize);
     } catch (error) {
       const message = error.response.data.message;
       console.log(message);
     }
   };
-  const renderSearchBy = () => {
-    const handleChange = (e) => {
-      setSearchType(e.value);
-    };
-    return (
-      <InnerContainer>
-        <SmallText>Search by</SmallText>
-        <Select
-          onChange={handleChange}
-          options={options}
-          defaultValue={options[0]}
-        />
-      </InnerContainer>
-    );
-  };
-  const renderSearch = () => {
-    //
-    const handleDateChange = (e) => {
-      setQueryDate(e);
-    };
 
+  const renderSearch = () => {
     return (
       <Container>
-        {searchType === "name" ? (
-          <Search setData={setData} setText={setText} queryDate={queryDate} />
-        ) : (
-          <div>
-            <SmallText>Search</SmallText>
-            <CustomDatePicker
-              selected={queryDate}
-              onChange={handleDateChange}
-              placeholder=" "
-              required
-              dateFormat="dd-MM-yyyy"
-            />
-          </div>
-        )}
-
-        {renderSearchBy()}
+        <Search setData={setData} setText={setText} />
       </Container>
-    );
-  };
-
-  const renderTable = () => {
-    return (
-      <>
-        <table {...getTableProps()}>
-          <thead>
-            {headerGroups.map((column) => {
-              return (
-                <tr {...column.getHeaderGroupProps()}>
-                  {column.headers.map((header) => {
-                    return (
-                      <th
-                        {...header.getHeaderProps(
-                          header.getSortByToggleProps()
-                        )}
-                      >
-                        {header.render("Header")}
-                        <span>
-                          {header.isSorted ? (
-                            !header.isSortedDesc ? (
-                              <FaSortUp />
-                            ) : (
-                              <FaSortDown />
-                            )
-                          ) : (
-                            ""
-                          )}
-                        </span>
-                      </th>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              // console.log(row.original.id);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  onClick={() => handleClick(row.original.id)}
-                >
-                  {row.cells.map((cell, i) => {
-                    return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <div>
-          <Pagination
-            page={pages}
-            data={data}
-            entries={entries}
-            setData={setData}
-            type={type}
-            setEntries={setEntries}
-          />
-        </div>
-      </>
     );
   };
 
   return (
     <div>
-      {/* {renderSearch()} */}
-      {data.length === 0 && (
+      {isEmpty && data.length === 0 && (
         <NoRecharge>
           You have no auto recharge!. Create{" "}
           <SingleLink
@@ -413,17 +225,45 @@ const HistoryBoxFour = ({ type }) => {
             }}
             to="/bulk"
           >
-            auto recharge.
+            scheduled recharge.
           </SingleLink>
         </NoRecharge>
       )}
       {data.length > 0 && (
         <div>
           {renderSearch()}
-          {text ? <NoResult> No results found</NoResult> : renderTable()}
+          {text ? (
+            <NoResult> No results found</NoResult>
+          ) : (
+            <Table
+              data={data}
+              entries={entries}
+              setData={setData}
+              pages={pages}
+              handleClick={handleClick}
+              header={header}
+              type={type}
+              pageSize={pageSize}
+            />
+          )}
         </div>
       )}
-      {/* {dataTwo.length > 0 && <TableTwo data={dataTwo} />} */}
+
+      {id !== 0 && dataTwo.length > 0 && (
+        <TableTwo
+          data={dataTwo}
+          id={id}
+          type={type}
+          pages={pagesTableTwo}
+          setData={setData}
+          entries={entriesTableTwo}
+          pageSize={pageSizeTableTwo}
+          setEntriesTableTwo={setEntriesTableTwo}
+          setPageSizeTableTwo={setPageSizeTableTwo}
+          setPagesTableTwo={setPagesTableTwo}
+          setDataTwo={setDataTwo}
+        />
+      )}
     </div>
   );
 };

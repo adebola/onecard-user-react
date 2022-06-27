@@ -14,6 +14,7 @@ export const RechargeDetailsContainer = styled.div`
   width: 600px;
   box-shadow: 0px 4px 90px 4px rgba(0, 0, 0, 0.1);
   border-radius: 20px;
+  position: relative;
 
   @media (max-width: 482px) {
     min-height: 0;

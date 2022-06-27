@@ -6,7 +6,7 @@ export const getBalance = () => {
 
 export const getTransaction = (num) => {
   return axios.get(
-    num ? `/transaction/?pageNumber=${num}&pageSize=10` : `/transaction`
+    num ? `/transaction/?pageNumber=${num}&pageSize=20` : `/transaction`
   );
 };
 
@@ -123,8 +123,8 @@ export const makeAutoRechargeRequest = (data) => {
   return axios.post("/auth-recharge/auto", data);
 };
 
-export const getAutoRechargePlans = () => {
-  return axios.get("/auth-recharge/auto/list");
+export const getAutoRechargePlans = (num = 1) => {
+  return axios.get(`/auth-recharge/auto/list?pageNumber=${num}&pageSize=20`);
 };
 
 export const getSingleAutoRechargePlan = (id) => {
@@ -177,8 +177,10 @@ export const searchByDateAuto = (data) => {
   return axios.post("/auth-recharge/auto/searchdate", data);
 };
 
-export const getBulkDetail = (id) => {
-  return axios.get(`/auth-recharge/bulk/individual/${id}`);
+export const getBulkDetail = (id, num = 1) => {
+  return axios.get(
+    `/auth-recharge/bulk/individual/${id}?pageNumber=${num}&pageSize=20`
+  );
 };
 
 export const getAllScheduledRequest = (num = 1) => {
@@ -187,18 +189,46 @@ export const getAllScheduledRequest = (num = 1) => {
   );
 };
 
-export const getAllScheduledRequestDetail = (id) => {
-  return axios.get(`/auth-recharge/scheduled/individual/${id}`);
+export const getAllScheduledRequestDetail = (id, num = 1) => {
+  return axios.get(
+    `/auth-recharge/scheduled/individual/${id}?pageNumber=${num}&pageSize=20`
+  );
 };
 
 export const downloadExcelBulk = (id) => {
-  return axios.get(`/auth-recharge/bulk/download/${id}`);
+  return axios.get(`/auth-recharge/bulk/download/${id}`, {
+    responseType: "blob",
+  });
 };
 
 export const downloadExcelSchedule = (id) => {
-  return axios.get(`/auth-recharge/scheduled/download/${id}`);
+  return axios.get(`/auth-recharge/scheduled/download/${id}`, {
+    responseType: "blob",
+  });
 };
 
 export const downloadExcelAuto = (id) => {
-  return axios.get(`/auth-recharge/bulk/download/${id}`);
+  return axios.get(`/auth-recharge/bulk/download/${id}`, {
+    responseType: "blob",
+  });
+};
+
+export const retryRequest = (id) => {
+  return axios.get(`/auth-recharge/bulk/retry/${id}`);
+};
+
+export const transactionExcelDownload = (data) => {
+  return axios.post(`/transaction/print`, data, {
+    responseType: "blob",
+  });
+};
+
+export const getWalletFunding = (num = 1) => {
+  return axios.get(`/account/wallet?pageNumber=${num}&pageSize=20`);
+};
+
+export const singleAutoRechargePlanBulk = (id, num = 1) => {
+  return axios.get(
+    `/auth-recharge/auto/bulk/${id}?pageNumber=${num}&pageSize=20`
+  );
 };

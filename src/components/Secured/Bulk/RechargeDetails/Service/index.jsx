@@ -119,6 +119,7 @@ const ServiceProvider = ({
   return (
     <Container gridTemplate={type}>
       {data.map((each) => {
+        console.log(filter, each.filter, airtimeId);
         return (
           <Item
             onClick={() => handleClick(each)}

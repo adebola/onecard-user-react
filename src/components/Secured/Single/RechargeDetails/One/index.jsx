@@ -162,13 +162,19 @@ const One = () => {
       !selectedSingleDataPlans ||
       !phoneNumber ||
       !serviceName ||
-      !rechargeName
+      (!rechargeName && rechargeType === 3)
     ) {
       setDisabled(true);
     } else {
       setDisabled(false);
     }
-  }, [phoneNumber, serviceName, selectedSingleDataPlans, rechargeName]);
+  }, [
+    phoneNumber,
+    serviceName,
+    selectedSingleDataPlans,
+    rechargeName,
+    rechargeType,
+  ]);
   useEffect(() => {
     setPhoneNumber("");
   }, [setPhoneNumber]);

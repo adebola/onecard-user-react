@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 export const SingleContext = createContext();
 
 const SingleContextProvider = ({ children }) => {
-  const [rechargeId, setRechargeId] = useState(1);
+  const rechargeId = 3;
   const [rechargeData, setRechargeData] = useState([]);
   const [singleData, setSingleData] = useState({});
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -14,6 +14,7 @@ const SingleContextProvider = ({ children }) => {
   const [message, setMessage] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
+  const [cableId, setCableId] = useState(0);
 
   return (
     <SingleContext.Provider
@@ -31,7 +32,6 @@ const SingleContextProvider = ({ children }) => {
         dataText,
         setDataText,
         rechargeId,
-        setRechargeId,
         serviceName,
         setServiceName,
         message,
@@ -40,6 +40,8 @@ const SingleContextProvider = ({ children }) => {
         setErrorMessage,
         responseMessage,
         setResponseMessage,
+        cableId,
+        setCableId,
       }}
     >
       {children}

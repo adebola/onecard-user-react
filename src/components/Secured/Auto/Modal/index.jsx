@@ -1,13 +1,11 @@
-import React, { useContext } from "react";
-import SingleContextProvider, {
-  SingleContext,
-} from "../../../../context/SingleRecharge";
+import React from "react";
+import SingleContextProvider from "../../../../context/SingleRecharge";
 import RechargeDetails from "./RechargeDetails";
 
-const AutoModal = () => {
+const AutoModal = ({ setModal }) => {
   return (
     <SingleContextProvider>
-      <RechargeDetails />
+      <RechargeDetails setModal={setModal} />
     </SingleContextProvider>
   );
 };

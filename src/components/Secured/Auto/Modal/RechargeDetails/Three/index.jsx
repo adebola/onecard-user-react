@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ServiceProvider from "../Service";
 
 import eko from "../../../../../../assets/eko.jpg";
@@ -7,6 +7,7 @@ import jos from "../../../../../../assets/jos.png";
 import styled from "styled-components";
 import Select from "react-select";
 import Loading from "./Loading";
+import { SingleContext } from "../../../../../../context/SingleRecharge";
 
 const options = [
   {
@@ -29,19 +30,55 @@ const Container = styled.div``;
 const Inner = styled.div``;
 
 const Input = styled.input`
-  padding: 9px 12px;
   width: 100%;
-  border: 1px solid var(--text-color);
-  border-radius: 3px;
+  height: 50px;
+  margin-top: 5px;
+  border: ${({ error }) =>
+    error ? "1px solid red" : "1px solid var(--text-color)"};
+  border-radius: 4px;
+  outline: none;
+  background: none;
+  padding: 0.5rem;
+  color: var(--text-color);
+  &::placeholder {
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+`;
+
+const MySelect = styled(Select)`
+  border: ${({ error }) =>
+    error ? "1px solid red" : "1px solid var(--text-color)"};
+  border-radius: 4px;
+  background: transparent;
+  padding: 5px;
+
+  svg {
+    fill: ${({ error }) => (error ? "red" : "var(--text-color)")};
+  }
+
+  .css-1okebmr-indicatorSeparator {
+    background: none;
+  }
+`;
+
+const BoldText = styled.div`
+  font-size: 12px;
   margin-top: 10px;
+  font-weight: bold;
+  color: var(--btn-color);
 `;
 
 const Three = () => {
-  const [serviceName, setServiceName] = useState("");
+  const { serviceName, setServiceName } = useContext(SingleContext);
   const [accountNumber, setAccountNumber] = useState("");
   const [selected, setSelected] = useState({});
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setServiceName("");
+  }, [setServiceName]);
 
   useEffect(() => {
     if (!accountNumber) return;
@@ -67,14 +104,22 @@ const Three = () => {
     return (
       <Container>
         <Inner>
-          <Select
+          <BoldText>Select a plan</BoldText>
+          <MySelect
             placeholder="Select a plan"
             options={options}
             value={
               Object.entries(selected).length > 0 ? selected : "Select a plan"
             }
             onChange={handleChange}
+            styles={{
+              control: () => ({
+                backgroundColor: "transparent",
+                display: "flex",
+              }),
+            }}
           />
+          <BoldText>Account Number</BoldText>
           <Input
             maxLength="13"
             placeholder="0433877877-89"
@@ -90,6 +135,8 @@ const Three = () => {
     return (
       <Container>
         <Inner>
+          <BoldText>Card Number</BoldText>
+
           <Input
             maxLength="11"
             placeholder="09890900009"
@@ -105,12 +152,7 @@ const Three = () => {
 
   return (
     <>
-      <ServiceProvider
-        id="true"
-        serviceName={serviceName}
-        setServiceName={setServiceName}
-        data={nepa}
-      />
+      <ServiceProvider id="true" data={nepa} />
       {serviceName === "EKEDP" && renderEko()}
       {serviceName === "JED" && renderJos()}
       {loading && (

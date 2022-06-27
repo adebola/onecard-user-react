@@ -6,9 +6,9 @@ import {
   getAllScheduledRequest,
   getAllSingleRequest,
   getAutoRechargePlans,
+  getWalletFunding,
   searchSingleDetail,
 } from "../../../../helper/requests";
-// import { getAllSingleRequest } from "../../../../helper/requests";
 import useDebounce from "../../../../hooks/useDebounce";
 
 const Container = styled.div`
@@ -70,6 +70,7 @@ const Button = styled.button`
 `;
 
 const Pagination = ({
+  tableTwo,
   query,
   entries,
   pages,
@@ -89,7 +90,7 @@ const Pagination = ({
   const debounceSearch = useDebounce(query);
 
   useEffect(() => {
-    if (!search) return;
+    // if (!search) return;
     if (type === "Single") {
       const awaitResponse = async () => {
         try {
@@ -129,11 +130,24 @@ const Pagination = ({
         }
       };
       awaitResponse();
-    } else {
+    } else if (type === "Auto") {
       const awaitResponse = async () => {
         try {
           const response = await getAutoRechargePlans(active);
-          setData(response.data);
+          setData(response.data.list);
+          setEntries(response.data.totalSize);
+          setPages(response.data.pages);
+          setPageSize(response.data.pageSize);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      awaitResponse();
+    } else {
+      const awaitResponse = async () => {
+        try {
+          const response = await getWalletFunding(active);
+          setData(response.data.list);
           setEntries(response.data.totalSize);
           setPages(response.data.pages);
           setPageSize(response.data.pageSize);
@@ -143,7 +157,7 @@ const Pagination = ({
       };
       awaitResponse();
     }
-  }, [active, type, setData, setEntries, setPages, setPageSize, search]);
+  }, [active, type, setData, setEntries, setPages, setPageSize]);
 
   useEffect(() => {
     if (search) return;

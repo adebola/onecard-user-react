@@ -10,6 +10,8 @@ import HistoryBoxOne from "./HistoryBoxOne";
 import HistoryBoxTwo from "./HistoryBoxTwo";
 import HistoryBoxThree from "./HistoryBoxThree";
 import HistoryBoxFour from "./HistoryBoxFour";
+// import HistoryBoxFour from "./HistoryBoxFour";
+import WalletFunding from "./WalletFunding/index";
 
 const BoxOne = styled.div`
   flex: 1;
@@ -18,7 +20,7 @@ const BoxOne = styled.div`
 const TabContainer = styled.div``;
 
 const TabInner = styled.div`
-  width: 600px;
+  width: 750px;
   display: flex;
   height: 50px;
   position: relative;
@@ -105,6 +107,16 @@ const Requests = () => {
           >
             Auto Requests
           </Tab>
+          <Tab
+            className={tabOptions === 5 && "active"}
+            onClick={() => {
+              setTabOptions(5);
+              setLeft(600);
+              setType("Wallet");
+            }}
+          >
+            Wallet Funding
+          </Tab>
           <Underline left={left} />
         </TabInner>
 
@@ -112,6 +124,7 @@ const Requests = () => {
         {tabOptions === 2 && <HistoryBoxTwo type={type} />}
         {tabOptions === 3 && <HistoryBoxThree type={type} />}
         {tabOptions === 4 && <HistoryBoxFour type={type} />}
+        {tabOptions === 5 && <WalletFunding type={type} />}
       </TabContainer>
     );
   };

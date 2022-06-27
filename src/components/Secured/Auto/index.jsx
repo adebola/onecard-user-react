@@ -9,7 +9,7 @@ import Container from "../../Container";
 
 import { Link, useNavigate } from "react-router-dom";
 
-import { MdEdit, MdDeleteOutline, MdOutlineClose, MdAdd } from "react-icons/md";
+import { MdEdit, MdDeleteOutline, MdAdd } from "react-icons/md";
 import { monthly, weekly } from "./data";
 
 import DatePicker from "react-datepicker";
@@ -269,6 +269,7 @@ const IconBlank = styled(Blank)`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 9px;
 `;
 
 const AutoRecharge = () => {
@@ -309,10 +310,10 @@ const AutoRecharge = () => {
     const awaitResponse = async () => {
       try {
         const response = await getAutoRechargePlans();
-        if (response.data.length === 0) {
+        if (response.data.list.length === 0) {
           setText(true);
         } else {
-          setDetails(response.data);
+          setDetails(response.data.list);
         }
       } catch (error) {
         const message = error.response.data.message;
@@ -329,11 +330,11 @@ const AutoRecharge = () => {
         try {
           const response = await getAutoRechargePlans();
 
-          if (response.data.length === 0) {
+          if (response.data.list.length === 0) {
             setText(true);
             setDetails([]);
           } else {
-            setDetails(response.data);
+            setDetails(response.data.list);
           }
         } catch (error) {
           const message = error.response.data.message;
@@ -602,7 +603,12 @@ const AutoRecharge = () => {
           </div>
 
           <div>
-            <BoldText>Recipient</BoldText>
+            <div style={{ display: "flex" }}>
+              <BoldText>Recipient</BoldText>
+              <IconBlank>
+                <MdAdd color="#114A80" onClick={() => setModal(true)} />
+              </IconBlank>
+            </div>
             <Detail>
               {recharge.map((each, i) => {
                 return (
@@ -619,35 +625,6 @@ const AutoRecharge = () => {
                       <p>{each.serviceCode}</p>
                       <p>{each.serviceCost}</p>
                     </div>
-                    {i === 0 ? (
-                      <div>
-                        <Blank />
-                        <IconBlank>
-                          <MdAdd
-                            color="#114A80"
-                            onClick={() => setModal(true)}
-                          />
-                        </IconBlank>
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <IconBlank>
-                          <MdOutlineClose color="#eb6a2b" />
-                        </IconBlank>
-                        <IconBlank>
-                          <MdAdd
-                            color="#114A80"
-                            onClick={() => setModal(true)}
-                          />
-                        </IconBlank>
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -669,7 +646,7 @@ const AutoRecharge = () => {
   const renderAddRecharge = () => {
     return (
       <AddRechargeModal>
-        <AutoModal />
+        <AutoModal setModal={setModal} />
       </AddRechargeModal>
     );
   };
@@ -711,12 +688,10 @@ const AutoRecharge = () => {
               {id !== 0 && renderDetails()}
             </Two>
           )}
-
-          {/* <Two>{renderDetails()}</Two> */}
         </Container>
 
         {done && renderModal()}
-        {/* {modal && renderAddRecharge()} */}
+        {modal && renderAddRecharge()}
       </Wrapper>
     </>
   );

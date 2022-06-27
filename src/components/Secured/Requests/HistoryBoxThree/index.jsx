@@ -11,7 +11,7 @@ import styled from "styled-components";
 import TableTwo from "./TableTwo";
 import DatePicker from "react-datepicker";
 import { convertDate } from "../../../../utils/dateformat";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ModalContext } from "../../../../context/ModalProvider";
 
 import Table from "../Table";
@@ -152,14 +152,21 @@ const Search = ({ setData, setText }) => {
 
 const HistoryBoxThree = ({ type }) => {
   const { setRechargeType } = useContext(ModalContext);
+  const navigate = useNavigate();
+
   const [data, setData] = useState([]);
   const [pageSize, setPageSize] = useState(0);
   const [dataTwo, setDataTwo] = useState([]);
 
   const [entries, setEntries] = useState(1);
+  const [id, setId] = useState(0);
   const [pages, setPages] = useState(0);
   const [text, setText] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
+
+  const [pageSizeTableTwo, setPageSizeTableTwo] = useState(0);
+  const [pagesTableTwo, setPagesTableTwo] = useState(0);
+  const [entriesTableTwo, setEntriesTableTwo] = useState(1);
 
   useEffect(() => {
     const awaitResponse = async () => {
@@ -182,16 +189,22 @@ const HistoryBoxThree = ({ type }) => {
     awaitResponse();
   }, []);
 
-  const handleClick = (id) => {
-    console.log("schedule", id);
-
-    // try {
-    //   const response = await getAllScheduledRequestDetail(id);
-    //   setDataTwo(response.data.list);
-    // } catch (error) {
-    //   const message = error.response.data.message;
-    //   console.log(message);
-    // }
+  const handleClick = async (id) => {
+    navigate({
+      pathname: "/history",
+      search: `?id=${id}`,
+    });
+    try {
+      const response = await getAllScheduledRequestDetail(id);
+      setDataTwo(response.data.list);
+      setId(id);
+      setEntriesTableTwo(response.data.totalSize);
+      setPagesTableTwo(response.data.pages);
+      setPageSizeTableTwo(response.data.pageSize);
+    } catch (error) {
+      const message = error.response.data.message;
+      console.log(message);
+    }
   };
 
   const renderSearch = () => {
@@ -239,7 +252,21 @@ const HistoryBoxThree = ({ type }) => {
         </div>
       )}
 
-      {dataTwo.length > 0 && <TableTwo data={dataTwo} id={0} type={type} />}
+      {id !== 0 && dataTwo.length > 0 && (
+        <TableTwo
+          data={dataTwo}
+          id={id}
+          type={type}
+          pages={pagesTableTwo}
+          setData={setData}
+          entries={entriesTableTwo}
+          pageSize={pageSizeTableTwo}
+          setEntriesTableTwo={setEntriesTableTwo}
+          setPageSizeTableTwo={setPageSizeTableTwo}
+          setPagesTableTwo={setPagesTableTwo}
+          setDataTwo={setDataTwo}
+        />
+      )}
     </div>
   );
 };

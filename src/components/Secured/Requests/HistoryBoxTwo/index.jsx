@@ -11,7 +11,7 @@ import styled from "styled-components";
 import TableTwo from "./TableTwo";
 import DatePicker from "react-datepicker";
 import { convertDate } from "../../../../utils/dateformat";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Table from "../Table";
 
 const Container = styled.div`
@@ -150,11 +150,14 @@ const Search = ({ setData, setText }) => {
 
 const HistoryBoxTwo = ({ type }) => {
   const [data, setData] = useState([]);
-  // const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(0);
+  const navigate = useNavigate();
 
-  const [entries, setEntries] = useState(1);
   const [pages, setPages] = useState(0);
+  const [pageSizeTableTwo, setPageSizeTableTwo] = useState(0);
+  const [pagesTableTwo, setPagesTableTwo] = useState(0);
+  const [entriesTableTwo, setEntriesTableTwo] = useState(1);
+  const [entries, setEntries] = useState(1);
   const [dataTwo, setDataTwo] = useState([]);
   const [text, setText] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
@@ -183,10 +186,17 @@ const HistoryBoxTwo = ({ type }) => {
   }, []);
 
   const handleClick = async (id) => {
+    navigate({
+      pathname: "/history",
+      search: `?id=${id}`,
+    });
     try {
       const response = await getBulkDetail(id);
       setDataTwo(response.data.list);
       setId(id);
+      setEntriesTableTwo(response.data.totalSize);
+      setPagesTableTwo(response.data.pages);
+      setPageSizeTableTwo(response.data.pageSize);
     } catch (error) {
       const message = error.response.data.message;
       console.log(message);
@@ -208,35 +218,51 @@ const HistoryBoxTwo = ({ type }) => {
   };
 
   return (
-    <div>
-      {isEmpty && data.length === 0 && (
-        <NoRecharge>
-          You have no bulk recharge!. Create{" "}
-          <SingleLink to="/bulk">bulk recharge.</SingleLink>
-        </NoRecharge>
-      )}
-      {data.length > 0 && (
-        <div>
-          {renderSearch()}
-          {text ? (
-            <NoResult> No results found</NoResult>
-          ) : (
-            <Table
-              data={data}
-              entries={entries}
-              setData={setData}
-              pages={pages}
-              handleClick={handleClick}
-              header={header}
-              type={type}
-              pageSize={pageSize}
-              setId={setId}
-            />
-          )}
-        </div>
-      )}
-      {dataTwo.length > 0 && <TableTwo data={dataTwo} id={id} type={type} />}
-    </div>
+    <>
+      <div>
+        {isEmpty && data.length === 0 && (
+          <NoRecharge>
+            You have no bulk recharge!. Create{" "}
+            <SingleLink to="/bulk">bulk recharge.</SingleLink>
+          </NoRecharge>
+        )}
+        {data.length > 0 && (
+          <div>
+            {renderSearch()}
+            {text ? (
+              <NoResult> No results found</NoResult>
+            ) : (
+              <Table
+                data={data}
+                entries={entries}
+                setData={setData}
+                pages={pages}
+                handleClick={handleClick}
+                header={header}
+                type={type}
+                pageSize={pageSize}
+                setId={setId}
+              />
+            )}
+          </div>
+        )}
+        {id !== 0 && dataTwo.length > 0 && (
+          <TableTwo
+            data={dataTwo}
+            id={id}
+            type={type}
+            pages={pagesTableTwo}
+            setData={setData}
+            entries={entriesTableTwo}
+            pageSize={pageSizeTableTwo}
+            setEntriesTableTwo={setEntriesTableTwo}
+            setPageSizeTableTwo={setPageSizeTableTwo}
+            setPagesTableTwo={setPagesTableTwo}
+            setDataTwo={setDataTwo}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

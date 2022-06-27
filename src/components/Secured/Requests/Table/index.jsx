@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import Pagination from "../Pagination";
 import { dateFormat } from "../../../../utils/format.created.date";
 
+import { BiCheck } from "react-icons/bi";
+import { RiCloseFill } from "react-icons/ri";
+import styled from "styled-components";
+
 const Table = ({
   data,
   pages,
@@ -28,20 +32,52 @@ const Table = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((each) => {
-              return (
-                <tr onClick={() => handleClick(each.id)}>
-                  <td>{each.recipient || each.id}</td>
-                  <td>{each.serviceCode || each.paymentMode}</td>
-                  <td>
-                    {each.serviceCost ||
-                      each.totalServiceCost ||
-                      dateFormat(each.scheduledDate)}
-                  </td>
-                  {each.createdAt && <td>{dateFormat(each.createdAt)}</td>}
-                </tr>
-              );
-            })}
+            {(type === "Single" || type === "Bulk" || type === "Schedule") &&
+              data.map((each) => {
+                return (
+                  <tr onClick={() => handleClick(each.id)}>
+                    <td>{each.id}</td>
+                    <td>{each.serviceCode || each.paymentMode}</td>
+                    <td>
+                      {each.serviceCost ||
+                        each.totalServiceCost ||
+                        dateFormat(each.scheduledDate)}
+                    </td>
+                    {each.createdAt && <td>{dateFormat(each.createdAt)}</td>}
+                  </tr>
+                );
+              })}
+
+            {type === "Auto" &&
+              data.map((each) => {
+                return (
+                  <tr onClick={() => handleClick(each.id)}>
+                    <td>{each.id}</td>
+                    <td>{each.title}</td>
+                    <td>{dateFormat(each.startDate)}</td>
+                    <td>{dateFormat(each.endDate)}</td>
+                    <td>{each.recurringType}</td>
+                  </tr>
+                );
+              })}
+
+            {type === "Wallet" &&
+              data.map((each) => {
+                return (
+                  <tr onClick={() => handleClick(each.id)}>
+                    <td>{each.amount.toFixed(2)}</td>
+                    <td>
+                      {!each.paymentVerified ? (
+                        <RiCloseFill color="red" size={19} />
+                      ) : (
+                        <BiCheck color="green" size={22} />
+                      )}
+                    </td>
+
+                    <td>{dateFormat(each.createdOn)}</td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
         <Pagination

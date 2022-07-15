@@ -31,8 +31,8 @@ const Sidebar = () => {
     },
     {
       id: 4,
-      name: "Fund Wallet",
-      link: "/fund",
+      name: "Wallet",
+      link: "/wallet",
     },
     {
       id: 5,

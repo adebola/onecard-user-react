@@ -60,8 +60,8 @@ const Underline = styled.div`
 const Requests = () => {
   const [toggle, setToggle] = useState(false);
   const [left, setLeft] = useState(0);
-  const [type, setType] = useState("Single");
   const [tabOptions, setTabOptions] = useState(1);
+  const [type, setType] = useState("Single");
 
   const renderTabs = () => {
     return (

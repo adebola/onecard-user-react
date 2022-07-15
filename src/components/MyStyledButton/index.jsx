@@ -5,7 +5,7 @@ import { Container, Button as ButtonContainer, ButtonRipple } from "./styles";
 const ANIMATION_MS = 600;
 const CIRCLE_SIZE = 50;
 
-const Button = ({ color, btnDisabled, to, name, myStyles, disabled }) => {
+const Button = ({ color, type, to, name, myStyles, disabled }) => {
   const navigate = useNavigate();
 
   const [ripples, setRipples] = useState([]);
@@ -42,8 +42,9 @@ const Button = ({ color, btnDisabled, to, name, myStyles, disabled }) => {
         disabled={disabled}
         className={clicked && "not-allowed"}
         onClick={handleClick}
+        type={type}
       >
-        {name}{" "}
+        {name}
         {ripples.map((ripple, i) => (
           <ButtonRipple key={i} x={ripple.x} y={ripple.y} />
         ))}

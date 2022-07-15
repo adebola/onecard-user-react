@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import Pagination from "../Pagination";
 import { dateFormat } from "../../../../utils/format.created.date";
 
-import { BiCheck } from "react-icons/bi";
-import { RiCloseFill } from "react-icons/ri";
-import styled from "styled-components";
-
 const Table = ({
   data,
   pages,
@@ -66,14 +62,7 @@ const Table = ({
                 return (
                   <tr onClick={() => handleClick(each.id)}>
                     <td>{each.amount.toFixed(2)}</td>
-                    <td>
-                      {!each.paymentVerified ? (
-                        <RiCloseFill color="red" size={19} />
-                      ) : (
-                        <BiCheck color="green" size={22} />
-                      )}
-                    </td>
-
+                    <td>{each.type}</td>
                     <td>{dateFormat(each.createdOn)}</td>
                   </tr>
                 );

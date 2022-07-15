@@ -5,7 +5,7 @@ export const header = [
   },
   {
     id: 2,
-    name: "Payment Verified",
+    name: "Payment Type",
   },
   {
     id: 3,

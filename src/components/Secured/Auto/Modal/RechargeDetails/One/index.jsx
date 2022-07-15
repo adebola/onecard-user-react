@@ -13,11 +13,9 @@ import MyStyledButton from "../../../../../MyStyledButton";
 import Bene from "../Beneficiary";
 import { css } from "styled-components";
 import { SingleContext } from "../../../../../../context/SingleRecharge";
-import { GlobalContext } from "../../../../../../context/GlobalProvider";
-import {
-  makeAutoRechargeRequest,
-  makeSingleRecharge,
-} from "../../../../../../helper/requests";
+import { editSingleAutoRechargePlan } from "../../../../../../helper/requests";
+import { convertDate } from "../../../../../../utils/dateformat";
+import { ModalContext } from "../../../../../../context/ModalProvider";
 
 const airtime = [
   { id: 1, airtime: "MTN-AIRTIME", data: "MTN-DATA", name: "mtn", img: mtn },
@@ -67,20 +65,6 @@ const Input = styled(ReactInputMask)`
   }
 `;
 
-const NormalInput = styled.input`
-  width: 100%;
-  margin: 15px 0;
-  height: 50px;
-  border: 1px solid var(--text-color);
-  border-radius: 4px;
-  outline: none;
-  padding: 0.5rem;
-  color: var(--text-color);
-  &::placeholder {
-    color: var(--text-color);
-  }
-`;
-
 const MySelect = styled(Select)`
   border: ${({ error }) =>
     error ? "1px solid red" : "1px solid var(--text-color)"};
@@ -122,14 +106,15 @@ const One = () => {
   const [phoneError, setPhoneError] = useState("");
   const [dataError, setDataError] = useState("");
 
-  const { paymentMode } = useContext(GlobalContext);
+  const { monthlyAutoRecharge, weeklyAutoRecharge } = useContext(ModalContext);
+
+  const id = new URLSearchParams(window.location.search).get("id");
 
   //singleContext
   const {
     phoneNumber,
     setPhoneNumber,
     rechargeData,
-    rechargeId,
     serviceProviderType,
     serviceProviderError,
     setServiceProviderError,
@@ -137,7 +122,11 @@ const One = () => {
     setRechargeData,
     setServiceProviderType,
     setMessage,
-    message,
+    name,
+    startDate,
+    endDate,
+    boldText,
+    autoRecharge,
   } = useContext(SingleContext);
 
   useEffect(() => {
@@ -172,33 +161,55 @@ const One = () => {
     )
       return;
     const data = populateData();
-    console.log(data);
 
-    makeAutoRechargeRequest(data)
+    let splitStartDate = startDate.toString().split(" ")[0];
+
+    let isNum = isNaN(splitStartDate.charAt(0));
+
+    const checkEndDate = (str) => {
+      if (str === null) {
+        return null;
+      } else {
+        let splitStartDate = str.toString().split(" ")[0];
+        let isNum = isNaN(splitStartDate.charAt(0));
+        if (isNum) {
+          return convertDate(str);
+        } else {
+          return str;
+        }
+      }
+    };
+
+    const dataToSend = {
+      title: name,
+      startDate: isNum ? convertDate(startDate) : startDate,
+      endDate: checkEndDate(endDate),
+      daysOfWeek:
+        boldText === "Weekly" && weeklyAutoRecharge.length === 0
+          ? autoRecharge
+          : weeklyAutoRecharge,
+      daysOfMonth:
+        boldText === "Monthly" && monthlyAutoRecharge.length === 0
+          ? autoRecharge
+          : monthlyAutoRecharge,
+      recipients: [data],
+    };
+
+    editSingleAutoRechargePlan(id, dataToSend)
       .then((res) => console.log(res))
       .catch((err) => {
         const message = err.response.data.message;
         console.log(message);
       });
-
-    //makeSingleRechargeRequest
-    // try {
-
-    // } catch (error) {
-
-    // }
   };
 
   const populateData = () => {
     let message;
 
     let data = {
-      paymentMode,
       productId: selectedDataPlan.id,
       recipient: phoneNumber.replace(/\D+/g, ""),
       serviceCode: serviceName,
-      redirectUrl: "",
-      rechargeType: "bulk",
     };
 
     message = {

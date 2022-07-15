@@ -232,3 +232,15 @@ export const singleAutoRechargePlanBulk = (id, num = 1) => {
     `/auth-recharge/auto/bulk/${id}?pageNumber=${num}&pageSize=20`
   );
 };
+
+export const bulkSearchBy = (data) => {
+  return axios.post(`/auth-recharge/bulk/individual/search`, data);
+};
+
+export const verifyUser = (id) => {
+  return axios.get(`/user/verify/${id}`);
+};
+
+export const transferFund = (data) => {
+  return axios.post("/account/transfer", data);
+};

@@ -8,7 +8,7 @@ export const Container = styled.div`
   background: #124a80;
   height: 100vh;
   position: fixed;
-  width: 23%;
+  width: 18%;
 
   ${MobileResponsive({
     display: "none",

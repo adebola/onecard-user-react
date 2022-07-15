@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Select from "react-select";
+import { bulkSearchBy } from "../../helper/requests";
 
 const Container = styled.div`
   display: flex;
@@ -50,35 +51,90 @@ const MySelect = styled(Select)`
   }
 `;
 
-const SearchBy = ({ children }) => {
-  const [text, setText] = useState("");
+const SearchBy = ({
+  children,
+  text,
+  setQuery,
+  setText,
+  setDataTwo,
+  setEmpty,
+  setEntriesTableTwo,
+  setPageSizeTableTwo,
+  setPagesTableTwo,
+}) => {
   const options = [
-    { label: "Reciepient", value: "Reciepient" },
-    { label: "Status", value: "Status" },
-    { label: "Product", value: "Product" },
+    { value: "recipient", label: "Recipient" },
+    { value: "status", label: "Status" },
+    { value: "product", label: "Product" },
   ];
   const optionsTwo = [
-    { label: "Failed", value: "Failed" },
-    { label: "Success", value: "Success" },
+    { value: "failed", label: "Failed" },
+    { value: "success", label: "Success" },
   ];
+  const id = new URLSearchParams(window.location.search).get("id");
+  const [status, setStatus] = useState("");
+  const [searchBy, setSearchBy] = useState(options[0]);
+
+  useEffect(() => {
+    if (!status) return;
+    const data = { bulkId: id, status: status === "failed" ? true : false };
+    const searchBy = async () => {
+      try {
+        const response = await bulkSearchBy(data);
+        if (response.data.list.length === 0) {
+          setEmpty(true);
+        } else {
+          setDataTwo(response.data.list);
+          setEmpty(false);
+          setEntriesTableTwo(response.data.totalSize);
+          setPagesTableTwo(response.data.pages);
+          setPageSizeTableTwo(response.data.pageSize);
+        }
+      } catch (error) {
+        const message = error.response.data.message;
+        console.log(message);
+      }
+    };
+    searchBy();
+  }, [
+    status,
+    setEmpty,
+    id,
+    setDataTwo,
+    setEntriesTableTwo,
+    setPageSizeTableTwo,
+    setPagesTableTwo,
+  ]);
+
   const handleChange = (e) => {
     setText(e.value);
+    setSearchBy(e);
+    setQuery("");
   };
   const handleTwoChange = (e) => {
-    console.log(e);
+    setStatus(e.value);
   };
 
   //renderSearchByStatus
   const renderSearchByStatus = () => {
     return (
-      <MySelect options={optionsTwo} onChange={(e) => handleTwoChange(e)} />
+      <MySelect
+        styles={{
+          control: () => ({
+            backgroundColor: "transparent",
+            display: "flex",
+          }),
+        }}
+        options={optionsTwo}
+        onChange={(e) => handleTwoChange(e)}
+      />
     );
   };
 
   return (
     <Container>
-      {children && text !== "Status" ? children : null}
-      {text === "Status" && renderSearchByStatus()}
+      {children && text !== "status" ? children : null}
+      {text === "status" && renderSearchByStatus()}
       <Inner>
         <Text>Search By</Text>
         <MySelect
@@ -89,6 +145,7 @@ const SearchBy = ({ children }) => {
             }),
           }}
           options={options}
+          value={searchBy}
           onChange={(e) => handleChange(e)}
         />
       </Inner>

@@ -63,9 +63,9 @@ const Inner = styled.div`
 `;
 
 const FullWidth = styled.div`
-  width: 77%;
+  width: 82%;
   position: relative;
-  left: 23%;
+  left: 18%;
   padding: 2rem;
 
   ${MobileResponsive({

@@ -72,7 +72,7 @@ const WalletFunding = ({ type }) => {
           query={query}
         />
       )}
-      {data.length > 0 && (
+      {/* {data.length > 0 && (
         <Table
           data={data}
           entries={entries}
@@ -85,7 +85,7 @@ const WalletFunding = ({ type }) => {
           search={!query}
           query={query}
         />
-      )}
+      )} */}
     </Container>
   );
 };

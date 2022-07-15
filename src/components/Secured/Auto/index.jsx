@@ -24,6 +24,7 @@ import Select from "./Select";
 import { ModalContext } from "../../../context/ModalProvider";
 import { convertDate } from "../../../utils/dateformat";
 import AutoModal from "./Modal";
+import { SingleContext } from "../../../context/SingleRecharge";
 
 const One = styled.div`
   width: 50%;
@@ -278,10 +279,20 @@ const AutoRecharge = () => {
   const { monthlyAutoRecharge, weeklyAutoRecharge, setRechargeType } =
     useContext(ModalContext);
 
-  const [name, setName] = useState("");
+  const {
+    name,
+    setName,
+    startDate,
+    setStartDate,
+    setAutoRecharge,
+    setBoldText,
+    endDate,
+    setEndDate,
+    boldText,
+    autoRecharge,
+  } = useContext(SingleContext);
+
   const [showOutline, setShowOutline] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
 
   const [nameEdit, setNameEdit] = useState(false);
   const [rechargeEdit, setRechargeEdit] = useState(false);
@@ -290,7 +301,6 @@ const AutoRecharge = () => {
 
   const [details, setDetails] = useState([]);
   const [singleDetail, setSingleDetail] = useState("");
-  const [boldText, setBoldText] = useState("");
 
   const [id, setId] = useState(0);
   const [editId, setEditId] = useState(1);
@@ -300,8 +310,6 @@ const AutoRecharge = () => {
   const [reload, setReload] = useState(false);
 
   const [done, setDone] = useState(false);
-
-  const [autoRecharge, setAutoRecharge] = useState([]);
   const [recharge, setRecharge] = useState([]);
 
   const [modal, setModal] = useState(false);
@@ -653,46 +661,48 @@ const AutoRecharge = () => {
 
   return (
     <>
-      <HamburgerMenu toggle={toggle} setToggle={setToggle} />
-      <MenuList toggle={toggle} setToggle={setToggle} />
-      <Wrapper>
-        <TopHeader header="Auto Recharge" />
-        <Container>
-          <One>
-            <SmallText text="Recharges" />
-            {renderRecharge()}
+      <>
+        <HamburgerMenu toggle={toggle} setToggle={setToggle} />
+        <MenuList toggle={toggle} setToggle={setToggle} />
+        <Wrapper>
+          <TopHeader header="Auto Recharge" />
+          <Container>
+            <One>
+              <SmallText text="Recharges" />
+              {renderRecharge()}
 
-            <div
-              style={{
-                marginTop: "40px",
-                marginBottom: "30px",
-              }}
-            >
-              {(text || details.length !== 0) && (
-                <CreateButton
-                  to="/bulk"
-                  onClick={() => {
-                    setRechargeType(3);
-                  }}
-                >
-                  Create AutoRecharge
-                </CreateButton>
-              )}
-            </div>
-          </One>
-          {id !== 0 && recharge.length > 0 && (
-            <Two>
-              <SmallText
-                text={`${name ? name : singleDetail}'s Recharge Details`}
-              />
-              {id !== 0 && renderDetails()}
-            </Two>
-          )}
-        </Container>
+              <div
+                style={{
+                  marginTop: "40px",
+                  marginBottom: "30px",
+                }}
+              >
+                {(text || details.length !== 0) && (
+                  <CreateButton
+                    to="/bulk"
+                    onClick={() => {
+                      setRechargeType(3);
+                    }}
+                  >
+                    Create AutoRecharge
+                  </CreateButton>
+                )}
+              </div>
+            </One>
+            {id !== 0 && recharge.length > 0 && (
+              <Two>
+                <SmallText
+                  text={`${name ? name : singleDetail}'s Recharge Details`}
+                />
+                {id !== 0 && renderDetails()}
+              </Two>
+            )}
+          </Container>
 
-        {done && renderModal()}
-        {modal && renderAddRecharge()}
-      </Wrapper>
+          {done && renderModal()}
+          {modal && renderAddRecharge()}
+        </Wrapper>
+      </>
     </>
   );
 };

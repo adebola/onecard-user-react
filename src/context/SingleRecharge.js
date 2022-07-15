@@ -15,6 +15,11 @@ const SingleContextProvider = ({ children }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [cableId, setCableId] = useState(0);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [name, setName] = useState("");
+  const [boldText, setBoldText] = useState("");
+  const [autoRecharge, setAutoRecharge] = useState([]);
 
   return (
     <SingleContext.Provider
@@ -42,6 +47,16 @@ const SingleContextProvider = ({ children }) => {
         setResponseMessage,
         cableId,
         setCableId,
+        name,
+        setName,
+        startDate,
+        setStartDate,
+        setAutoRecharge,
+        setBoldText,
+        endDate,
+        setEndDate,
+        boldText,
+        autoRecharge,
       }}
     >
       {children}

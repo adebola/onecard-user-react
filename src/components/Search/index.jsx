@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
+import { bulkSearchBy } from "../../helper/requests";
+import useDebounce from "../../hooks/useDebounce";
 
 const SearchContainer = styled.div`
   .form {
@@ -46,11 +49,82 @@ const SearchContainer = styled.div`
     font-size: 0.8rem;
   }
 `;
-const Search = () => {
+const Search = ({
+  text,
+  setDataTwo,
+  setEntriesTableTwo,
+  setPageSizeTableTwo,
+  setPagesTableTwo,
+  query,
+  setQuery,
+  setEmpty,
+}) => {
+  const value = useDebounce(query);
+  const id = new URLSearchParams(window.location.search).get("id");
+
+  useEffect(() => {
+    if (!value || !query) {
+      setEmpty(false);
+      return;
+    }
+    const searchBy = async () => {
+      let data;
+      if (text === "recipient") {
+        data = {
+          bulkId: id,
+          recipient: value,
+        };
+      } else {
+        data = {
+          bulkId: id,
+          product: value,
+        };
+      }
+      try {
+        const response = await bulkSearchBy(data);
+
+        if (response.data.list.length === 0) {
+          setEmpty(true);
+        } else {
+          setDataTwo(response.data.list);
+          setEmpty(false);
+          setEntriesTableTwo(response.data.totalSize);
+          setPagesTableTwo(response.data.pages);
+          setPageSizeTableTwo(response.data.pageSize);
+        }
+      } catch (error) {
+        const message = error.response.data.message;
+        console.log(message);
+      }
+    };
+    searchBy();
+  }, [
+    text,
+    setEmpty,
+    id,
+    value,
+    setDataTwo,
+    setEntriesTableTwo,
+    setPageSizeTableTwo,
+    setPagesTableTwo,
+    query,
+  ]);
+
+  const handleChange = (e) => {
+    setQuery(e.target.value);
+  };
+
   return (
     <SearchContainer>
       <div className="form">
-        <input className="form__input" placeholder=" " required type="tel" />
+        <input
+          onChange={(e) => handleChange(e)}
+          className="form__input"
+          placeholder=" "
+          required
+          value={query}
+          type="tel"
+        />
         <label className="form__label">Search</label>
       </div>
     </SearchContainer>

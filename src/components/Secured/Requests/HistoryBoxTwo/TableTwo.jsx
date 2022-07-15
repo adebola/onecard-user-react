@@ -7,12 +7,13 @@ import ExcelDownload from "../ExcelDownload";
 import Pagination from "./PaginationTableTwo";
 import { BiCheck } from "react-icons/bi";
 import { RiCloseFill } from "react-icons/ri";
-import { retryRequest } from "../../../../helper/requests";
+import { getBulkDetail, retryRequest } from "../../../../helper/requests";
 
 import { AiOutlineClose } from "react-icons/ai";
 import CancelButton from "../../../Button/normal";
 import SearchBy from "../../../SearchBy";
 import Search from "../../../Search";
+import { useEffect } from "react";
 
 const Button = styled.button`
   display: flex;
@@ -105,6 +106,12 @@ const IconBox = styled.div`
   margin-bottom: 20px;
 `;
 
+const EmptyText = styled.p`
+  color: var(--text-color);
+  font-size: 14px;
+  margin: 20px 0;
+`;
+
 const TableTwo = ({
   data,
   id,
@@ -121,6 +128,32 @@ const TableTwo = ({
 }) => {
   const [clicked, setClicked] = useState(false);
   const [msg, setMsg] = useState("");
+  const [text, setText] = useState("recipient");
+  const [query, setQuery] = useState("");
+  const [empty, setEmpty] = useState(false);
+
+  useEffect(() => {
+    const awaitResponse = async () => {
+      try {
+        const response = await getBulkDetail(id);
+        setDataTwo(response.data.list);
+        setEntriesTableTwo(response.data.totalSize);
+        setPagesTableTwo(response.data.pages);
+        setPageSizeTableTwo(response.data.pageSize);
+      } catch (error) {
+        const message = error.response.data.message;
+        console.log(message);
+      }
+    };
+    !query && setEmpty(false) && awaitResponse();
+  }, [
+    id,
+    query,
+    setDataTwo,
+    setEntriesTableTwo,
+    setPageSizeTableTwo,
+    setPagesTableTwo,
+  ]);
 
   const handleRetryRequest = async () => {
     // console.log(clicked, id);
@@ -159,61 +192,87 @@ const TableTwo = ({
     );
   };
 
+  console.log(empty);
+
   return (
     <Container>
-      <SearchBy>
-        <Search />
+      <SearchBy
+        setEmpty={setEmpty}
+        setEntriesTableTwo={setEntriesTableTwo}
+        setPageSizeTableTwo={setPageSizeTableTwo}
+        setPagesTableTwo={setPagesTableTwo}
+        setDataTwo={setDataTwo}
+        text={text}
+        setQuery={setQuery}
+        setText={setText}
+      >
+        <Search
+          setEmpty={setEmpty}
+          setDataTwo={setDataTwo}
+          query={query}
+          setQuery={setQuery}
+          text={text}
+          setEntriesTableTwo={setEntriesTableTwo}
+          setPageSizeTableTwo={setPageSizeTableTwo}
+          setPagesTableTwo={setPagesTableTwo}
+        />
       </SearchBy>
-      <div>
-        <div>
-          <table>
-            <thead>
-              <tr>
-                {tableHeaderTwo.map((each) => (
-                  <th>{each.name}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((each) => {
-                return (
+      {empty ? (
+        <EmptyText>No results found, try another search</EmptyText>
+      ) : (
+        <>
+          <div>
+            <div>
+              <table>
+                <thead>
                   <tr>
-                    <td>{each.recipient}</td>
-                    <td>{each.serviceCode}</td>
-                    <td>{each.serviceCost.toFixed(2)}</td>
-                    <td>
-                      {each.failed ? (
-                        <Button onClick={handleRetryRequest}>
-                          <RiCloseFill color="red" size={19} />
-                          <p>RETRY</p>
-                        </Button>
-                      ) : (
-                        <BiCheck color="green" size={22} />
-                      )}
-                    </td>
+                    {tableHeaderTwo.map((each) => (
+                      <th>{each.name}</th>
+                    ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {data.map((each) => {
+                    return (
+                      <tr>
+                        <td>{each.recipient}</td>
+                        <td>{each.serviceCode}</td>
+                        <td>{each.serviceCost.toFixed(2)}</td>
+                        <td>
+                          {each.failed ? (
+                            <Button onClick={handleRetryRequest}>
+                              <RiCloseFill color="red" size={19} />
+                              <p>RETRY</p>
+                            </Button>
+                          ) : (
+                            <BiCheck color="green" size={22} />
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
 
-          <Pagination
-            active={active}
-            setActive={setActive}
-            entries={entries}
-            pageSize={pageSize}
-            data={data}
-            pages={pages}
-            id={id}
-            type={type}
-            setEntriesTableTwo={setEntriesTableTwo}
-            setPageSizeTableTwo={setPageSizeTableTwo}
-            setPagesTableTwo={setPagesTableTwo}
-            setDataTwo={setDataTwo}
-          />
-        </div>
-      </div>
-      <ExcelDownload id={id} type={type} />
+              <Pagination
+                active={active}
+                setActive={setActive}
+                entries={entries}
+                pageSize={pageSize}
+                data={data}
+                pages={pages}
+                id={id}
+                type={type}
+                setEntriesTableTwo={setEntriesTableTwo}
+                setPageSizeTableTwo={setPageSizeTableTwo}
+                setPagesTableTwo={setPagesTableTwo}
+                setDataTwo={setDataTwo}
+              />
+            </div>
+          </div>
+          <ExcelDownload id={id} type={type} />
+        </>
+      )}
       {clicked && renderModal()}
     </Container>
   );

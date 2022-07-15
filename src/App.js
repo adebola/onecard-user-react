@@ -25,7 +25,7 @@ const App = () => {
         <Route exact path="/dashboard" element={<Dashboard />} />
         <Route exact path="/single" element={<Single />} />
         <Route exact path="/bulk" element={<Bulk />} />
-        <Route exact path="/fund" element={<Fund />} />
+        <Route exact path="/wallet" element={<Fund />} />
         <Route exact path="/auto" element={<Auto />} />
         <Route exact path="/bene" element={<Beneficiaries />} />
         <Route exact path="/profile" element={<Profile />} />

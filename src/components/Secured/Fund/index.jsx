@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Container from "../../Container";
 import SmallText from "../../SmallText";
 import TopHeader from "../../TopNav";
@@ -12,8 +12,10 @@ import MenuList from "../../Hamburger/Menulist";
 import WalletTab from "./WalletTab";
 import styled from "styled-components";
 import MyStyledButton from "../../MyStyledButton";
-import { transferFund, verifyUser } from "../../../helper/requests";
+import { transferFund, verifyUser, getBalance } from "../../../helper/requests";
 import Loader from "../../Modal/Loader/index";
+import WalletBalance from "../../WalletBalance/index";
+import { GlobalContext } from "../../../context/GlobalProvider";
 
 const BoldText = styled.div`
   font-size: 12px;
@@ -35,7 +37,7 @@ const Input = styled.input`
   }
 `;
 
-const SendMoneyContainer = styled.form`
+const SendMoneyContainer = styled.div`
   margin-top: 20px;
 `;
 
@@ -50,33 +52,67 @@ const UserDetails = styled.div`
   }
 `;
 
+const ErrorBox = styled.div`
+  color: red;
+  font-size: 11px;
+`;
+
 const Fund = () => {
+  const { balance, setBalance } = useContext(GlobalContext);
+
   const [toggle, setToggle] = useState(false);
   const [tabOption, setTabOption] = useState(1);
   const [userID, setUserID] = useState("");
   const [amount, setAmount] = useState("");
   const [userDetails, setUserDetails] = useState({});
   const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
-    if (userID.length === 36) {
-      const awaitResponse = async () => {
-        try {
-          const response = await verifyUser(userID);
-          setUserDetails(response.data);
-        } catch (error) {
-          const message = error.response.data.message;
-          console.log(message);
-        }
-      };
-      awaitResponse();
+    if (!userID) {
+      setUserDetails({});
     }
   }, [userID]);
 
-  const handleBlur = () => {};
+  useEffect(() => {
+    if (amount) {
+      setErrorMessage("");
+    }
+  }, [amount]);
+
+  useEffect(() => {
+    const awaitResponse = async () => {
+      try {
+        const res = await getBalance();
+        setBalance(res.data.balance);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    reload && awaitResponse();
+  }, [reload, setBalance]);
+
+  const handleBlur = async () => {
+    if (!userID) {
+      return;
+    }
+    try {
+      const response = await verifyUser(userID);
+      setUserDetails(response.data);
+    } catch (error) {
+      const message = error.response.data.message;
+      console.log(message);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!amount || !userID) {
+      setErrorMessage("This field is required");
+      return;
+    }
     const data = { recipient: userID, amount };
     try {
       await transferFund(data);
@@ -93,49 +129,51 @@ const Fund = () => {
     setAmount("");
     setUserDetails({});
     setUserID("");
+    setReload(true);
   };
 
   const renderSendMoney = () => {
     return (
-      <SendMoneyContainer onSubmit={handleSubmit}>
-        <BoldText>User ID or Username</BoldText>
-        <Input
-          onChange={({ target }) => {
-            setUserID(target.value);
-          }}
-          type="tel"
-          maskChar=" "
-          value={userID}
-          onBlur={handleBlur}
-          mask="999 9999 9999"
-          placeholder="Enter user id"
-        />
+      <form onSubmit={handleSubmit}>
+        <SendMoneyContainer>
+          <BoldText> Username or User ID </BoldText>
+          <Input
+            onChange={({ target }) => {
+              setUserID(target.value);
+            }}
+            type="tel"
+            maskChar=" "
+            value={userID}
+            onBlur={handleBlur}
+            mask="999 9999 9999"
+            placeholder="Username or email"
+          />
+          {!userID && <ErrorBox>{errorMessage}</ErrorBox>}
 
-        {Object.keys(userDetails).length !== 0 && (
-          <>
-            <UserDetails>
-              <p>
-                {userDetails.firstName} {userDetails.lastName}
-              </p>
-              <p>{userDetails.email}</p>
-            </UserDetails>
-            <BoldText>Amount</BoldText>
-            <Input
-              onChange={({ target }) => {
-                setAmount(target.value);
-              }}
-              type="tel"
-              maskChar=" "
-              value={amount}
-              onBlur={handleBlur}
-              mask="999 9999 9999"
-              placeholder="Enter amount"
-            />
+          <UserDetails>
+            <p>
+              {userDetails?.firstName} {userDetails?.lastName}
+            </p>
+            <p>{userDetails?.email}</p>
+          </UserDetails>
+          <BoldText>Amount</BoldText>
+          <Input
+            onChange={({ target }) => {
+              setAmount(target.value);
+            }}
+            type="tel"
+            maskChar=" "
+            value={amount}
+            onBlur={handleBlur}
+            mask="999 9999 9999"
+            placeholder="Enter amount"
+          />
+          <ErrorBox>{errorMessage}</ErrorBox>
+        </SendMoneyContainer>
+        <WalletBalance flex={true} balance={balance} />
 
-            <MyStyledButton name="Transfer" myStyles={{ marginTop: "10px" }} />
-          </>
-        )}
-      </SendMoneyContainer>
+        <MyStyledButton name="Transfer" myStyles={{ marginTop: "10px" }} />
+      </form>
     );
   };
 

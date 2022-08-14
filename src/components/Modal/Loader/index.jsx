@@ -82,8 +82,9 @@ const WhiteBackground = styled.div`
   justify-content: center;
   flex-direction: column;
   @media (max-width: 500px) {
-    width: 80%;
+    width: 85%;
     height: 300px;
+    padding: 3px;
   }
 `;
 

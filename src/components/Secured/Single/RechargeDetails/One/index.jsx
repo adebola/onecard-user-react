@@ -161,8 +161,8 @@ const One = () => {
     if (
       !selectedSingleDataPlans ||
       !phoneNumber ||
-      !serviceName ||
-      (!rechargeName && rechargeType === 3)
+      !serviceName
+      // (!rechargeName && rechargeType === 3)
     ) {
       setDisabled(true);
     } else {
@@ -175,6 +175,18 @@ const One = () => {
     rechargeName,
     rechargeType,
   ]);
+
+  useEffect(() => {
+    if (airtimeId === 6) {
+      if (!accountNumber || Object.keys(selectedSingleDataPlans).length === 0) {
+        setDisabled(true);
+      } else {
+        setDisabled(false);
+      }
+    }
+    return;
+  }, [airtimeId, accountNumber, selectedSingleDataPlans]);
+
   useEffect(() => {
     setPhoneNumber("");
   }, [setPhoneNumber]);

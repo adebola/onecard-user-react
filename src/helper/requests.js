@@ -10,8 +10,8 @@ export const getTransaction = (num) => {
   );
 };
 
-export const getDataPlans = (each) => {
-  return axios.get(`/recharge/plans/${each}`);
+export const getDataPlans = (type) => {
+  return axios.get(`/recharge/plans/${type}`);
 };
 
 export const makeSingleRecharge = (data) => {

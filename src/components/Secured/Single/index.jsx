@@ -4,7 +4,6 @@ import SmallText from "../../SmallText";
 import TopHeader from "../../TopNav";
 import Wrapper from "../../Wrapper";
 import Recharge from "./Recharge";
-import RechargeDetails from "./RechargeDetails";
 
 import HamburgerMenu from "../../Hamburger";
 import MenuList from "../../Hamburger/Menulist";
@@ -16,6 +15,7 @@ import {
 } from "../../../helper/requests";
 import { GlobalContext } from "../../../context/GlobalProvider";
 import { ModalContext } from "../../../context/ModalProvider";
+import Card from "../../Card";
 
 const Single = () => {
   const [toggle, setToggle] = useState(false);
@@ -106,7 +106,8 @@ const Single = () => {
           </SingleBoxOne>
           <SingleBoxTwo>
             <SmallText text="Recharge Details" />
-            <RechargeDetails />
+            {/* <RechargeDetails /> */}
+            <Card />
           </SingleBoxTwo>
         </Container>
       </Wrapper>

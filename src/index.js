@@ -8,6 +8,7 @@ import ModalContextProvider from "./context/ModalProvider";
 import UserServices from "./services/UserServices";
 import "react-datepicker/dist/react-datepicker.css";
 import SingleContextProvider from "./context/SingleRecharge";
+import { SingleMessageProvider } from "./context/SingleRechargeContext";
 
 const GlobalStyle = createGlobalStyle`
 * {
@@ -96,8 +97,10 @@ const app = () =>
           <ModalContextProvider>
             <SingleContextProvider>
               <GlobalProvider>
-                <GlobalStyle />
-                <App />
+                <SingleMessageProvider>
+                  <GlobalStyle />
+                  <App />
+                </SingleMessageProvider>
               </GlobalProvider>
             </SingleContextProvider>
           </ModalContextProvider>

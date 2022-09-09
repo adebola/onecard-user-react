@@ -1,6 +1,4 @@
 import { createContext, useState } from "react";
-import setHours from "date-fns/setHours";
-import setMinutes from "date-fns/setMinutes";
 
 export const GlobalContext = createContext();
 
@@ -12,9 +10,7 @@ const GlobalProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
 
   //date
-  const [startDate, setStartDate] = useState(
-    setHours(setMinutes(new Date(), 30), 16)
-  );
+  const [startDate, setStartDate] = useState(new Date());
 
   const [endDate, setEndDate] = useState();
   //data-type

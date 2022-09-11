@@ -46,7 +46,7 @@ const Card = ({ bulk }) => {
   const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
     useContext(BulkRechargeContext);
 
-  console.log(bulkData);
+  // console.log(bulkData);
 
   const { startDate, endDate } = useContext(GlobalContext);
   const auto = useContext(ModalContext);
@@ -109,17 +109,43 @@ const Card = ({ bulk }) => {
     );
 
     // setBulkRecipients(_recipients);
-    setBulkData({
-      recipients: _recipients,
-      paymentMode,
-      scheduledDate,
-      rechargeType: "bulk",
-      redirectUrl:
-        paymentMode === "paystack"
-          ? `${window.origin}${window.location.pathname}`
-          : "",
-    });
-  }, [bulkRecharges, setBulkData, paymentMode, scheduledDate]);
+    if (auto.rechargeType === 3) {
+      setBulkData({
+        recipients: _recipients,
+        paymentMode,
+        rechargeType: "bulk",
+        redirectUrl:
+          paymentMode === "paystack"
+            ? `${window.origin}${window.location.pathname}`
+            : "",
+        daysOfMonth: auto.monthlyAutoRecharge,
+        daysOfWeek: auto.weeklyAutoRecharge,
+        endDate: endDate && convertDate(endDate),
+        startDate: startDate && convertDate(startDate),
+        title: auto.rechargeName,
+      });
+    } else {
+      setBulkData({
+        recipients: _recipients,
+        paymentMode,
+        scheduledDate,
+        rechargeType: "bulk",
+        redirectUrl:
+          paymentMode === "paystack"
+            ? `${window.origin}${window.location.pathname}`
+            : "",
+      });
+    }
+  }, [
+    bulkRecharges,
+    setBulkData,
+    paymentMode,
+    scheduledDate,
+    bulk,
+    auto,
+    endDate,
+    startDate,
+  ]);
 
   useEffect(() => {
     if (selectedId === 1) {
@@ -200,6 +226,7 @@ const Card = ({ bulk }) => {
             },
           ],
           paymentMode,
+          productId,
           daysOfMonth: auto.monthlyAutoRecharge,
           daysOfWeek: auto.weeklyAutoRecharge,
           endDate: convertDate(endDate),
@@ -583,17 +610,14 @@ const Card = ({ bulk }) => {
               recipient: data.recipients[0].recipient,
               serviceCost: data.recipients[0].serviceCost,
               serviceCode: data.recipients[0].serviceCode,
-              daysOfMonth: auto.monthlyAutoRecharge,
-              daysOfWeek: auto.weeklyAutoRecharge,
-              endDate: convertDate(endDate),
-              startDate: convertDate(startDate),
-              title: auto.rechargeName,
             });
 
         break;
       default:
         break;
     }
+
+    console.log(newData);
 
     setBulkRecharges([newData, ...bulkRecharges]);
 
@@ -614,6 +638,14 @@ const Card = ({ bulk }) => {
         };
         break;
       case 3:
+        dataToSend = {
+          ...bulkData,
+          endDate: convertDate(endDate),
+          startDate: convertDate(startDate),
+          daysOfMonth: auto.monthlyAutoRecharge,
+          daysOfWeek: auto.weeklyAutoRecharge,
+          title: auto.rechargeName,
+        };
         break;
       default:
         break;

@@ -20,6 +20,5 @@ export const makeCableRecharge = (data) => {
 };
 
 export const makeContactRequest = (data) => {
-  console.log(data);
   return axios.post("/contactus", data);
 };

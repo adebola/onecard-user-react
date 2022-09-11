@@ -3,8 +3,8 @@ import { BulkRechargeContext } from "../../context//BulkRecharge";
 import styled from "styled-components";
 
 const Container = styled.div`
-  height: 20px;
-  width: 20px;
+  height: 25px;
+  width: 25px;
   border-radius: 50%;
   background-color: #ff0000;
   color: #fff;
@@ -22,7 +22,7 @@ const Container = styled.div`
 const Badge = () => {
   const { bulkRecharges } = useContext(BulkRechargeContext);
   const length = bulkRecharges.length;
-  return <Container>{length}</Container>;
+  return <Container>{length > 99 ? "99+" : length}</Container>;
 };
 
 export default Badge;

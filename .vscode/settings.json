@@ -1,18 +1,20 @@
 {
-    "cSpell.ignoreWords": [
-        "Landingpage",
-        "Menulist",
-        "activeclassname",
-        "bulkfile",
-        "companyadd",
-        "companyremove",
-        "datepicker",
-        "newbulk",
-        "onecard",
-        "onecardweb",
-        "orgusers",
-        "removeuser",
-        "schedulefile",
-        "sidebardata"
-    ]
+  "cSpell.ignoreWords": [
+    "Landingpage",
+    "Menulist",
+    "Swal",
+    "activeclassname",
+    "bulkfile",
+    "companyadd",
+    "companyremove",
+    "datepicker",
+    "newbulk",
+    "onecard",
+    "onecardweb",
+    "orgusers",
+    "removeuser",
+    "schedulefile",
+    "sidebardata",
+    "sweetalert"
+  ]
 }

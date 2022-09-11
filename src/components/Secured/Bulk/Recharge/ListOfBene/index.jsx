@@ -95,7 +95,6 @@ const Action = styled.div`
   cursor: pointer;
   .icon {
     color: #eb6a2b;
-    /* background-color: #eb6a2b; */
   }
 `;
 

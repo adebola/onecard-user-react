@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SyncLoader } from "react-spinners";
 import { SingleRechargeContext } from "../../context/SingleRechargeContext";
+// import Error from "../Error"z
 import Input from "../Input";
 import * as styles from "../../utils/styles";
 import Error, { ErrorMessage } from "../Error";

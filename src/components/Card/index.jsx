@@ -18,8 +18,10 @@ import Swal from "sweetalert2";
 import { convertDate } from "../../utils/dateformat";
 import { ModalContext } from "../../context/ModalProvider";
 import { GlobalContext } from "../../context/GlobalProvider";
+import { v4 } from "uuid";
+import { BulkRechargeContext } from "../../context/BulkRecharge";
 
-const Card = () => {
+const Card = ({ bulk }) => {
   const {
     setTabDetails,
     tabDetails,
@@ -40,6 +42,11 @@ const Card = () => {
     setSuccess,
     dataPlans,
   } = useContext(SingleRechargeContext);
+
+  const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
+    useContext(BulkRechargeContext);
+
+  console.log(bulkData);
 
   const { startDate, endDate } = useContext(GlobalContext);
   const auto = useContext(ModalContext);
@@ -76,12 +83,52 @@ const Card = () => {
   }, [selectedId, setActiveId]);
 
   useEffect(() => {
+    const _recipients = bulkRecharges.map(
+      ({ recipient, serviceCode, type, serviceCost, productId }) => {
+        let data;
+        switch (type) {
+          case "DATA":
+            data = {
+              recipient,
+              serviceCode,
+              productId,
+            };
+            break;
+          case "AIRTIME":
+            data = {
+              recipient,
+              serviceCode,
+              serviceCost,
+            };
+            break;
+          default:
+            break;
+        }
+        return data;
+      }
+    );
+
+    // setBulkRecipients(_recipients);
+    setBulkData({
+      recipients: _recipients,
+      paymentMode,
+      scheduledDate,
+      rechargeType: "bulk",
+      redirectUrl:
+        paymentMode === "paystack"
+          ? `${window.origin}${window.location.pathname}`
+          : "",
+    });
+  }, [bulkRecharges, setBulkData, paymentMode, scheduledDate]);
+
+  useEffect(() => {
     if (selectedId === 1) {
       setDataPlans([]);
     }
   }, [selectedId, activeId, setDataPlans]);
 
   const handleSubmit = (e) => {
+    ///TODO: handle paystack redirect
     e.preventDefault();
     setClicked(true);
     let data;
@@ -111,6 +158,9 @@ const Card = () => {
     }
     //DATA RECHARGE
     if (selectedId === 1) {
+      ////////
+      ////////////////////////////////
+      //Instant Recharge
       data = {
         recipient,
         serviceCode,
@@ -121,6 +171,7 @@ const Card = () => {
             ? `${window.origin}${window.location.pathname}`
             : "",
       };
+
       //Schedule data Recharge
       if (auto.rechargeType === 2) {
         data = {
@@ -134,6 +185,7 @@ const Card = () => {
           scheduledDate,
           rechargeType: "single",
           paymentMode,
+          productId,
         };
       }
 
@@ -156,7 +208,8 @@ const Card = () => {
         };
       }
     }
-
+    /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
     //AIRTIME RECHARGE
     if (selectedId === 2) {
       data = {
@@ -359,19 +412,18 @@ const Card = () => {
       }
     }
 
-    console.log(data);
-
     switch (auto.rechargeType) {
+      ////////////////////////////////
       case 1:
-        singleRequest(data);
+        bulk ? handleBulkRequest(data) : instantRecharge(data);
         break;
 
       case 2:
-        scheduledRequest(data);
+        bulk ? handleBulkRequest(data) : scheduleRecharge(data);
         break;
 
       case 3:
-        autoRechargeRequest(data);
+        bulk ? handleBulkRequest(data) : autoRecharge(data);
         break;
 
       default:
@@ -379,7 +431,7 @@ const Card = () => {
     }
   };
 
-  const singleRequest = async (data) => {
+  const instantRecharge = async (data) => {
     setShowModal(true);
     try {
       const response = await makeSingleRecharge(data);
@@ -412,7 +464,7 @@ const Card = () => {
     }
   };
 
-  const scheduledRequest = async (data) => {
+  const scheduleRecharge = async (data) => {
     setShowModal(true);
     try {
       await makeScheduleRecharge(data);
@@ -440,7 +492,7 @@ const Card = () => {
   };
 
   //TODO:
-  const autoRechargeRequest = async (data) => {
+  const autoRecharge = async (data) => {
     setShowModal(true);
     try {
       await makeAutoRechargeRequest(data);
@@ -465,6 +517,108 @@ const Card = () => {
         setShowModal(false);
       });
     }
+  };
+
+  //Handle Bulk Recharges
+  const handleBulkRequest = (data) => {
+    let newData;
+    const price = dataPlans.find((each) => {
+      return data.productId === each.id;
+    })?.price;
+
+    newData = {
+      id: v4(),
+      type: serviceCode.split("-")[1],
+    };
+
+    switch (selectedId) {
+      ////////AIRTIME
+      case 1:
+        auto.rechargeType === 1
+          ? (newData = {
+              ...newData,
+              recipient: data.recipient,
+              productId: data.productId,
+              price,
+              serviceCode: data.serviceCode,
+            })
+          : auto.rechargeType === 2
+          ? (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              productId: data.recipients[0].productId,
+              price,
+              serviceCode: data.recipients[0].serviceCode,
+            })
+          : (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              productId: data.recipients[0].productId,
+              price,
+              serviceCode: data.recipients[0].serviceCode,
+              daysOfMonth: auto.monthlyAutoRecharge,
+              daysOfWeek: auto.weeklyAutoRecharge,
+              endDate: convertDate(endDate),
+              startDate: convertDate(startDate),
+              title: auto.rechargeName,
+            });
+        break;
+      case 2:
+        auto.rechargeType === 1
+          ? (newData = {
+              ...newData,
+              recipient: data.recipient,
+              serviceCost: data.serviceCost,
+              serviceCode: data.serviceCode,
+            })
+          : auto.rechargeType === 2
+          ? (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              serviceCost: data.recipients[0].serviceCost,
+              serviceCode: data.recipients[0].serviceCode,
+            })
+          : (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              serviceCost: data.recipients[0].serviceCost,
+              serviceCode: data.recipients[0].serviceCode,
+              daysOfMonth: auto.monthlyAutoRecharge,
+              daysOfWeek: auto.weeklyAutoRecharge,
+              endDate: convertDate(endDate),
+              startDate: convertDate(startDate),
+              title: auto.rechargeName,
+            });
+
+        break;
+      default:
+        break;
+    }
+
+    setBulkRecharges([newData, ...bulkRecharges]);
+
+    let dataToSend = {
+      paymentMode,
+      rechargeType: "bulk",
+      redirectUrl:
+        paymentMode === "paystack"
+          ? `${window.origin}${window.location.pathname}`
+          : "",
+    };
+
+    switch (auto.rechargeType) {
+      case 2:
+        dataToSend = {
+          ...bulkData,
+          scheduledDate,
+        };
+        break;
+      case 3:
+        break;
+      default:
+        break;
+    }
+    setBulkData({ ...bulkData, ...dataToSend });
   };
 
   return (
@@ -510,11 +664,13 @@ const Card = () => {
                     return {
                       id: each.product_id,
                       value: each.product_id,
+                      price: each.price.split(".")[0],
                       label: `${each.network} ${
                         each.category === null ? "" : each.category
                       } Data ${each.allowance} ${each.price.split(".")[0]}`,
                     };
                   });
+
                   setDataPlans(data);
                 }
               }}
@@ -533,7 +689,7 @@ const Card = () => {
           {(selectedId === 3 || selectedId === 4) && !success ? null : (
             <>
               <PaymentMode />
-              <Button name="Submit" />
+              {bulk ? <Button name="Add" /> : <Button name="Submit" />}
             </>
           )}
           <WalletBalance />

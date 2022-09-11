@@ -9,6 +9,7 @@ import UserServices from "./services/UserServices";
 import "react-datepicker/dist/react-datepicker.css";
 import SingleContextProvider from "./context/SingleRecharge";
 import { SingleMessageProvider } from "./context/SingleRechargeContext";
+import BulkRechargeContextProvider from "./context/BulkRecharge";
 
 const GlobalStyle = createGlobalStyle`
 * {
@@ -93,18 +94,20 @@ const app = () =>
   render(
     <>
       <Router>
-        <AuthProvider>
-          <ModalContextProvider>
-            <SingleContextProvider>
-              <GlobalProvider>
-                <SingleMessageProvider>
-                  <GlobalStyle />
-                  <App />
-                </SingleMessageProvider>
-              </GlobalProvider>
-            </SingleContextProvider>
-          </ModalContextProvider>
-        </AuthProvider>
+        <BulkRechargeContextProvider>
+          <AuthProvider>
+            <ModalContextProvider>
+              <SingleContextProvider>
+                <GlobalProvider>
+                  <SingleMessageProvider>
+                    <GlobalStyle />
+                    <App />
+                  </SingleMessageProvider>
+                </GlobalProvider>
+              </SingleContextProvider>
+            </ModalContextProvider>
+          </AuthProvider>
+        </BulkRechargeContextProvider>
       </Router>
     </>,
     document.getElementById("root")

@@ -5,7 +5,7 @@ import TopHeader from "../../TopNav";
 import { BulkBoxOne, BulkBoxTwo } from "./styles";
 
 import Recharge from "./Recharge";
-import RechargeDetails from "./RechargeDetails";
+// import RechargeDetails from "./RechargeDetails";
 import SmallText from "../../SmallText";
 import HamburgerMenu from "../../Hamburger";
 import MenuList from "../../Hamburger/Menulist";
@@ -16,6 +16,7 @@ import {
   getBulkRechargeResponse,
   getScheduledRechargeResponse,
 } from "../../../helper/requests";
+import Card from "../../Card";
 
 const Bulk = () => {
   const [toggle, setToggle] = useState(false);
@@ -99,7 +100,8 @@ const Bulk = () => {
           </BulkBoxOne>
           <BulkBoxTwo>
             <SmallText text="Recharge Details" />
-            <RechargeDetails rechargeId={rechargeType} />
+            {/* <RechargeDetails rechargeId={rechargeType} /> */}
+            <Card bulk />
           </BulkBoxTwo>
         </Container>
       </Wrapper>

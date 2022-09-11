@@ -1,7 +1,8 @@
 import React from "react";
+import BulkList from "../../../BulkList";
 import ScheduleDatePicker from "../../../DatePicker";
 import AutoRecharge from "./Auto";
-import ListOfBene from "./ListOfBene";
+// import ListOfBene from "./ListOfBene";
 
 import {
   RechargeBox,
@@ -47,7 +48,8 @@ const Recharge = ({ rechargeType, setRechargeType }) => {
             </div>
           );
         })}
-        <ListOfBene rechargeType={rechargeType} />
+        {/* <ListOfBene rechargeType={rechargeType} /> */}
+        <BulkList />
       </RechargeInner>
     </RechargeContainer>
   );

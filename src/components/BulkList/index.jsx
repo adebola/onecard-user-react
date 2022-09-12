@@ -69,8 +69,7 @@ const BulkList = () => {
               onClick={async () => {
                 setShowModal(true);
                 try {
-                  const response = await makeAutoRechargeRequest(bulkData);
-                  console.log(response);
+                  await makeAutoRechargeRequest(bulkData);
                   Swal.fire({
                     icon: "success",
                     title: "SUCCESS",

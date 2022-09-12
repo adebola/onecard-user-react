@@ -46,6 +46,8 @@ const Card = ({ bulk }) => {
   const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
     useContext(BulkRechargeContext);
 
+  console.log(bulkData);
+
   const { startDate, endDate } = useContext(GlobalContext);
   const auto = useContext(ModalContext);
 
@@ -593,11 +595,6 @@ const Card = ({ bulk }) => {
               productId: data.recipients[0].productId,
               price,
               serviceCode: data.recipients[0].serviceCode,
-              daysOfMonth: auto.monthlyAutoRecharge,
-              daysOfWeek: auto.weeklyAutoRecharge,
-              endDate: convertDate(endDate),
-              startDate: convertDate(startDate),
-              title: auto.rechargeName,
             });
         break;
       case 2:
@@ -626,8 +623,6 @@ const Card = ({ bulk }) => {
       default:
         break;
     }
-
-    console.log(newData);
 
     setBulkRecharges([newData, ...bulkRecharges]);
 

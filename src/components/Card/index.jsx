@@ -46,8 +46,6 @@ const Card = ({ bulk }) => {
   const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
     useContext(BulkRechargeContext);
 
-  console.log(bulkData);
-
   const { startDate, endDate } = useContext(GlobalContext);
   const auto = useContext(ModalContext);
 

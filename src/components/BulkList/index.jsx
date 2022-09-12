@@ -4,7 +4,7 @@ import { MdClose } from "react-icons/md";
 import { BulkRechargeContext } from "../../context/BulkRecharge";
 import Badge from "../../components/Badge";
 import { Inner, Price, Send } from "./styles";
-import { makeScheduledRecharge } from "../../helper/requests";
+import { makeAutoRechargeRequest } from "../../helper/requests";
 import { SingleRechargeContext } from "../../context/SingleRechargeContext";
 import Swal from "sweetalert2";
 
@@ -16,6 +16,7 @@ const BulkList = () => {
     SingleRechargeContext
   );
 
+  // console.log(bulkData);
   const resetForm = (type) => {
     setClicked(false);
     setDetails({
@@ -68,12 +69,12 @@ const BulkList = () => {
               onClick={async () => {
                 setShowModal(true);
                 try {
-                  const response = await makeScheduledRecharge(bulkData);
+                  const response = await makeAutoRechargeRequest(bulkData);
                   console.log(response);
                   Swal.fire({
                     icon: "success",
                     title: "SUCCESS",
-                    text: `Your scheduled bulk request was submitted successfully.`,
+                    text: `Your auto bulk request was submitted successfully.`,
                     confirmButtonColor: "var(--btn-color)",
                   }).then(() => {
                     setShowModal(false);

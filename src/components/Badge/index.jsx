@@ -3,8 +3,8 @@ import { BulkRechargeContext } from "../../context//BulkRecharge";
 import styled from "styled-components";
 
 const Container = styled.div`
-  height: 25px;
-  width: 25px;
+  height: 22px;
+  width: 22px;
   border-radius: 50%;
   background-color: #ff0000;
   color: #fff;

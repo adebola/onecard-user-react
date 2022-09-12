@@ -46,8 +46,6 @@ const Card = ({ bulk }) => {
   const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
     useContext(BulkRechargeContext);
 
-  // console.log(bulkData);
-
   const { startDate, endDate } = useContext(GlobalContext);
   const auto = useContext(ModalContext);
 
@@ -108,33 +106,45 @@ const Card = ({ bulk }) => {
       }
     );
 
-    // setBulkRecipients(_recipients);
-    if (auto.rechargeType === 3) {
-      setBulkData({
-        recipients: _recipients,
-        paymentMode,
-        rechargeType: "bulk",
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
-        daysOfMonth: auto.monthlyAutoRecharge,
-        daysOfWeek: auto.weeklyAutoRecharge,
-        endDate: endDate && convertDate(endDate),
-        startDate: startDate && convertDate(startDate),
-        title: auto.rechargeName,
-      });
-    } else {
-      setBulkData({
-        recipients: _recipients,
-        paymentMode,
-        scheduledDate,
-        rechargeType: "bulk",
-        redirectUrl:
-          paymentMode === "paystack"
-            ? `${window.origin}${window.location.pathname}`
-            : "",
-      });
+    switch (auto.rechargeType) {
+      case 1:
+        setBulkData({
+          recipients: _recipients,
+          paymentMode,
+          rechargeType: "bulk",
+          redirectUrl:
+            paymentMode === "paystack"
+              ? `${window.origin}${window.location.pathname}`
+              : "",
+        });
+        break;
+      case 2:
+        setBulkData({
+          recipients: _recipients,
+          paymentMode,
+          scheduledDate,
+          rechargeType: "bulk",
+          redirectUrl:
+            paymentMode === "paystack"
+              ? `${window.origin}${window.location.pathname}`
+              : "",
+        });
+        break;
+      case 3:
+        setBulkData({
+          recipients: _recipients,
+          paymentMode,
+          rechargeType: "bulk",
+          daysOfMonth: auto.monthlyAutoRecharge,
+          daysOfWeek: auto.weeklyAutoRecharge,
+          endDate: endDate && convertDate(endDate),
+          startDate: startDate && convertDate(startDate),
+          title: auto.rechargeName,
+        });
+        break;
+
+      default:
+        break;
     }
   }, [
     bulkRecharges,

@@ -7,8 +7,39 @@ import { Inner, Price, Send } from "./styles";
 import { makeAutoRechargeRequest } from "../../helper/requests";
 import { SingleRechargeContext } from "../../context/SingleRechargeContext";
 import Swal from "sweetalert2";
+import * as images from "../../data/images";
+import styled from "styled-components";
+
+const ImageContainer = styled.div`
+  height: 19px;
+  width: 19px;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+`;
+
+const SmallImage = styled.img``;
+
+const Type = styled.div`
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
+  color: #000;
+  margin-right: 5px;
+`;
 
 const BulkList = () => {
+  const image = [
+    { id: 1, type: "MTN", img: images.mtn },
+    { id: 2, type: "AIRTEL", img: images.airtel },
+    { id: 3, type: "GLO", img: images.glo },
+    { id: 4, type: "9MOBILE", img: images.mobile },
+    { id: 5, type: "SPECTRANET", img: images.spectranet },
+    { id: 6, type: "SMILE", img: images.smile },
+  ];
   const { bulkRecharges, setBulkRecharges, bulkData } =
     useContext(BulkRechargeContext);
 
@@ -41,12 +72,30 @@ const BulkList = () => {
           <div className="inner">
             <Badge />
             {bulkRecharges.map((each) => {
+              console.log(each);
+              const img = image.find(
+                (e) => e.type === each.serviceCode.split("-")[0]
+              );
               return (
                 <div key={each.id} className="item">
-                  <p>
-                    {each.serviceCode} {each.recipient} - #
-                    {each?.serviceCost || each?.price}
-                  </p>
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ImageContainer>
+                        <SmallImage src={img?.img} />
+                      </ImageContainer>
+                      <Type>{each.recipient}</Type>
+                      <Type>{each.serviceCode.split("-")[1]}</Type>
+                      <Type>&#8358;{each?.serviceCost || each?.price}</Type>
+
+                      {/* {each.serviceCode} {each.recipient} - #
+                    {each?.serviceCost || each?.price} */}
+                    </div>
+                  </>
                   <div className="icon">
                     <MdClose
                       size={18}

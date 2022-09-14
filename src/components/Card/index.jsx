@@ -1,6 +1,15 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SingleRechargeContext } from "../../context/SingleRechargeContext";
-import { Container, Grid, GridItem, GridText, Image } from "./styles";
+import {
+  Container,
+  Grid,
+  GridItem,
+  GridText,
+  Image,
+  SmallText,
+  StyledTab,
+  Line,
+} from "./styles";
 import { data } from "../../data";
 import Form from "../Form";
 
@@ -9,19 +18,35 @@ import Button from "../Button/normal";
 import WalletBalance from "../WalletBalance";
 import {
   getDataPlans,
+  getSingleRechargeResponse,
   makeAutoRechargeRequest,
   makeScheduleRecharge,
   makeSingleRecharge,
 } from "../../helper/requests";
 import Loader from "../Loader";
-import Swal from "sweetalert2";
 import { convertDate } from "../../utils/dateformat";
 import { ModalContext } from "../../context/ModalProvider";
 import { GlobalContext } from "../../context/GlobalProvider";
 import { v4 } from "uuid";
 import { BulkRechargeContext } from "../../context/BulkRecharge";
+import {
+  getAuthId,
+  getIdDetails,
+  removeAuthId,
+  removeIdDetails,
+  setAuthId,
+  setIdDetails,
+} from "../../helper";
+import { getMessage, getPayStackMessage } from "../../utils/messages.response";
+import { Tab } from "@headlessui/react";
+import ExcelFileUpload from "../Secured/Bulk/RechargeDetails/ExcelFileUpload";
 
 const Card = ({ bulk }) => {
+  const tabs = [
+    { id: 1, name: "Manual Entry" },
+    { id: 2, name: "File upload" },
+  ];
+
   const {
     setTabDetails,
     tabDetails,
@@ -43,13 +68,55 @@ const Card = ({ bulk }) => {
     dataPlans,
   } = useContext(SingleRechargeContext);
 
-  const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
+  const { bulkRecharges, setBulkRecharges, setBulkData } =
     useContext(BulkRechargeContext);
+
+  const [id, setId] = useState(getAuthId() ? getAuthId() : null);
+  const [authUrl, setAuthUrl] = useState("");
+  const [currentTabIndex, setCurrentTabIndex] = useState(0);
 
   const { startDate, endDate } = useContext(GlobalContext);
   const auto = useContext(ModalContext);
 
   const scheduledDate = convertDate(startDate);
+
+  useEffect(() => {
+    if (authUrl !== "") {
+      window.location = authUrl;
+    }
+  }, [authUrl]);
+
+  const removeFromLocalStorage = () => {
+    removeAuthId();
+    removeIdDetails();
+    setId(null);
+  };
+
+  useEffect(() => {
+    if (id !== null) {
+      getSingleRechargeResponse(id)
+        .then((response) => {
+          const data = getIdDetails();
+
+          const msg = response.data.message;
+          getPayStackMessage(
+            msg,
+            false,
+            removeFromLocalStorage,
+            data,
+            data.r_type
+          );
+        })
+        .catch((error) => {
+          const msg = error.response.data.message;
+
+          setTimeout(
+            () => getPayStackMessage(msg, true, removeFromLocalStorage),
+            1000
+          );
+        });
+    }
+  }, [id]);
 
   const {
     productId,
@@ -139,7 +206,7 @@ const Card = ({ bulk }) => {
           daysOfWeek: auto.weeklyAutoRecharge,
           endDate: endDate && convertDate(endDate),
           startDate: startDate && convertDate(startDate),
-          title: auto.rechargeName,
+          redirectUrl: `${window.origin}${window.location.pathname}`,
         });
         break;
 
@@ -307,6 +374,7 @@ const Card = ({ bulk }) => {
           serviceCost,
           accountType,
           telephone,
+          paymentMode,
         };
       } else {
         data = {
@@ -314,6 +382,7 @@ const Card = ({ bulk }) => {
           serviceCode,
           serviceCost,
           telephone,
+          paymentMode,
         };
       }
       //
@@ -351,7 +420,7 @@ const Card = ({ bulk }) => {
 
       /////////////////////////////////////////////////
       /////////////////////////////////////////////////
-      //Auto airtime Recharge
+      //Auto recharge
       if (auto.rechargeType === 3) {
         if (activeId === 1) {
           data = {
@@ -449,6 +518,8 @@ const Card = ({ bulk }) => {
       }
     }
 
+    // return;
+
     switch (auto.rechargeType) {
       ////////////////////////////////
       case 1:
@@ -468,97 +539,117 @@ const Card = ({ bulk }) => {
     }
   };
 
+  const rm = () => {
+    setShowModal(false);
+    resetForm();
+    setActiveId(0);
+  };
+
   const instantRecharge = async (data) => {
+    let price;
     setShowModal(true);
+    if (data.productId && data.serviceCode.includes("-DATA")) {
+      price = dataPlans.find((each) => each.id === data.productId).price;
+    }
+
     try {
       const response = await makeSingleRecharge(data);
       if (response.status === 200) {
         if (response.data.authorizationUrl) {
-          window.location = response.data.authorizationUrl;
-        } else {
-          Swal.fire({
-            icon: "success",
-            title: "SUCCESS",
-            text: `Your ${serviceCode} recharge of ₦${serviceCost} to ${recipient} was completed successfully.`,
-            confirmButtonColor: "var(--btn-color)",
-          }).then(() => {
-            setShowModal(false);
-            resetForm();
-            setActiveId(0);
+          setAuthUrl(response.data.authorizationUrl);
+          setAuthId(response.data.id);
+          setId(response.data.id);
+          setShowModal(false);
+          setIdDetails({
+            serviceCode,
+            serviceCost,
+            recipient,
+            r_type: auto.rechargeType,
           });
+        } else {
+          getMessage(
+            "Instant Successful",
+            false,
+            rm,
+            price,
+            data,
+            auto.rechargeType
+          );
         }
       }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        iconColor: "#F27474",
-        title: "Error",
-        text: error.response.data.message,
-        confirmButtonColor: "var(--btn-color)",
-      }).then(() => {
-        setShowModal(false);
-      });
+      const msg = error.response.data.message;
+      getMessage(msg, true, () => setShowModal(false));
     }
   };
 
   const scheduleRecharge = async (data) => {
     setShowModal(true);
     try {
-      await makeScheduleRecharge(data);
-      Swal.fire({
-        icon: "success",
-        title: "SUCCESS",
-        text: `Your ${serviceCode}  scheduled recharge of ₦${serviceCost} to ${recipient} was submitted successfully.`,
-        confirmButtonColor: "var(--btn-color)",
-      }).then(() => {
+      const response = await makeScheduleRecharge(data);
+      if (response.data.authorizationUrl) {
+        setAuthUrl(response.data.authorizationUrl);
+        setAuthId(response.data.id);
+        setId(response.data.id);
         setShowModal(false);
-        resetForm();
-        setActiveId(0);
-      });
+        setIdDetails({
+          serviceCode,
+          serviceCost,
+          recipient,
+          r_type: auto.rechargeType,
+        });
+      } else {
+        getMessage(
+          "Schedule Successful",
+          false,
+          rm,
+          null,
+          data,
+          auto.rechargeType
+        );
+      }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        iconColor: "#F27474",
-        title: "Error",
-        text: error.response.data.message,
-        confirmButtonColor: "var(--btn-color)",
-      }).then(() => {
-        setShowModal(false);
-      });
+      const msg = error.response.data.message;
+      getMessage(msg, true, () => setShowModal(false));
     }
   };
 
-  //TODO:
   const autoRecharge = async (data) => {
     setShowModal(true);
     try {
-      await makeAutoRechargeRequest(data);
-      Swal.fire({
-        icon: "success",
-        title: "SUCCESS",
-        text: `Your ${serviceCode} auto recharge of ₦${serviceCost} to ${recipient} was submitted successfully.`,
-        confirmButtonColor: "var(--btn-color)",
-      }).then(() => {
+      const response = await makeAutoRechargeRequest(data);
+
+      if (response.data.authorizationUrl) {
+        setAuthUrl(response.data.authorizationUrl);
+        setAuthId(response.data.id);
+        setId(response.data.id);
         setShowModal(false);
-        resetForm();
-        setActiveId(0);
-      });
+        setIdDetails({
+          serviceCode,
+          serviceCost,
+          recipient,
+          r_type: auto.rechargeType,
+        });
+      } else {
+        getMessage(
+          "Autorecharge Successful",
+          false,
+          rm,
+          null,
+          data,
+          auto.rechargeType
+        );
+      }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        iconColor: "#F27474",
-        title: "Error",
-        text: error.response.data.message,
-        confirmButtonColor: "var(--btn-color)",
-      }).then(() => {
-        setShowModal(false);
-      });
+      const msg = error.response.data.message;
+      getMessage(msg, true, () => setShowModal(false));
     }
   };
 
   //Handle Bulk Recharges
   const handleBulkRequest = (data) => {
     let newData;
+
     const price = dataPlans.find((each) => {
       return data.productId === each.id;
     })?.price;
@@ -623,112 +714,188 @@ const Card = ({ bulk }) => {
     }
 
     setBulkRecharges([newData, ...bulkRecharges]);
-
-    let dataToSend = {
-      paymentMode,
-      rechargeType: "bulk",
-      redirectUrl:
-        paymentMode === "paystack"
-          ? `${window.origin}${window.location.pathname}`
-          : "",
-    };
-
-    switch (auto.rechargeType) {
-      case 2:
-        dataToSend = {
-          ...bulkData,
-          scheduledDate,
-        };
-        break;
-      case 3:
-        dataToSend = {
-          ...bulkData,
-          endDate: convertDate(endDate),
-          startDate: convertDate(startDate),
-          daysOfMonth: auto.monthlyAutoRecharge,
-          daysOfWeek: auto.weeklyAutoRecharge,
-          title: auto.rechargeName,
-        };
-        break;
-      default:
-        break;
-    }
-    setBulkData({ ...bulkData, ...dataToSend });
   };
 
   return (
     <Container>
+      <SmallText>What will you like to do ?</SmallText>
       {showModal && <Loader />}
-      <Grid repeat="5">
-        {data.map(({ name, id, img, tabDetails, errors }) => {
-          return (
-            <GridItem
-              className={id === selectedId && "active"}
-              onClick={() => {
-                setTabDetails(tabDetails);
-                setSelectedId(id);
-                setErrors(errors);
-              }}
-              key={id}
-            >
-              {img}
-              <GridText>{name}</GridText>
-            </GridItem>
-          );
-        })}
-      </Grid>
-      <Grid repeat="6">
-        {tabDetails.map(({ id, img, type, select }) => {
-          return (
-            <GridItem
-              onClick={async () => {
-                setActiveId(id);
-                setIsSelect(select);
 
-                if (id === 3 || id === 4) {
-                  setLoading(true);
-                  setSuccess(false);
-                  setClicked(false);
-                }
-                if (id === activeId) return;
-                resetForm(type);
-                if (type.includes("-DATA")) {
-                  //get plans
-                  const plans = await getDataPlans(type);
-                  const data = plans.data.map((each) => {
-                    return {
-                      id: each.product_id,
-                      value: each.product_id,
-                      price: each.price.split(".")[0],
-                      label: `${each.network} ${
-                        each.category === null ? "" : each.category
-                      } Data ${each.allowance} ${each.price.split(".")[0]}`,
-                    };
-                  });
+      {bulk && (
+        <Tab.Group
+          selectedIndex={currentTabIndex}
+          onChange={setCurrentTabIndex}
+        >
+          <Tab.List>
+            {tabs.map((each, index) => {
+              return (
+                <StyledTab
+                  key={each.id}
+                  className={currentTabIndex === index && "active"}
+                >
+                  {each.name}
+                </StyledTab>
+              );
+            })}
+            <Line />
+          </Tab.List>
 
-                  setDataPlans(data);
-                }
-              }}
-              className={activeId === id && "active"}
-              key={id}
-            >
-              <Image src={img} />
-            </GridItem>
-          );
-        })}
-      </Grid>
+          <Tab.Panels>
+            <Tab.Panel>
+              <Grid repeat="5">
+                {data.map(({ name, id, img, tabDetails, errors }) => {
+                  return (
+                    <GridItem
+                      className={id === selectedId && "active"}
+                      onClick={() => {
+                        setTabDetails(tabDetails);
+                        setSelectedId(id);
+                        setErrors(errors);
+                      }}
+                      key={id}
+                    >
+                      {img}
+                      <GridText>{name}</GridText>
+                    </GridItem>
+                  );
+                })}
+              </Grid>
+              <Grid repeat="6">
+                {tabDetails.map(({ id, img, type, select }) => {
+                  return (
+                    <GridItem
+                      onClick={async () => {
+                        setActiveId(id);
+                        setIsSelect(select);
 
-      {activeId !== 0 && (
-        <form onSubmit={handleSubmit}>
-          <Form />
-          {(selectedId === 3 || selectedId === 4) && !success ? null : (
-            <>
-              <PaymentMode />
-              {bulk ? <Button name="Add" /> : <Button name="Submit" />}
-            </>
+                        if (id === 3 || id === 4) {
+                          setLoading(true);
+                          setSuccess(false);
+                          setClicked(false);
+                        }
+                        if (id === activeId) return;
+                        resetForm(type);
+                        if (type.includes("-DATA")) {
+                          //get plans
+                          const plans = await getDataPlans(type);
+                          const data = plans.data.map((each) => {
+                            return {
+                              id: each.product_id,
+                              value: each.product_id,
+                              price: each.price.split(".")[0],
+                              label: `${each.network} ${
+                                each.category === null ? "" : each.category
+                              } Data ${each.allowance} ${
+                                each.price.split(".")[0]
+                              }`,
+                            };
+                          });
+
+                          setDataPlans(data);
+                        }
+                      }}
+                      className={activeId === id && "active"}
+                      key={id}
+                    >
+                      <Image src={img} />
+                    </GridItem>
+                  );
+                })}
+              </Grid>
+
+              {activeId !== 0 && (
+                <form onSubmit={handleSubmit}>
+                  <Form />
+                  {(selectedId === 3 || selectedId === 4) && !success ? null : (
+                    <>
+                      <PaymentMode />
+                      {bulk ? <Button name="Add" /> : <Button name="Submit" />}
+                    </>
+                  )}
+                  <WalletBalance />
+                </form>
+              )}
+            </Tab.Panel>
+            <Tab.Panel>
+              <ExcelFileUpload />
+            </Tab.Panel>
+          </Tab.Panels>
+        </Tab.Group>
+      )}
+      {!bulk && (
+        <>
+          <Grid repeat="5">
+            {data.map(({ name, id, img, tabDetails, errors }) => {
+              return (
+                <GridItem
+                  className={id === selectedId && "active"}
+                  onClick={() => {
+                    setTabDetails(tabDetails);
+                    setSelectedId(id);
+                    setErrors(errors);
+                  }}
+                  key={id}
+                >
+                  {img}
+                  <GridText>{name}</GridText>
+                </GridItem>
+              );
+            })}
+          </Grid>
+          <Grid repeat="6">
+            {tabDetails.map(({ id, img, type, select }) => {
+              return (
+                <GridItem
+                  onClick={async () => {
+                    setActiveId(id);
+                    setIsSelect(select);
+
+                    if (id === 3 || id === 4) {
+                      setLoading(true);
+                      setSuccess(false);
+                      setClicked(false);
+                    }
+                    if (id === activeId) return;
+                    resetForm(type);
+                    if (type.includes("-DATA")) {
+                      //get plans
+                      const plans = await getDataPlans(type);
+                      const data = plans.data.map((each) => {
+                        return {
+                          id: each.product_id,
+                          value: each.product_id,
+                          price: each.price.split(".")[0],
+                          label: `${each.network} ${
+                            each.category === null ? "" : each.category
+                          } Data ${each.allowance} ${each.price.split(".")[0]}`,
+                        };
+                      });
+
+                      setDataPlans(data);
+                    }
+                  }}
+                  className={activeId === id && "active"}
+                  key={id}
+                >
+                  <Image src={img} />
+                </GridItem>
+              );
+            })}
+          </Grid>
+
+          {activeId !== 0 && (
+            <form onSubmit={handleSubmit}>
+              <Form />
+              {(selectedId === 3 || selectedId === 4) && !success ? null : (
+                <>
+                  <PaymentMode />
+                  {bulk ? <Button name="Add" /> : <Button name="Submit" />}
+                </>
+              )}
+              <WalletBalance />
+            </form>
           )}
-          <WalletBalance />
-        </form>
+        </>
       )}
     </Container>
   );

@@ -10,13 +10,8 @@ import {
 import { GlobalContext } from "../../../../../context/GlobalProvider";
 import { ModalContext } from "../../../../../context/ModalProvider";
 import { convertDate } from "../../../../../utils/dateformat";
-import Hover from "../TabButton";
-// import axios from "axios";
 
 const Container = styled.form`
-  /* display: flex;
-	gap: 30px;
-	*/
   margin-top: 40px;
 `;
 
@@ -99,16 +94,9 @@ const Link = styled.a`
   color: var(--text-color);
 `;
 
-const ExcelFileUpload = ({
-  setFileSelect,
-  setOptionId,
-  optionId,
-  fileSelect,
-  rechargeId,
-}) => {
+const ExcelFileUpload = ({ rechargeId }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
-  const [left, setLeft] = useState(0);
   const [clicked, setClicked] = useState(false);
 
   const { setResponseMessage, startDate, endDate } = useContext(GlobalContext);
@@ -142,17 +130,6 @@ const ExcelFileUpload = ({
   const handleChange = (e) => {
     if (!e.target.files[0]) return;
     setSelectedFile(e.target.files[0]);
-  };
-
-  const handleClick = () => {
-    setOptionId(1);
-    setFileSelect(false);
-    setLeft(0);
-  };
-  const handleSecondClick = () => {
-    setFileSelect(true);
-    setOptionId(2);
-    setLeft(85);
   };
 
   const handleSubmit = async (e) => {
@@ -231,46 +208,37 @@ const ExcelFileUpload = ({
 
   return (
     <Container onSubmit={handleSubmit}>
-      <Hover
-        id={optionId}
-        left={left}
-        onClickOne={handleClick}
-        onClickTwo={handleSecondClick}
-      />
-
       <Inner>
-        {optionId === 2 && (
-          <>
-            <SelectBox>
-              <ButtonAndLink>
-                <FileContainer className={clicked && "disabled"}>
-                  <FileUploadIcon>
-                    <AiOutlineUpload size={19} fill="white" />
-                  </FileUploadIcon>
-                  <FileText>Choose an excel file</FileText>
+        <>
+          <SelectBox>
+            <ButtonAndLink>
+              <FileContainer className={clicked && "disabled"}>
+                <FileUploadIcon>
+                  <AiOutlineUpload size={19} fill="white" />
+                </FileUploadIcon>
+                <FileText>Choose an excel file</FileText>
 
-                  <FileUpload
-                    disabled={selectedFile?.name}
-                    type="file"
-                    onChange={handleChange}
-                    name="file"
-                  />
-                </FileContainer>
-                <Link href="https://delifrost.s3.amazonaws.com/bulk-request.xlsx">
-                  Download excel sample
-                </Link>
-              </ButtonAndLink>
-              {error && <ErrorBox>{error}</ErrorBox>}
-              {selectedFile && !error && (
-                <FileName>
-                  {" "}
-                  filename : <Name>{selectedFile?.name}</Name>
-                </FileName>
-              )}{" "}
-            </SelectBox>
-            <Button type="submit" disabled={disabled} name="Submit" />
-          </>
-        )}
+                <FileUpload
+                  disabled={selectedFile?.name}
+                  type="file"
+                  onChange={handleChange}
+                  name="file"
+                />
+              </FileContainer>
+              <Link href="https://delifrost.s3.amazonaws.com/bulk-request.xlsx">
+                Download excel sample
+              </Link>
+            </ButtonAndLink>
+            {error && <ErrorBox>{error}</ErrorBox>}
+            {selectedFile && !error && (
+              <FileName>
+                {" "}
+                filename : <Name>{selectedFile?.name}</Name>
+              </FileName>
+            )}{" "}
+          </SelectBox>
+          <Button type="submit" disabled={disabled} name="Submit" />
+        </>
       </Inner>
     </Container>
   );

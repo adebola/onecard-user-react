@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Tab } from "@headlessui/react";
 
 const Container = styled.div`
   min-height: 464px;
@@ -56,4 +57,45 @@ const Image = styled.img`
   }};
 `;
 
-export { Container, Grid, GridItem, GridText, Image };
+const SmallText = styled.p`
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 11px;
+  letter-spacing: 0em;
+  text-align: left;
+  color: var(--text-color);
+`;
+
+const StyledTab = styled(Tab)`
+  padding: 0.5rem 0;
+  margin-right: 0.5rem;
+  background: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  margin-top: 10px;
+  &.active {
+    color: var(--text-color);
+    font-weight: bold;
+    border-bottom: 1px solid var(--text-color);
+  }
+`;
+
+const Line = styled.div`
+  height: 1px;
+  background: #e4e7eb;
+  width: 100%;
+`;
+
+export {
+  Container,
+  Grid,
+  GridItem,
+  GridText,
+  Image,
+  SmallText,
+  StyledTab,
+  Line,
+};

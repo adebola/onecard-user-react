@@ -193,7 +193,6 @@ const Loading = () => {
                     error={clicked && productId === ""}
                     name="productId"
                     onChange={({ target }) => {
-                      console.log(target.value);
                       setDetails({
                         ...details,
                         [target.name]: target.value,

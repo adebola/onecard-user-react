@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { SyncLoader } from "react-spinners";
 import { SingleRechargeContext } from "../../context/SingleRechargeContext";

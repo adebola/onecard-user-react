@@ -15,6 +15,7 @@
     "removeuser",
     "schedulefile",
     "sidebardata",
-    "sweetalert"
+    "sweetalert",
+    "noauthrequests"
   ]
 }

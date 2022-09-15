@@ -69,7 +69,7 @@ const Card = ({ bulk }) => {
     cardDetails,
   } = useContext(SingleRechargeContext);
 
-  const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
+  const { bulkRecharges, setBulkRecharges, setBulkData } =
     useContext(BulkRechargeContext);
 
   const [id, setId] = useState(getAuthId() ? getAuthId() : null);

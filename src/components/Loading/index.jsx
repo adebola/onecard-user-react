@@ -63,6 +63,8 @@ const Loading = () => {
     setClicked,
     setDataPlans,
     dataPlans,
+    cardDetails,
+    setCardDetails,
   } = useContext(SingleRechargeContext);
   const {
     recipient,
@@ -72,8 +74,6 @@ const Loading = () => {
     serviceCode,
     productId,
   } = details;
-
-  const [cardDetails, setCardDetails] = useState({});
 
   const isEko = selectedId === 3 && activeId === 1;
   const isJos = selectedId === 3 && activeId === 2;
@@ -133,8 +133,7 @@ const Loading = () => {
         setSuccess(true);
       })
       .catch((err) => {
-        console.log(err);
-        setErrorMessage("Invalid card details");
+        setErrorMessage(err.response.data.message);
         setLoading(false);
       });
   }, [
@@ -147,6 +146,7 @@ const Loading = () => {
     setSuccess,
     setErrorMessage,
     setDataPlans,
+    setCardDetails,
   ]);
 
   return (

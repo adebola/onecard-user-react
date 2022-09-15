@@ -75,17 +75,17 @@ const StyledTab = styled(Tab)`
   border: none;
   cursor: pointer;
   font-size: 11px;
-  margin-top: 10px;
+  margin-top: 15px;
+  color: var(--text-color);
   &.active {
-    color: var(--text-color);
-    font-weight: bold;
-    border-bottom: 1px solid var(--text-color);
+    font-weight: 800;
+    border-bottom: 1px solid var(--btn-color);
   }
 `;
 
 const Line = styled.div`
   height: 1px;
-  background: #e4e7eb;
+  background: #e6bea7;
   width: 100%;
 `;
 

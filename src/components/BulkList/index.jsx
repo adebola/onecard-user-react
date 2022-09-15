@@ -11,8 +11,8 @@ import * as images from "../../data/images";
 import styled from "styled-components";
 
 const ImageContainer = styled.div`
-  height: 19px;
-  width: 19px;
+  height: 18px;
+  width: 18px;
   border-radius: 3px;
   overflow: hidden;
   display: flex;
@@ -20,8 +20,11 @@ const ImageContainer = styled.div`
   align-items: center;
   margin: 10px;
 `;
-
-const SmallImage = styled.img``;
+const SmallImage = styled.img`
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+`;
 
 const Type = styled.div`
   text-transform: uppercase;
@@ -32,6 +35,8 @@ const Type = styled.div`
 `;
 
 const BulkList = () => {
+  ////////////////////
+  ////////////////////
   const image = [
     { id: 1, type: "MTN", img: images.mtn },
     { id: 2, type: "AIRTEL", img: images.airtel },
@@ -39,6 +44,11 @@ const BulkList = () => {
     { id: 4, type: "9MOBILE", img: images.mobile },
     { id: 5, type: "SPECTRANET", img: images.spectranet },
     { id: 6, type: "SMILE", img: images.smile },
+    { id: 7, type: "GOTV", img: images.gotv },
+    { id: 8, type: "DSTV", img: images.dstv },
+    { id: 9, type: "STARTIMES", img: images.startimes },
+    { id: 10, type: "EKEDP", img: images.eko },
+    { id: 11, type: "JED", img: images.jos },
   ];
   const { bulkRecharges, setBulkRecharges, bulkData } =
     useContext(BulkRechargeContext);
@@ -47,7 +57,6 @@ const BulkList = () => {
     SingleRechargeContext
   );
 
-  // console.log(bulkData);
   const resetForm = (type) => {
     setClicked(false);
     setDetails({
@@ -72,9 +81,8 @@ const BulkList = () => {
           <div className="inner">
             <Badge />
             {bulkRecharges.map((each) => {
-              console.log(each);
               const img = image.find(
-                (e) => e.type === each.serviceCode.split("-")[0]
+                (e) => e.type === each.serviceCode?.split("-")[0]
               );
               return (
                 <div key={each.id} className="item">
@@ -89,11 +97,12 @@ const BulkList = () => {
                         <SmallImage src={img?.img} />
                       </ImageContainer>
                       <Type>{each.recipient}</Type>
-                      <Type>{each.serviceCode.split("-")[1]}</Type>
+                      <Type>
+                        {each?.serviceCode.split("-")[1]
+                          ? each.serviceCode.split("-")[1]
+                          : each.serviceCode}
+                      </Type>
                       <Type>&#8358;{each?.serviceCost || each?.price}</Type>
-
-                      {/* {each.serviceCode} {each.recipient} - #
-                    {each?.serviceCost || each?.price} */}
                     </div>
                   </>
                   <div className="icon">

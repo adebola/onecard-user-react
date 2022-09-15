@@ -26,6 +26,8 @@ export const SingleMessageProvider = ({ children }) => {
   const [response, setResponse] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [cardDetails, setCardDetails] = useState({});
+
   return (
     <SingleRechargeContext.Provider
       value={{
@@ -55,6 +57,8 @@ export const SingleMessageProvider = ({ children }) => {
         setResponse,
         errorMessage,
         setErrorMessage,
+        cardDetails,
+        setCardDetails,
       }}
     >
       {children}

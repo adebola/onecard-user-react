@@ -66,9 +66,10 @@ const Card = ({ bulk }) => {
     showModal,
     setSuccess,
     dataPlans,
+    cardDetails,
   } = useContext(SingleRechargeContext);
 
-  const { bulkRecharges, setBulkRecharges, setBulkData } =
+  const { bulkRecharges, setBulkRecharges, bulkData, setBulkData } =
     useContext(BulkRechargeContext);
 
   const [id, setId] = useState(getAuthId() ? getAuthId() : null);
@@ -149,7 +150,7 @@ const Card = ({ bulk }) => {
 
   useEffect(() => {
     const _recipients = bulkRecharges.map(
-      ({ recipient, serviceCode, type, serviceCost, productId }) => {
+      ({ recipient, serviceCode, type, serviceCost, name, productId }) => {
         let data;
         switch (type) {
           case "DATA":
@@ -161,6 +162,23 @@ const Card = ({ bulk }) => {
             break;
           case "AIRTIME":
             data = {
+              recipient,
+              serviceCode,
+              serviceCost,
+            };
+
+            break;
+          case "CABLE":
+            data = {
+              recipient,
+              serviceCode,
+              productId,
+              name,
+            };
+            break;
+          case "ELECTRICITY":
+            data = {
+              name,
               recipient,
               serviceCode,
               serviceCost,
@@ -375,6 +393,7 @@ const Card = ({ bulk }) => {
           accountType,
           telephone,
           paymentMode,
+          name: cardDetails.customerName,
         };
       } else {
         data = {
@@ -383,6 +402,7 @@ const Card = ({ bulk }) => {
           serviceCost,
           telephone,
           paymentMode,
+          name: cardDetails.customerName,
         };
       }
       //
@@ -648,10 +668,11 @@ const Card = ({ bulk }) => {
 
   //Handle Bulk Recharges
   const handleBulkRequest = (data) => {
+    console.log(data);
     let newData;
 
     const price = dataPlans.find((each) => {
-      return data.productId === each.id;
+      return data.productId === each.id || each.code;
     })?.price;
 
     newData = {
@@ -709,10 +730,66 @@ const Card = ({ bulk }) => {
             });
 
         break;
+      case 3:
+        auto.rechargeType === 1
+          ? (newData = {
+              ...newData,
+              recipient,
+              serviceCode,
+              serviceCost,
+              type: "ELECTRICITY",
+              name: data.name,
+            })
+          : auto.rechargeType === 2
+          ? (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              serviceCode: data.recipients[0].serviceCode,
+              serviceCost: data.recipients[0].serviceCost,
+              name: data.name,
+            })
+          : (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              serviceCode: data.recipients[0].serviceCode,
+              serviceCost: data.recipients[0].serviceCost,
+              name: data.name,
+            });
+        break;
+      case 4:
+        auto.rechargeType === 1
+          ? (newData = {
+              ...newData,
+              recipient: data.recipient,
+              productId: data.productId,
+              serviceCode: data.serviceCode,
+              price,
+              name: data.name,
+              type: "CABLE",
+            })
+          : auto.rechargeType === 2
+          ? (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              productId: data.recipients[0].productId,
+              price,
+              serviceCode: data.recipients[0].serviceCode,
+              name: data.name,
+              type: "CABLE",
+            })
+          : (newData = {
+              ...newData,
+              recipient: data.recipients[0].recipient,
+              productId: data.recipients[0].productId,
+              serviceCode: data.recipients[0].serviceCode,
+              price,
+              name: data.name,
+              type: "CABLE",
+            });
+        break;
       default:
         break;
     }
-
     setBulkRecharges([newData, ...bulkRecharges]);
   };
 

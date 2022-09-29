@@ -89,6 +89,24 @@ const Line = styled.div`
   width: 100%;
 `;
 
+const LoginContainer = styled.div`
+  margin-top: 10px;
+  display: flex;
+`;
+const Text = styled.p`
+  color: var(--text-color);
+  font-size: 13px;
+`;
+
+const LoginButton = styled.button`
+  background: none;
+  text-decoration: underline;
+  border: none;
+  outline: none;
+  margin-left: 10px;
+  cursor: pointer;
+`;
+
 export {
   Container,
   Grid,
@@ -98,4 +116,7 @@ export {
   SmallText,
   StyledTab,
   Line,
+  LoginContainer,
+  Text,
+  LoginButton,
 };

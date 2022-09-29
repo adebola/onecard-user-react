@@ -9,6 +9,9 @@ import {
   SmallText,
   StyledTab,
   Line,
+  LoginContainer,
+  Text,
+  LoginButton,
 } from "./styles";
 import { data } from "../../data";
 import Form from "../Form";
@@ -40,8 +43,9 @@ import {
 import { getMessage, getPayStackMessage } from "../../utils/messages.response";
 import { Tab } from "@headlessui/react";
 import ExcelFileUpload from "../Secured/Bulk/RechargeDetails/ExcelFileUpload";
+import UserServices from "../../services/UserServices";
 
-const Card = ({ bulk }) => {
+const Card = ({ bulk, landing }) => {
   const tabs = [
     { id: 1, name: "Manual Entry" },
     { id: 2, name: "File upload" },
@@ -217,6 +221,7 @@ const Card = ({ bulk }) => {
         break;
       case 3:
         setBulkData({
+          title: auto.rechargeName,
           recipients: _recipients,
           paymentMode,
           rechargeType: "bulk",
@@ -286,7 +291,7 @@ const Card = ({ bulk }) => {
         recipient,
         serviceCode,
         productId,
-        paymentMode,
+        paymentMode: landing ? "paystack" : paymentMode,
         redirectUrl:
           paymentMode === "paystack"
             ? `${window.origin}${window.location.pathname}`
@@ -668,7 +673,6 @@ const Card = ({ bulk }) => {
 
   //Handle Bulk Recharges
   const handleBulkRequest = (data) => {
-    console.log(data);
     let newData;
 
     const price = dataPlans.find((each) => {
@@ -899,10 +903,12 @@ const Card = ({ bulk }) => {
           </Tab.Panels>
         </Tab.Group>
       )}
+
       {!bulk && (
         <>
           <Grid repeat="5">
             {data.map(({ name, id, img, tabDetails, errors }) => {
+              if (landing && id === 5) return null;
               return (
                 <GridItem
                   className={id === selectedId && "active"}
@@ -919,57 +925,75 @@ const Card = ({ bulk }) => {
               );
             })}
           </Grid>
-          <Grid repeat="6">
-            {tabDetails.map(({ id, img, type, select }) => {
-              return (
-                <GridItem
-                  onClick={async () => {
-                    setActiveId(id);
-                    setIsSelect(select);
+          {landing && selectedId === 3 ? (
+            <LoginContainer>
+              <Text>You have to login to continue with the transaction.</Text>
+              <LoginButton onClick={UserServices.doLogin}>Log in</LoginButton>
+            </LoginContainer>
+          ) : (
+            <Grid repeat="6">
+              {tabDetails.map(({ id, img, type, select }) => {
+                return (
+                  <GridItem
+                    onClick={async () => {
+                      setActiveId(id);
+                      setIsSelect(select);
 
-                    if (id === 3 || id === 4) {
-                      setLoading(true);
-                      setSuccess(false);
-                      setClicked(false);
-                    }
-                    if (id === activeId) return;
-                    resetForm(type);
-                    if (type.includes("-DATA")) {
-                      //get plans
-                      const plans = await getDataPlans(type);
-                      const data = plans.data.map((each) => {
-                        return {
-                          id: each.product_id,
-                          value: each.product_id,
-                          price: each.price.split(".")[0],
-                          label: `${each.network} ${
-                            each.category === null ? "" : each.category
-                          } Data ${each.allowance} ${each.price.split(".")[0]}`,
-                        };
-                      });
+                      if (id === 3 || id === 4) {
+                        setLoading(true);
+                        setSuccess(false);
+                        setClicked(false);
+                      }
+                      if (id === activeId) return;
+                      resetForm(type);
+                      if (type.includes("-DATA")) {
+                        //get plans
+                        const plans = await getDataPlans(type);
+                        const data = plans.data.map((each) => {
+                          return {
+                            id: each.product_id,
+                            value: each.product_id,
+                            price: each.price.split(".")[0],
+                            label: `${each.network} ${
+                              each.category === null ? "" : each.category
+                            } Data ${each.allowance} ${
+                              each.price.split(".")[0]
+                            }`,
+                          };
+                        });
 
-                      setDataPlans(data);
-                    }
-                  }}
-                  className={activeId === id && "active"}
-                  key={id}
-                >
-                  <Image src={img} />
-                </GridItem>
-              );
-            })}
-          </Grid>
+                        setDataPlans(data);
+                      }
+                    }}
+                    className={activeId === id && "active"}
+                    key={id}
+                  >
+                    <Image src={img} />
+                  </GridItem>
+                );
+              })}
+            </Grid>
+          )}
 
           {activeId !== 0 && (
             <form onSubmit={handleSubmit}>
-              <Form />
+              <Form landing={landing} />
               {(selectedId === 3 || selectedId === 4) && !success ? null : (
                 <>
-                  <PaymentMode />
-                  {bulk ? <Button name="Add" /> : <Button name="Submit" />}
+                  {!landing && <PaymentMode />}
+                  {bulk ? (
+                    <Button name="Add" />
+                  ) : (
+                    <Button
+                      myStyle={{
+                        margin: "20px 0",
+                      }}
+                      name="Submit"
+                    />
+                  )}
                 </>
               )}
-              <WalletBalance />
+              {!landing && <WalletBalance />}
             </form>
           )}
         </>

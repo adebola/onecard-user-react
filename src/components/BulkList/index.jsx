@@ -4,11 +4,16 @@ import { MdClose } from "react-icons/md";
 import { BulkRechargeContext } from "../../context/BulkRecharge";
 import Badge from "../../components/Badge";
 import { Inner, Price, Send } from "./styles";
-import { makeAutoRechargeRequest } from "../../helper/requests";
+import {
+  makeAutoRechargeRequest,
+  makeBulkRecharge,
+  makeScheduleRecharge,
+} from "../../helper/requests";
 import { SingleRechargeContext } from "../../context/SingleRechargeContext";
 import Swal from "sweetalert2";
 import * as images from "../../data/images";
 import styled from "styled-components";
+import { ModalContext } from "../../context/ModalProvider";
 
 const ImageContainer = styled.div`
   height: 18px;
@@ -56,6 +61,7 @@ const BulkList = () => {
   const { setShowModal, setClicked, setDetails, details } = useContext(
     SingleRechargeContext
   );
+  const auto = useContext(ModalContext);
 
   const resetForm = (type) => {
     setClicked(false);
@@ -125,30 +131,44 @@ const BulkList = () => {
             <div>Total - #{formatBalance(totalPrice)}</div>
             <Send
               onClick={async () => {
-                setShowModal(true);
-                try {
-                  await makeAutoRechargeRequest(bulkData);
-                  Swal.fire({
-                    icon: "success",
-                    title: "SUCCESS",
-                    text: `Your auto bulk request was submitted successfully.`,
-                    confirmButtonColor: "var(--btn-color)",
-                  }).then(() => {
-                    setShowModal(false);
-                    resetForm();
-                    setBulkRecharges([]);
-                  });
-                } catch (error) {
-                  Swal.fire({
-                    icon: "error",
-                    iconColor: "#F27474",
-                    title: "Error",
-                    text: error.response.data.message,
-                    confirmButtonColor: "var(--btn-color)",
-                  }).then(() => {
-                    setShowModal(false);
-                  });
+                // setShowModal(true);
+                switch (auto.rechargeType) {
+                  case 1:
+                    makeBulkRecharge(bulkData);
+                    break;
+                  case 2:
+                    makeScheduleRecharge(bulkData);
+                    break;
+                  case 3:
+                    makeAutoRechargeRequest(bulkData);
+                    break;
+
+                  default:
+                    break;
                 }
+                //   try {
+                //     await makeAutoRechargeRequest(bulkData);
+                //     Swal.fire({
+                //       icon: "success",
+                //       title: "SUCCESS",
+                //       text: `Your auto bulk request was submitted successfully.`,
+                //       confirmButtonColor: "var(--btn-color)",
+                //     }).then(() => {
+                //       setShowModal(false);
+                //       resetForm();
+                //       setBulkRecharges([]);
+                //     });
+                //   } catch (error) {
+                //     Swal.fire({
+                //       icon: "error",
+                //       iconColor: "#F27474",
+                //       title: "Error",
+                //       text: error.response.data.message,
+                //       confirmButtonColor: "var(--btn-color)",
+                //     }).then(() => {
+                //       setShowModal(false);
+                //     });
+                //   }
               }}
             >
               Submit

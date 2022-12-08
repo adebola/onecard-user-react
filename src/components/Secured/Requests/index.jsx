@@ -12,6 +12,7 @@ import HistoryBoxThree from "./HistoryBoxThree";
 import HistoryBoxFour from "./HistoryBoxFour";
 // import HistoryBoxFour from "./HistoryBoxFour";
 import WalletFunding from "./WalletFunding/index";
+import TransactionHistory from "../TransactionHistory";
 
 const BoxOne = styled.div`
   flex: 1;
@@ -136,7 +137,9 @@ const Requests = () => {
       <Wrapper>
         <TopHeader header="History" />
         <Container>
-          <BoxOne>{renderTabs()}</BoxOne>
+          <BoxOne>
+            <TransactionHistory />
+          </BoxOne>
         </Container>
       </Wrapper>
     </>

@@ -223,6 +223,30 @@ export const transactionExcelDownload = (data) => {
   });
 };
 
+export const downloadSingleTransactions = (data) => {
+  return axios.post(`/auth-recharge/single/download `, data, {
+    responseType: "blob",
+  });
+};
+
+export const downloadBulkTransactions = (data) => {
+  return axios.post(`/auth-recharge/bulk/download `, data, {
+    responseType: "blob",
+  });
+};
+
+export const downloadScheduledTransactions = (data) => {
+  return axios.post(`/auth-recharge/scheduled/download`, data, {
+    responseType: "blob",
+  });
+};
+
+export const downloadAutoTransactions = (data) => {
+  return axios.post(`/auth-recharge/auto/download`, data, {
+    responseType: "blob",
+  });
+};
+
 export const getWalletFunding = (num = 1) => {
   return axios.get(`/account/wallet?pageNumber=${num}&pageSize=20`);
 };
@@ -243,4 +267,11 @@ export const verifyUser = (id) => {
 
 export const transferFund = (data) => {
   return axios.post("/account/transfer", data);
+};
+
+export const makeSingleSearchRequest = (data, num = 1) => {
+  return axios.post(
+    `/auth-recharge/single/search?pageNumber=${num}&pageSize=20`,
+    data
+  );
 };

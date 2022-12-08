@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import SingleContextProvider from "./context/SingleRecharge";
 import { SingleMessageProvider } from "./context/SingleRechargeContext";
 import BulkRechargeContextProvider from "./context/BulkRecharge";
+import { TableProvider } from "./context/TableContext";
 
 const GlobalStyle = createGlobalStyle`
 * {
@@ -22,10 +23,6 @@ const GlobalStyle = createGlobalStyle`
 html {
   scroll-behavior: smooth;
 }
-
-
-
-
 
 table {
   font-family: Arial, Helvetica, sans-serif;
@@ -84,7 +81,6 @@ body {
 @media screen and (max-width: 767px){
 	input, select, textarea{
 		font-size:16px;
-		
 	}
 }
 
@@ -95,18 +91,20 @@ const app = () =>
     <>
       <Router>
         <BulkRechargeContextProvider>
-          <AuthProvider>
-            <ModalContextProvider>
-              <SingleContextProvider>
-                <GlobalProvider>
-                  <SingleMessageProvider>
-                    <GlobalStyle />
-                    <App />
-                  </SingleMessageProvider>
-                </GlobalProvider>
-              </SingleContextProvider>
-            </ModalContextProvider>
-          </AuthProvider>
+          <TableProvider>
+            <AuthProvider>
+              <ModalContextProvider>
+                <SingleContextProvider>
+                  <GlobalProvider>
+                    <SingleMessageProvider>
+                      <GlobalStyle />
+                      <App />
+                    </SingleMessageProvider>
+                  </GlobalProvider>
+                </SingleContextProvider>
+              </ModalContextProvider>
+            </AuthProvider>
+          </TableProvider>
         </BulkRechargeContextProvider>
       </Router>
     </>,

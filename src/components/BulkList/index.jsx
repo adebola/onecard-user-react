@@ -131,44 +131,88 @@ const BulkList = () => {
             <div>Total - #{formatBalance(totalPrice)}</div>
             <Send
               onClick={async () => {
-                // setShowModal(true);
+                setShowModal(true);
                 switch (auto.rechargeType) {
                   case 1:
-                    makeBulkRecharge(bulkData);
+                    try {
+                      await makeBulkRecharge(bulkData);
+                      Swal.fire({
+                        icon: "success",
+                        title: "SUCCESS",
+                        text: `Your auto bulk request was submitted successfully.`,
+                        confirmButtonColor: "var(--btn-color)",
+                      }).then(() => {
+                        setShowModal(false);
+                        resetForm();
+                        setBulkRecharges([]);
+                      });
+                    } catch (error) {
+                      Swal.fire({
+                        icon: "error",
+                        iconColor: "#F27474",
+                        title: "Error",
+                        text: error.response.data.message,
+                        confirmButtonColor: "var(--btn-color)",
+                      }).then(() => {
+                        setShowModal(false);
+                      });
+                    }
                     break;
                   case 2:
-                    makeScheduleRecharge(bulkData);
+                    try {
+                      await makeScheduleRecharge(bulkData);
+                      Swal.fire({
+                        icon: "success",
+                        title: "SUCCESS",
+                        text: `Your scheduled bulk request was submitted successfully.`,
+                        confirmButtonColor: "var(--btn-color)",
+                      }).then(() => {
+                        setShowModal(false);
+                        resetForm();
+                        setBulkRecharges([]);
+                      });
+                    } catch (error) {
+                      Swal.fire({
+                        icon: "error",
+                        iconColor: "#F27474",
+                        title: "Error",
+                        text: error.response.data.message,
+                        confirmButtonColor: "var(--btn-color)",
+                      }).then(() => {
+                        setShowModal(false);
+                      });
+                    }
                     break;
                   case 3:
-                    makeAutoRechargeRequest(bulkData);
+                    try {
+                      await makeAutoRechargeRequest(bulkData);
+                      Swal.fire({
+                        icon: "success",
+                        title: "SUCCESS",
+                        text: `Your auto bulk request was submitted successfully.`,
+                        confirmButtonColor: "var(--btn-color)",
+                      }).then(() => {
+                        setShowModal(false);
+                        resetForm();
+                        setBulkRecharges([]);
+                      });
+                    } catch (error) {
+                      Swal.fire({
+                        icon: "error",
+                        iconColor: "#F27474",
+                        title: "Error",
+                        text: error.response.data.message,
+                        confirmButtonColor: "var(--btn-color)",
+                      }).then(() => {
+                        setShowModal(false);
+                      });
+                    }
+
                     break;
 
                   default:
                     break;
                 }
-                //   try {
-                //     await makeAutoRechargeRequest(bulkData);
-                //     Swal.fire({
-                //       icon: "success",
-                //       title: "SUCCESS",
-                //       text: `Your auto bulk request was submitted successfully.`,
-                //       confirmButtonColor: "var(--btn-color)",
-                //     }).then(() => {
-                //       setShowModal(false);
-                //       resetForm();
-                //       setBulkRecharges([]);
-                //     });
-                //   } catch (error) {
-                //     Swal.fire({
-                //       icon: "error",
-                //       iconColor: "#F27474",
-                //       title: "Error",
-                //       text: error.response.data.message,
-                //       confirmButtonColor: "var(--btn-color)",
-                //     }).then(() => {
-                //       setShowModal(false);
-                //     });
-                //   }
               }}
             >
               Submit

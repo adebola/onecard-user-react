@@ -9,7 +9,8 @@ import { header } from "./columns";
 import styled from "styled-components";
 import useDebounce from "../../../../hooks/useDebounce";
 import { Link } from "react-router-dom";
-import Table from "../Table";
+// import Table from "../Table";
+import Table from "../../../Table";
 
 const Container = styled.div`
   display: flex;
@@ -233,7 +234,9 @@ const HistoryBoxOne = ({ type }) => {
 
   return (
     <div>
-      {isEmpty && data.length === 0 && (
+      {/* <p>Hello</p> */}
+      <Table />
+      {/* {isEmpty && data.length === 0 && (
         <NoRecharge>
           You have no single recharge!. Create{" "}
           <SingleLink to="/single">single recharge.</SingleLink>
@@ -278,7 +281,7 @@ const HistoryBoxOne = ({ type }) => {
             <OkayButton onClick={() => setSingleDetail({})}>OK</OkayButton>
           </div>
         </Details>
-      )}
+      )} */}
     </div>
   );
 };

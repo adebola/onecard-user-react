@@ -67,6 +67,10 @@ const data = [
         id: 3,
         message: "Please enter a phone number",
       },
+      {
+        id: 4,
+        message: "Enter a valid phone number",
+      },
     ],
   },
   {
@@ -112,6 +116,14 @@ const data = [
       {
         id: 3,
         message: "Phone number is required!",
+      },
+      {
+        id: 4,
+        message: "Enter a valid phone number!",
+      },
+      {
+        id: 5,
+        message: "Enter a valid amount!",
       },
     ],
   },

@@ -74,8 +74,6 @@ const Pagination = ({
   const [firstIndex, setFirstIndex] = useState(0);
   const [secondIndex, setSecondIndex] = useState(5);
 
-  // console.log(pages, pageSize, entries, data);
-
   useEffect(() => {
     const awaitResponse = async (id) => {
       try {

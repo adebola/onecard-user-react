@@ -44,6 +44,11 @@ import { getMessage, getPayStackMessage } from "../../utils/messages.response";
 import { Tab } from "@headlessui/react";
 import ExcelFileUpload from "../Secured/Bulk/RechargeDetails/ExcelFileUpload";
 import UserServices from "../../services/UserServices";
+import {
+  getDataPlansNoAuth,
+  makeSingleRechargeNoAuth,
+} from "../../helper/noauthrequests";
+import { isAmount, isPhoneNumber } from "../../utils";
 
 const Card = ({ bulk, landing }) => {
   const tabs = [
@@ -343,7 +348,8 @@ const Card = ({ bulk, landing }) => {
         recipient,
         serviceCode,
         serviceCost,
-        paymentMode,
+        paymentMode: landing ? "paystack" : paymentMode,
+
         redirectUrl:
           paymentMode === "paystack"
             ? `${window.origin}${window.location.pathname}`
@@ -496,7 +502,7 @@ const Card = ({ bulk, landing }) => {
         name,
         serviceCode,
         productId,
-        paymentMode,
+        paymentMode: landing ? "paystack" : paymentMode,
         redirectUrl:
           paymentMode === "paystack"
             ? `${window.origin}${window.location.pathname}`
@@ -545,6 +551,16 @@ const Card = ({ bulk, landing }) => {
 
     // return;
 
+    if (selectedId === 1 && !isPhoneNumber(data.recipient)) {
+      return;
+    }
+    if (
+      selectedId === 2 &&
+      (!isPhoneNumber(data.recipient) || !isAmount(data.serviceCost))
+    ) {
+      return;
+    }
+
     switch (auto.rechargeType) {
       ////////////////////////////////
       case 1:
@@ -578,9 +594,13 @@ const Card = ({ bulk, landing }) => {
     }
 
     try {
-      const response = await makeSingleRecharge(data);
+      const request = landing
+        ? makeSingleRechargeNoAuth(data)
+        : makeSingleRecharge(data);
+      const response = await request;
       if (response.status === 200) {
         if (response.data.authorizationUrl) {
+          setShowModal(false);
           setAuthUrl(response.data.authorizationUrl);
           setAuthId(response.data.id);
           setId(response.data.id);
@@ -944,11 +964,16 @@ const Card = ({ bulk, landing }) => {
                         setSuccess(false);
                         setClicked(false);
                       }
+
                       if (id === activeId) return;
                       resetForm(type);
+
                       if (type.includes("-DATA")) {
+                        const request = landing
+                          ? getDataPlansNoAuth(type)
+                          : getDataPlans(type);
                         //get plans
-                        const plans = await getDataPlans(type);
+                        const plans = await request;
                         const data = plans.data.map((each) => {
                           return {
                             id: each.product_id,
@@ -961,7 +986,7 @@ const Card = ({ bulk, landing }) => {
                             }`,
                           };
                         });
-
+                        // setNoAuthDataPlans(data);
                         setDataPlans(data);
                       }
                     }}

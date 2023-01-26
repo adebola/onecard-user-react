@@ -1,4 +1,7 @@
-const isPhoneNumber = (phoneNumber) => {
+const isPhoneNumber = (phoneNumber, selectedId) => {
+  if (selectedId === 5 || selectedId === 6) {
+    return true;
+  }
   const secondDigits = ["9", "8", "7"];
   if (phoneNumber[0] !== "0" || !secondDigits.includes(phoneNumber[1])) {
     return false;

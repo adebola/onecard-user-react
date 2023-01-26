@@ -1,37 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
-import { SingleRechargeContext } from "../../context/SingleRechargeContext";
 import {
   Container,
   Grid,
   GridItem,
   GridText,
   Image,
+  Line,
+  LoginButton,
+  LoginContainer,
   SmallText,
   StyledTab,
-  Line,
-  LoginContainer,
   Text,
-  LoginButton,
 } from "./styles";
-import { data } from "../../data";
-import Form from "../Form";
-
-import PaymentMode from "../../components/PaymentMode";
-import Button from "../Button/normal";
-import WalletBalance from "../WalletBalance";
-import {
-  getDataPlans,
-  getSingleRechargeResponse,
-  makeAutoRechargeRequest,
-  makeScheduleRecharge,
-  makeSingleRecharge,
-} from "../../helper/requests";
-import Loader from "../Loader";
-import { convertDate } from "../../utils/dateformat";
-import { ModalContext } from "../../context/ModalProvider";
-import { GlobalContext } from "../../context/GlobalProvider";
-import { v4 } from "uuid";
-import { BulkRechargeContext } from "../../context/BulkRecharge";
+import React, { useContext, useEffect, useState } from "react";
 import {
   getAuthId,
   getIdDetails,
@@ -40,15 +20,35 @@ import {
   setAuthId,
   setIdDetails,
 } from "../../helper";
-import { getMessage, getPayStackMessage } from "../../utils/messages.response";
-import { Tab } from "@headlessui/react";
-import ExcelFileUpload from "../Secured/Bulk/RechargeDetails/ExcelFileUpload";
-import UserServices from "../../services/UserServices";
+import {
+  getDataPlans,
+  getSingleRechargeResponse,
+  makeAutoRechargeRequest,
+  makeScheduleRecharge,
+  makeSingleRecharge,
+} from "../../helper/requests";
 import {
   getDataPlansNoAuth,
   makeSingleRechargeNoAuth,
 } from "../../helper/noauthrequests";
+import { getMessage, getPayStackMessage } from "../../utils/messages.response";
 import { isAmount, isPhoneNumber } from "../../utils";
+
+import { BulkRechargeContext } from "../../context/BulkRecharge";
+import Button from "../Button/normal";
+import ExcelFileUpload from "../Secured/Bulk/RechargeDetails/ExcelFileUpload";
+import Form from "../Form";
+import { GlobalContext } from "../../context/GlobalProvider";
+import Loader from "../Loader";
+import { ModalContext } from "../../context/ModalProvider";
+import PaymentMode from "../../components/PaymentMode";
+import { SingleRechargeContext } from "../../context/SingleRechargeContext";
+import { Tab } from "@headlessui/react";
+import UserServices from "../../services/UserServices";
+import WalletBalance from "../WalletBalance";
+import { convertDate } from "../../utils/dateformat";
+import { data } from "../../data";
+import { v4 } from "uuid";
 
 const Card = ({ bulk, landing }) => {
   const tabs = [
@@ -551,7 +551,7 @@ const Card = ({ bulk, landing }) => {
 
     // return;
 
-    if (selectedId === 1 && !isPhoneNumber(data.recipient)) {
+    if (selectedId === 1 && !isPhoneNumber(data.recipient, activeId)) {
       return;
     }
     if (
@@ -588,7 +588,9 @@ const Card = ({ bulk, landing }) => {
 
   const instantRecharge = async (data) => {
     let price;
+
     setShowModal(true);
+
     if (data.productId && data.serviceCode.includes("-DATA")) {
       price = dataPlans.find((each) => each.id === data.productId).price;
     }

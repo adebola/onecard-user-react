@@ -60,7 +60,7 @@ const SearchBy = ({
   };
 
   return (
-    <div>
+    <div style={{ marginTop: "35px" }}>
       <div>
         <Select value={searchBy} onChange={handleChange}>
           {_options.map((each) => {

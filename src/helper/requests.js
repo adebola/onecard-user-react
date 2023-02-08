@@ -1,4 +1,5 @@
 import axios from "./axios";
+import axiosMultipart from "./axios-multipart";
 
 export const getBalance = () => {
   return axios.get("/account/balance");
@@ -67,7 +68,7 @@ export const makeBulkAutoRechargeWithExcel = (data) => {
 };
 
 export const makeBulkRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/bulk/file", data);
+  return axiosMultipart.post("/auth-recharge/bulk/file", data);
 };
 
 export const makeBulkScheduleRechargeWithExcel = (data) => {

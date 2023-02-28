@@ -64,7 +64,7 @@ export const getScheduledRechargeResponse = (id) => {
 };
 
 export const makeBulkAutoRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/auto/file", data);
+  return axiosMultipart.post("/auth-recharge/auto/file", data);
 };
 
 export const makeBulkRechargeWithExcel = (data) => {
@@ -72,7 +72,7 @@ export const makeBulkRechargeWithExcel = (data) => {
 };
 
 export const makeBulkScheduleRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/scheduled/file", data);
+  return axiosMultipart.post("/auth-recharge/scheduled/file", data);
 };
 
 export const makeCableRecharge = (data) => {

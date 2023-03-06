@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
-import styled from "styled-components";
-import { AiOutlineUpload } from "react-icons/ai";
-import Button from "../../../../Button/normal";
+import React, { useContext, useEffect, useState } from "react";
 import {
   makeBulkAutoRechargeWithExcel,
   makeBulkRechargeWithExcel,
   makeBulkScheduleRechargeWithExcel,
 } from "../../../../../helper/requests";
+
+import { AiOutlineUpload } from "react-icons/ai";
+import Button from "../../../../Button/normal";
 import { GlobalContext } from "../../../../../context/GlobalProvider";
-import { ModalContext } from "../../../../../context/ModalProvider";
-import { convertDate } from "../../../../../utils/dateformat";
 import Loader from "../../../../Loader";
+import { ModalContext } from "../../../../../context/ModalProvider";
 import { SingleRechargeContext } from "../../../../../context/SingleRechargeContext";
+import { convertDate } from "../../../../../utils/dateformat";
 import { getExcelMessage } from "../../../../../utils/messages.response";
+import styled from "styled-components";
 
 const Container = styled.form`
   margin-top: 40px;
@@ -132,6 +133,11 @@ const ExcelFileUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!selectedFile) {
+      setError("Please select a file to upload !");
+      return;
+    }
     let data = new FormData();
     setShowModal(true);
     switch (auto.rechargeType) {
@@ -141,7 +147,6 @@ const ExcelFileUpload = () => {
         try {
           await makeBulkRechargeWithExcel(data);
           setSelectedFile(null);
-
           getExcelMessage("Instant Recharge Successful", false, () =>
             setShowModal(false)
           );
@@ -176,8 +181,8 @@ const ExcelFileUpload = () => {
           title: rechargeName,
           daysOfWeek: weeklyAutoRecharge,
           daysOfMonth: monthlyAutoRecharge,
-          startDate,
-          endDate,
+          startDate: convertDate(startDate),
+          endDate: convertDate(endDate),
           paymentMode: "wallet",
         };
 
@@ -203,8 +208,6 @@ const ExcelFileUpload = () => {
         break;
     }
   };
-
-  const disabled = !selectedFile;
 
   return (
     <Container onSubmit={handleSubmit}>
@@ -233,7 +236,7 @@ const ExcelFileUpload = () => {
               </FileName>
             )}{" "}
           </SelectBox>
-          <Button name="Submit" disabled={disabled} type="submit" />
+          <Button name="Submit" type="submit" />
         </>
       </Inner>
     </Container>

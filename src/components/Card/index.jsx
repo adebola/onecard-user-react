@@ -549,14 +549,17 @@ const Card = ({ bulk, landing }) => {
       }
     }
 
-    // return;
-
-    if (selectedId === 1 && !isPhoneNumber(data.recipient, activeId)) {
+    if (
+      selectedId === 1 &&
+      !isPhoneNumber(data.recipient || data.recipients[0].recipient, activeId)
+    ) {
       return;
     }
+
     if (
       selectedId === 2 &&
-      (!isPhoneNumber(data.recipient) || !isAmount(data.serviceCost))
+      (!isPhoneNumber(data.recipient || data.recipients[0].recipient) ||
+        !isAmount(data.serviceCost || data.recipients[0].serviceCost))
     ) {
       return;
     }

@@ -1,4 +1,5 @@
 import axios from "./axios";
+import axiosMultipart from "./axios-multipart";
 
 export const getBalance = () => {
   return axios.get("/account/balance");
@@ -62,18 +63,16 @@ export const getScheduledRechargeResponse = (id) => {
   return axios.get(`/auth-recharge/scheduled/${id}`);
 };
 
+export const makeBulkAutoRechargeWithExcel = (data) => {
+  return axiosMultipart.post("/auth-recharge/auto/file", data);
+};
+
 export const makeBulkRechargeWithExcel = (data) => {
-  //todo
-  console.log(data);
-  return axios.post("/auth-recharge/bulk/file", data);
+  return axiosMultipart.post("/auth-recharge/bulk/file", data);
 };
 
 export const makeBulkScheduleRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/scheduled/file", data);
-};
-
-export const makeBulkAutoRechargeWithExcel = (data) => {
-  return axios.post("/auth-recharge/auto/file", data);
+  return axiosMultipart.post("/auth-recharge/scheduled/file", data);
 };
 
 export const makeCableRecharge = (data) => {

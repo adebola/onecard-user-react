@@ -1,37 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
-import { SingleRechargeContext } from "../../context/SingleRechargeContext";
 import {
   Container,
   Grid,
   GridItem,
   GridText,
   Image,
+  Line,
+  LoginButton,
+  LoginContainer,
   SmallText,
   StyledTab,
-  Line,
-  LoginContainer,
   Text,
-  LoginButton,
 } from "./styles";
-import { data } from "../../data";
-import Form from "../Form";
-
-import PaymentMode from "../../components/PaymentMode";
-import Button from "../Button/normal";
-import WalletBalance from "../WalletBalance";
-import {
-  getDataPlans,
-  getSingleRechargeResponse,
-  makeAutoRechargeRequest,
-  makeScheduleRecharge,
-  makeSingleRecharge,
-} from "../../helper/requests";
-import Loader from "../Loader";
-import { convertDate } from "../../utils/dateformat";
-import { ModalContext } from "../../context/ModalProvider";
-import { GlobalContext } from "../../context/GlobalProvider";
-import { v4 } from "uuid";
-import { BulkRechargeContext } from "../../context/BulkRecharge";
+import React, { useContext, useEffect, useState } from "react";
 import {
   getAuthId,
   getIdDetails,
@@ -40,10 +20,35 @@ import {
   setAuthId,
   setIdDetails,
 } from "../../helper";
+import {
+  getDataPlans,
+  getSingleRechargeResponse,
+  makeAutoRechargeRequest,
+  makeScheduleRecharge,
+  makeSingleRecharge,
+} from "../../helper/requests";
+import {
+  getDataPlansNoAuth,
+  makeSingleRechargeNoAuth,
+} from "../../helper/noauthrequests";
 import { getMessage, getPayStackMessage } from "../../utils/messages.response";
-import { Tab } from "@headlessui/react";
+import { isAmount, isPhoneNumber } from "../../utils";
+
+import { BulkRechargeContext } from "../../context/BulkRecharge";
+import Button from "../Button/normal";
 import ExcelFileUpload from "../Secured/Bulk/RechargeDetails/ExcelFileUpload";
+import Form from "../Form";
+import { GlobalContext } from "../../context/GlobalProvider";
+import Loader from "../Loader";
+import { ModalContext } from "../../context/ModalProvider";
+import PaymentMode from "../../components/PaymentMode";
+import { SingleRechargeContext } from "../../context/SingleRechargeContext";
+import { Tab } from "@headlessui/react";
 import UserServices from "../../services/UserServices";
+import WalletBalance from "../WalletBalance";
+import { convertDate } from "../../utils/dateformat";
+import { data } from "../../data";
+import { v4 } from "uuid";
 
 const Card = ({ bulk, landing }) => {
   const tabs = [
@@ -343,7 +348,8 @@ const Card = ({ bulk, landing }) => {
         recipient,
         serviceCode,
         serviceCost,
-        paymentMode,
+        paymentMode: landing ? "paystack" : paymentMode,
+
         redirectUrl:
           paymentMode === "paystack"
             ? `${window.origin}${window.location.pathname}`
@@ -496,7 +502,7 @@ const Card = ({ bulk, landing }) => {
         name,
         serviceCode,
         productId,
-        paymentMode,
+        paymentMode: landing ? "paystack" : paymentMode,
         redirectUrl:
           paymentMode === "paystack"
             ? `${window.origin}${window.location.pathname}`
@@ -543,7 +549,20 @@ const Card = ({ bulk, landing }) => {
       }
     }
 
-    // return;
+    if (
+      selectedId === 1 &&
+      !isPhoneNumber(data.recipient || data.recipients[0].recipient, activeId)
+    ) {
+      return;
+    }
+
+    if (
+      selectedId === 2 &&
+      (!isPhoneNumber(data.recipient || data.recipients[0].recipient) ||
+        !isAmount(data.serviceCost || data.recipients[0].serviceCost))
+    ) {
+      return;
+    }
 
     switch (auto.rechargeType) {
       ////////////////////////////////
@@ -572,15 +591,21 @@ const Card = ({ bulk, landing }) => {
 
   const instantRecharge = async (data) => {
     let price;
+
     setShowModal(true);
+
     if (data.productId && data.serviceCode.includes("-DATA")) {
       price = dataPlans.find((each) => each.id === data.productId).price;
     }
 
     try {
-      const response = await makeSingleRecharge(data);
+      const request = landing
+        ? makeSingleRechargeNoAuth(data)
+        : makeSingleRecharge(data);
+      const response = await request;
       if (response.status === 200) {
         if (response.data.authorizationUrl) {
+          setShowModal(false);
           setAuthUrl(response.data.authorizationUrl);
           setAuthId(response.data.id);
           setId(response.data.id);
@@ -944,11 +969,16 @@ const Card = ({ bulk, landing }) => {
                         setSuccess(false);
                         setClicked(false);
                       }
+
                       if (id === activeId) return;
                       resetForm(type);
+
                       if (type.includes("-DATA")) {
+                        const request = landing
+                          ? getDataPlansNoAuth(type)
+                          : getDataPlans(type);
                         //get plans
-                        const plans = await getDataPlans(type);
+                        const plans = await request;
                         const data = plans.data.map((each) => {
                           return {
                             id: each.product_id,
@@ -961,7 +991,7 @@ const Card = ({ bulk, landing }) => {
                             }`,
                           };
                         });
-
+                        // setNoAuthDataPlans(data);
                         setDataPlans(data);
                       }
                     }}

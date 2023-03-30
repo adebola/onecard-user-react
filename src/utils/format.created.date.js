@@ -1,4 +1,4 @@
-export const dateFormat = (params) => {
+export const dateFormat = (params, key) => {
   if (!params) return;
   const timeDate = params.split(" ");
 
@@ -6,12 +6,17 @@ export const dateFormat = (params) => {
     const formatTimeAndDate = timeDate[0].split("T");
     const time = convertTime(formatTimeAndDate[1]);
     const d = convertDate(formatTimeAndDate[0]);
+
+    if (key === "date") {
+      return d;
+    }
     return `${d} ${time}`;
   } else {
     const time = convertTime(timeDate[1]);
     const d = convertDate(timeDate[0]);
-
-    //   let yr, month, day;
+    if (key === "date") {
+      return d;
+    }
     return `${d} ${time}`;
   }
 };

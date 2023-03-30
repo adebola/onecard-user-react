@@ -38,7 +38,6 @@ const getPayStackMessage = ({ msg, error, rm, data, type }) => {
 
   if (!error) {
     const msg = type === 1 ? "completed" : "submitted";
-
     Swal.fire({
       title: msg,
       text: `Your ${serviceCode} ${
@@ -65,4 +64,28 @@ const getPayStackMessage = ({ msg, error, rm, data, type }) => {
   }
 };
 
-export { getMessage, getPayStackMessage };
+const getExcelMessage = (msg, err, setShowModal) => {
+  if (err) {
+    Swal.fire({
+      title: "Error",
+      iconColor: "#F27474",
+      text: msg,
+      icon: "error",
+      confirmButtonText: "OK",
+    }).then(() => {
+      setShowModal();
+    });
+  } else {
+    Swal.fire({
+      title: msg,
+      text: "Your excel file has been uploaded successfully.",
+      icon: "success",
+      confirmButtonText: "OK",
+      confirmButtonColor: "var(--btn-color)",
+    }).then(() => {
+      setShowModal();
+    });
+  }
+};
+
+export { getMessage, getPayStackMessage, getExcelMessage };

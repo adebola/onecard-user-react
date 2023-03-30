@@ -21,7 +21,6 @@ const App = () => {
         <Route exact path="/*" element={<Landing />} />
       </Route>
       <Route element={<PrivateRoute />}>
-        {/* <Route exact path='/*' element={<Secured />} /> */}
         <Route exact path="/dashboard" element={<Dashboard />} />
         <Route exact path="/single" element={<Single />} />
         <Route exact path="/bulk" element={<Bulk />} />

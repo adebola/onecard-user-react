@@ -6,6 +6,7 @@ const _kc =
     : new Keycloak("/keycloak.json");
 
 const initKC = (onAuthenticatedCallback) => {
+
   _kc
     .init({
       onLoad: "check-sso",

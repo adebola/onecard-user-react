@@ -1,8 +1,8 @@
 {
-	"realm": "devbj",
-	"auth-server-url": "http://localhost:8080/auth/",
-	"ssl-required": "external",
-	"resource": "devbj-js",
-	"public-client": true,
-	"confidential-port": 0
+  "realm": "onecard",
+  "auth-server-url": "http://localhost:8080/auth/",
+  "ssl-required": "external",
+  "resource": "public-client",
+  "public-client": true,
+  "confidential-port": 0
 }

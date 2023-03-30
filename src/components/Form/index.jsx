@@ -1,9 +1,11 @@
+import { BoldText, Select } from "./styles";
 import React, { useContext } from "react";
-import { SingleRechargeContext } from "../../context/SingleRechargeContext";
+import { isAmount, isPhoneNumber } from "../../utils";
+
 import Error from "../Error";
 import Input from "../Input";
 import Loading from "../Loading";
-import { BoldText, Select } from "./styles";
+import { SingleRechargeContext } from "../../context/SingleRechargeContext";
 
 const Form = () => {
   const {
@@ -13,6 +15,7 @@ const Form = () => {
     dataPlans,
     clicked,
     selectedId,
+    activeId,
     errors,
     setSuccess,
     setErrorMessage,
@@ -65,9 +68,9 @@ const Form = () => {
             <option value="">Select a data plan</option>
           )}
 
-          {data.map((each) => {
+          {data.map((each, index) => {
             return (
-              <option key={each.id} value={each.value}>
+              <option key={index} value={each.value}>
                 {each.label}
               </option>
             );
@@ -82,11 +85,24 @@ const Form = () => {
         {isActive ? (
           <BoldText>Card number</BoldText>
         ) : (
-          <BoldText>Phone number</BoldText>
+          <BoldText>
+            {activeId === 5 || activeId === 6
+              ? "Account number"
+              : "Phone number"}
+          </BoldText>
         )}
         <Input
-          error={clicked && recipient === ""}
-          placeholder={isActive ? "9998876789" : "Enter a phone number"}
+          error={
+            (clicked && recipient === "") ||
+            (clicked && !isPhoneNumber(recipient, activeId))
+          }
+          placeholder={
+            isActive
+              ? "9998876789"
+              : activeId === 5 || activeId === 6
+              ? "Enter account number"
+              : "Enter a phone number"
+          }
           value={recipient}
           maxLength={isActive ? "13" : "13"}
           onChange={({ target }) => {
@@ -105,7 +121,15 @@ const Form = () => {
             });
           }}
         />
-        <Error msg={clicked && recipient === "" && errors[2].message} />
+        <Error
+          msg={
+            (clicked && recipient === "" && errors[2].message) ||
+            (clicked &&
+              !isPhoneNumber(recipient, activeId) &&
+              errors[3]?.message)
+          }
+        />
+
         {selectedId === 3 && recipient.length === 13 && <Loading />}
       </div>
     );
@@ -158,7 +182,10 @@ const Form = () => {
       <div>
         <BoldText>Amount</BoldText>
         <Input
-          error={clicked && serviceCost === ""}
+          error={
+            (clicked && serviceCost === "") ||
+            (clicked && !isAmount(serviceCost))
+          }
           placeholder="Enter amount"
           value={serviceCost}
           onChange={({ target }) => {
@@ -168,10 +195,18 @@ const Form = () => {
             });
           }}
         />
-        <Error msg={serviceCost === "" && errors[1].message} />
+        <Error
+          msg={
+            (serviceCost === "" && errors[1].message) ||
+            (!isAmount(serviceCost) && errors[4]?.message)
+          }
+        />
         <BoldText>Phone number</BoldText>
         <Input
-          error={clicked && recipient === ""}
+          error={
+            (clicked && recipient === "") ||
+            (clicked && !isPhoneNumber(recipient))
+          }
           placeholder="Enter a phone number"
           value={recipient}
           onChange={({ target }) => {
@@ -181,7 +216,12 @@ const Form = () => {
             });
           }}
         />
-        <Error msg={recipient === "" && errors[2].message} />
+        <Error
+          msg={
+            (clicked && recipient === "" && errors[2].message) ||
+            (clicked && !isPhoneNumber(recipient) && errors[3]?.message)
+          }
+        />
       </div>
     );
   }

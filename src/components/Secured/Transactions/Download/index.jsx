@@ -79,7 +79,6 @@ const DownloadWithDataRange = () => {
     };
     try {
       const response = await transactionExcelDownload(formattedData);
-      console.log(response);
       saveAs(response.data, "transactions.xlsx");
     } catch (error) {
       const message = error.response.data.message;

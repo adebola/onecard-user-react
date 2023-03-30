@@ -1,15 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
-import styled from "styled-components";
-import { AiOutlineUpload } from "react-icons/ai";
-import Button from "../../../../Button/normal";
+import React, { useContext, useEffect, useState } from "react";
 import {
   makeBulkAutoRechargeWithExcel,
   makeBulkRechargeWithExcel,
   makeBulkScheduleRechargeWithExcel,
 } from "../../../../../helper/requests";
+
+import { AiOutlineUpload } from "react-icons/ai";
+import Button from "../../../../Button/normal";
 import { GlobalContext } from "../../../../../context/GlobalProvider";
+import Loader from "../../../../Loader";
 import { ModalContext } from "../../../../../context/ModalProvider";
+import { SingleRechargeContext } from "../../../../../context/SingleRechargeContext";
 import { convertDate } from "../../../../../utils/dateformat";
+import { getExcelMessage } from "../../../../../utils/messages.response";
+import styled from "styled-components";
 
 const Container = styled.form`
   margin-top: 40px;
@@ -94,25 +98,18 @@ const Link = styled.a`
   color: var(--text-color);
 `;
 
-const ExcelFileUpload = ({ rechargeId }) => {
+const ExcelFileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
-  const [clicked, setClicked] = useState(false);
+  const { showModal, setShowModal } = useContext(SingleRechargeContext);
 
-  const { setResponseMessage, startDate, endDate } = useContext(GlobalContext);
-  const {
-    setResponseModal,
-    setErrorMessage,
-    setErrorModal,
-    rechargeName,
-    monthlyAutoRecharge,
-    weeklyAutoRecharge,
-  } = useContext(ModalContext);
+  const { startDate, endDate } = useContext(GlobalContext);
+  const { rechargeName, monthlyAutoRecharge, weeklyAutoRecharge } =
+    useContext(ModalContext);
 
   useEffect(() => {
     const getName = (name) => {
       const accepted = ["xlsx", "xls"];
-
       const splitItem = name.split(".");
       const lastItem = splitItem[splitItem.length - 1];
       if (accepted.includes(lastItem)) {
@@ -132,98 +129,100 @@ const ExcelFileUpload = ({ rechargeId }) => {
     setSelectedFile(e.target.files[0]);
   };
 
+  const auto = useContext(ModalContext);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let data = new FormData();
-    setClicked(true);
 
-    if (rechargeId === 3) {
-      const auto = {
-        title: rechargeName,
-        daysOfWeek: weeklyAutoRecharge,
-        daysOfMonth: monthlyAutoRecharge,
-        startDate,
-        endDate,
-        paymentMode: "wallet",
-      };
-
-      const dataForm = new Blob([JSON.stringify(auto)], {
-        type: "application/json",
-      });
-
-      data.append("auto", dataForm);
-      data.append("file", selectedFile);
-
-      try {
-        // const fresponse = await axios.post("https://httpbin.org/post", data);
-        // console.log(fresponse);
-
-        const response = await makeBulkAutoRechargeWithExcel(data);
-        console.log(response);
-      } catch (error) {
-        console.log(error);
-      }
-
+    if (!selectedFile) {
+      setError("Please select a file to upload !");
       return;
     }
+    let data = new FormData();
+    setShowModal(true);
+    switch (auto.rechargeType) {
+      case 1:
+        data.append("file", selectedFile);
 
-    if (rechargeId === 1) {
-      data.append("file", selectedFile);
-      try {
-        await makeBulkRechargeWithExcel(data);
-        setResponseModal(true);
-        setResponseMessage("Bulk Excel Successful");
-        setSelectedFile(null);
-      } catch (error) {
-        const message = error.response.data.message;
-        setErrorModal(true);
-        setErrorMessage(message);
-        setSelectedFile(null);
-      }
-    } else {
-      const scheduledDate = convertDate(startDate);
-      const dateData = new Blob([JSON.stringify({ scheduledDate })], {
-        type: "application/json",
-      });
-      data.append("file", selectedFile);
-      data.append("date", dateData);
+        try {
+          await makeBulkRechargeWithExcel(data);
+          setSelectedFile(null);
+          getExcelMessage("Instant Recharge Successful", false, () =>
+            setShowModal(false)
+          );
+        } catch (error) {
+          const message = error.response.data.message;
+          getExcelMessage(message, true, () => setShowModal(false));
+        }
+        break;
 
-      // makeBulkScheduleRechargeWithExcel;
-      try {
-        await makeBulkScheduleRechargeWithExcel(data);
-        setResponseModal(true);
-        setResponseMessage("Bulk Excel Successful");
-        setSelectedFile(null);
-      } catch (error) {
-        const message = error.response.data.message;
-        setErrorModal(true);
-        setErrorMessage(message);
-        setSelectedFile(null);
-      }
+      case 2:
+        const scheduledDate = convertDate(startDate);
+
+        const dateData = new Blob([JSON.stringify({ scheduledDate })], {
+          type: "application/json",
+        });
+        data.append("file", selectedFile);
+        data.append("date", dateData);
+
+        try {
+          await makeBulkScheduleRechargeWithExcel(data);
+          setSelectedFile(null);
+          getExcelMessage("Schedule Recharge Successful", false, () =>
+            setShowModal(false)
+          );
+        } catch (error) {
+          const message = error.response.data.message;
+          getExcelMessage(message, true, () => setShowModal(false));
+        }
+        break;
+      case 3:
+        const auto = {
+          title: rechargeName,
+          daysOfWeek: weeklyAutoRecharge,
+          daysOfMonth: monthlyAutoRecharge,
+          startDate: convertDate(startDate),
+          endDate: convertDate(endDate),
+          paymentMode: "wallet",
+        };
+
+        const dataForm = new Blob([JSON.stringify(auto)], {
+          type: "application/json",
+        });
+
+        data.append("auto", dataForm);
+        data.append("file", selectedFile);
+
+        try {
+          await makeBulkAutoRechargeWithExcel(data);
+          setSelectedFile(null);
+          getExcelMessage("Auto Recharge Successful", false, () =>
+            setShowModal(false)
+          );
+        } catch (error) {
+          const message = error.response.data.message;
+          getExcelMessage(message, true, () => setShowModal(false));
+        }
+        break;
+      default:
+        break;
     }
-    setClicked(false);
   };
-
-  const disabled = !selectedFile;
 
   return (
     <Container onSubmit={handleSubmit}>
       <Inner>
+        {showModal && <Loader />}
         <>
           <SelectBox>
             <ButtonAndLink>
-              <FileContainer className={clicked && "disabled"}>
+              <FileContainer>
                 <FileUploadIcon>
                   <AiOutlineUpload size={19} fill="white" />
                 </FileUploadIcon>
                 <FileText>Choose an excel file</FileText>
 
-                <FileUpload
-                  disabled={selectedFile?.name}
-                  type="file"
-                  onChange={handleChange}
-                  name="file"
-                />
+                <FileUpload type="file" onChange={handleChange} name="file" />
               </FileContainer>
               <Link href="https://delifrost.s3.amazonaws.com/bulk-request.xlsx">
                 Download excel sample
@@ -237,7 +236,7 @@ const ExcelFileUpload = ({ rechargeId }) => {
               </FileName>
             )}{" "}
           </SelectBox>
-          <Button type="submit" disabled={disabled} name="Submit" />
+          <Button name="Submit" type="submit" />
         </>
       </Inner>
     </Container>

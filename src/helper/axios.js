@@ -2,6 +2,7 @@ import axios from 'axios';
 import UserServices from '../services/UserServices';
 
 let BASE_URL = 'https://onecard01.factorialsystems.io';
+// let BASE_URL = 'http://localhost:8081';
 
 const instance = axios.create({
 	baseURL: `${BASE_URL}/api/v1`,

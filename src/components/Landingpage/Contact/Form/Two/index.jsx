@@ -58,14 +58,14 @@ const Two = () => {
         <ImageContainer>
           <Image src={form} alt="form" />
         </ImageContainer>
-        <TextBox>
+        {/* <TextBox>
           <Icon>
             <MdOutlineLocationOn />
           </Icon>
           <SmallText>
             No 6 Obukun Street, Ilupeju Estate, off Coker Road, Lagos, Nigeria.
           </SmallText>
-        </TextBox>
+        </TextBox> */}
         <TextBox>
           <Icon>
             <BiPhoneCall />

@@ -78,7 +78,6 @@ const Pagination = ({
   const query = new URLSearchParams(window.location.search).get("id");
 
   useEffect(() => {
-    console.log("running");
     const awaitResponse = async () => {
       try {
         const response = await singleAutoRechargePlanBulk(id, active);

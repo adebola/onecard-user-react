@@ -10,6 +10,8 @@
 
 # production
 /build
+/.vscode
+/.firebase
 
 # misc
 .DS_Store

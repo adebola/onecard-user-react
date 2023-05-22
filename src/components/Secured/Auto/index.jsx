@@ -1,28 +1,30 @@
-import { Link, useNavigate } from "react-router-dom";
-import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import React, { useContext, useEffect, useState } from "react";
+import SmallText from "../../SmallText";
+import TopHeader from "../../TopNav";
+import Wrapper from "../../Wrapper";
+import HamburgerMenu from "../../Hamburger";
+import MenuList from "../../Hamburger/Menulist";
+import styled from "styled-components";
+import Container from "../../Container";
+
+import { Link, useNavigate } from "react-router-dom";
+
+import { MdEdit, MdDeleteOutline, MdAdd } from "react-icons/md";
+import { monthly, weekly } from "./data";
+
+import DatePicker from "react-datepicker";
 import {
   deleteSingleAutoRechargePlan,
   editSingleAutoRechargePlan,
   getAutoRechargePlans,
   getSingleAutoRechargePlan,
 } from "../../../helper/requests";
-import { monthly, weekly } from "./data";
-
-import AutoModal from "./Modal";
-import Container from "../../Container";
-import DatePicker from "react-datepicker";
-import HamburgerMenu from "../../Hamburger";
-import MenuList from "../../Hamburger/Menulist";
-import { ModalContext } from "../../../context/ModalProvider";
-import Select from "./Select";
-import { SingleContext } from "../../../context/SingleRecharge";
-import SmallText from "../../SmallText";
-import TopHeader from "../../TopNav";
-import Wrapper from "../../Wrapper";
-import { convertDate } from "../../../utils/dateformat";
 import { convertNewDate } from "../../../utils/format.start.end";
-import styled from "styled-components";
+import Select from "./Select";
+import { ModalContext } from "../../../context/ModalProvider";
+import { convertDate } from "../../../utils/dateformat";
+import AutoModal from "./Modal";
+import { SingleContext } from "../../../context/SingleRecharge";
 
 const One = styled.div`
   width: 50%;
@@ -403,6 +405,8 @@ const AutoRecharge = () => {
       }
     };
 
+    recharge.forEach(r => {r.id = null});
+
     const data = {
       title: name,
       startDate: isNum ? convertDate(startDate) : startDate,
@@ -415,12 +419,7 @@ const AutoRecharge = () => {
         boldText === "Monthly" && monthlyAutoRecharge.length === 0
           ? autoRecharge
           : monthlyAutoRecharge,
-      recipients: recharge.map((e) => {
-        if (e.id) {
-          delete e.id;
-        }
-        return e;
-      }),
+      recipients: recharge
     };
 
     try {

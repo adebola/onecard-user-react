@@ -387,7 +387,7 @@ const Card = ({ bulk, landing }) => {
           paymentMode,
           daysOfMonth: auto.monthlyAutoRecharge,
           daysOfWeek: auto.weeklyAutoRecharge,
-          endDate: convertDate(endDate),
+          endDate: endDate ? convertDate(endDate) : null,
           startDate: convertDate(startDate),
           title: auto.rechargeName,
         };

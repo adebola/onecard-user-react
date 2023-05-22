@@ -5,7 +5,7 @@ import { ImDownload } from "react-icons/im";
 import DatePicker from "react-datepicker";
 import {
   downloadAutoTransactions,
-  downloadBulkTransactions,
+  downloadBulkTransactions, downloadExcelAuto,
   downloadScheduledTransactions,
   downloadSingleTransactions,
 } from "../../../helper/requests";
@@ -71,7 +71,9 @@ const Icon = styled.div`
   margin-right: 7px;
 `;
 
-const DownloadWithDateRange = ({ value }) => {
+// Added id for Bulk Individual requests, that don't have date ranges
+// but have parent bulk id
+const DownloadWithDateRange = ({ value, id }) => {
   const [data, setData] = useState({
     startDate: null,
     endDate: null,
@@ -82,34 +84,49 @@ const DownloadWithDateRange = ({ value }) => {
       startDate: data.startDate === null ? null : convertDate(data.startDate),
       endDate: data.endDate === null ? null : convertDate(data.endDate),
     };
-    console.log(formattedData);
+
     switch (value) {
       case "single":
         const singleRequest = async () => {
           try {
             const { data } = await downloadSingleTransactions(formattedData);
-            // const blob = new Blob([data], { type: "application/vnd.ms-excel" });
+            // const blob = new Blob([data], { type:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             saveAs(data, "single_transaction.xlsx");
           } catch (error) {
             const message = error.response.data.message;
             console.log(message);
           }
         };
-        singleRequest();
+        await singleRequest();
         break;
       case "bulk":
         const bulkRequest = async () => {
           try {
             const { data } = await downloadBulkTransactions(formattedData);
-            const blob = new Blob([data], { type: "application/vnd.ms-excel" });
+            const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             saveAs(blob, "bulk_transaction.xlsx");
           } catch (error) {
             const message = error.response.data.message;
             console.log(message);
           }
         };
-        bulkRequest();
+        await bulkRequest();
         break;
+
+      case "bulk-individual":
+        const bulkIndividualRequest = async () => {
+          try {
+            const { data } = await downloadExcelAuto(id);
+            const blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            saveAs(blob, "bulk_individuals.xlsx");
+          } catch( error) {
+            const message = error.response.data.message;
+            console.log(message);
+          }
+        };
+        await bulkIndividualRequest();
+        break;
+
       case "scheduled":
         const scheduledRequest = async () => {
           try {
@@ -121,7 +138,7 @@ const DownloadWithDateRange = ({ value }) => {
             console.log(message);
           }
         };
-        scheduledRequest();
+        await scheduledRequest();
         break;
 
       case "auto":
@@ -135,7 +152,7 @@ const DownloadWithDateRange = ({ value }) => {
             console.log(message);
           }
         };
-        autoRequest();
+        await autoRequest();
         break;
       default:
         break;

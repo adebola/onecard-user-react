@@ -127,7 +127,7 @@ const DetailsTable = ({
             setPages={setDetailedPages}
             bulkId={bulkId}
           />
-          <DownloadWithDateRange value="bulk" />
+          <DownloadWithDateRange value="bulk-individual" id = {bulkId}/>
         </div>
       )}
     </div>

@@ -20,7 +20,6 @@ const Form = () => {
     setSuccess,
     setErrorMessage,
   } = useContext(SingleRechargeContext);
-
   const isActive = selectedId === 3;
 
   const data = isActive

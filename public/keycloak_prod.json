@@ -1,0 +1,7 @@
+{
+  "realm": "onecard",
+  "auth-server-url": "https://auth.factorialsystems.io/auth",
+  "ssl-required": "external",
+  "resource": "public-client",
+  "public-client": true
+}

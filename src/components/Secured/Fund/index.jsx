@@ -28,7 +28,8 @@ const Input = styled.input`
   width: 340px;
   margin: 10px 0;
   height: 50px;
-  border: 1px solid var(--text-color);
+  border: ${({ error }) =>
+    error ? `1px solid red` : `1px solid var(--text-color)`};
   border-radius: 4px;
   outline: none;
   padding: 0.5rem;
@@ -62,6 +63,7 @@ const Fund = () => {
   const { balance, setBalance } = useContext(GlobalContext);
 
   const [toggle, setToggle] = useState(false);
+  const [clicked, setClicked] = useState(false);
   const [tabOption, setTabOption] = useState(1);
   const [userID, setUserID] = useState("");
   const [amount, setAmount] = useState("");
@@ -121,8 +123,12 @@ const Fund = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setClicked(true);
 
-    if (!amount || !userID) {
+    if (!amount) {
+      setErrorTwoMessage("This field is required");
+    }
+    if (!userID) {
       setErrorMessage("This field is required");
       return;
     }
@@ -154,6 +160,7 @@ const Fund = () => {
             onChange={({ target }) => {
               setUserID(target.value);
             }}
+            error={clicked && !userID}
             type="tel"
             maskChar=" "
             value={userID}
@@ -174,6 +181,7 @@ const Fund = () => {
             onChange={({ target }) => {
               setAmount(target.value);
             }}
+            error={clicked && !amount}
             type="tel"
             maskChar=" "
             value={amount}

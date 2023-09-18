@@ -113,6 +113,7 @@ const RenderKYC = () => {
   };
 
   const handleStepThree = async () => {
+    if (!bvn) return;
     setShowModal(true);
     try {
       const res = await verifyBVN(bvn);

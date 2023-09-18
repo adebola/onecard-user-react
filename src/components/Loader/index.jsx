@@ -1,7 +1,9 @@
 import React, { useContext } from "react";
+
 import { ScaleLoader } from "react-spinners";
-import styled from "styled-components";
 import { SingleRechargeContext } from "../../context/SingleRechargeContext";
+import styled from "styled-components";
+
 const Container = styled.div`
   height: 100vh;
   width: 100%;
@@ -15,11 +17,11 @@ const Container = styled.div`
   left: 0;
 `;
 
-const Loader = () => {
+const Loader = ({ children }) => {
   const { showModal } = useContext(SingleRechargeContext);
   return (
     <Container>
-      {showModal && <ScaleLoader color="var(--text-color)" />}
+      {showModal ? <ScaleLoader color="var(--text-color)" /> : children}
     </Container>
   );
 };
